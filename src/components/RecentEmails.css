@@ -1,0 +1,23 @@
+.deliverability-meter {
+    width: 100%;
+  }
+  
+  .deliverability-meter-bar {
+    background: linear-gradient(
+      90deg,
+      #549ee7 0%,
+      #549ee7 calc(5% - 0.0625rem),
+      #fff calc(5% - 0.0625rem),
+      #fff calc(5% + 0.0625rem),
+      #ff5f7d calc(5% + 0.0625rem),
+      #ff5f7d calc(10% - 0.0625rem),
+      #fff calc(10% - 0.0625rem),
+      #fff calc(10% + 0.0625rem),
+      #ffcb60 calc(10% + 0.0625rem),
+      #ffcb60 calc(80% - 0.0625rem),
+      #fff calc(80% - 0.0625rem),
+      #fff calc(80% + 0.0625rem),
+      #3ed299 calc(80% + 0.0625rem),
+      #3ed299 100%
+    );
+  }

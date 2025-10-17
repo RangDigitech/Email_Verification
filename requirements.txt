@@ -1,0 +1,19 @@
+# Minimal recommended Python dependencies for tooling and small scripts
+# NOTE: this project contains no Python source files. These packages are
+# recommended for development and small utility scripts you may add later.
+# Adjust or regenerate with `pip freeze > requirements.txt` after installing
+# actual project dependencies.
+
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Testing & linting
+pytest>=7.4.0
+flake8>=6.1.0
+
+# Formatting & import sorting
+black>=24.4.0
+isort>=5.12.0
+
+# Git hooks
+pre-commit>=3.4.0
