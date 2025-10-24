@@ -33,12 +33,11 @@ export default function RecentEmails({ limit = 12 }) {
 
   // Helper function to get score badge color
   const getScoreBadgeStyle = (score) => {
-    if (score >= 80) return { bg: '#d1fae5', color: '#065f46' };
-    if (score >= 50) return { bg: '#fef3c7', color: '#92400e' };
-    return { bg: '#fee2e2', color: '#991b1b' };
+    if (score >= 80) return { bg: '#0d6e46', color: '#fff' };
+    if (score >= 50) return { bg: '#b88b02', color: '#fff' };
+    return { bg: '#993c3c', color: '#fff' };
   };
 
-  // Helper function to get score gauge color
   const getScoreColor = (score) => {
     if (score >= 80) return '#3ed299';
     if (score >= 10) return '#ffcb60';
@@ -46,15 +45,9 @@ export default function RecentEmails({ limit = 12 }) {
     return '#549ee7';
   };
 
-  const handleEmailClick = (email) => {
-    setSelectedEmail(email);
-  };
+  const handleEmailClick = (email) => setSelectedEmail(email);
+  const handleBackClick = () => setSelectedEmail(null);
 
-  const handleBackClick = () => {
-    setSelectedEmail(null);
-  };
-
-  // Filter rows based on selection
   const displayRows = selectedEmail ? [selectedEmail] : rows;
 
   return (
@@ -71,7 +64,8 @@ export default function RecentEmails({ limit = 12 }) {
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          margin: 0
+          margin: 0,
+          color: 'black'
         }}>
           Recent Verifications
           <span style={{
@@ -81,7 +75,7 @@ export default function RecentEmails({ limit = 12 }) {
             width: 20,
             height: 20,
             borderRadius: '50%',
-            background: '#fb923c',
+            background: 'black',
             color: '#fff',
             fontSize: 12,
             fontWeight: 600
@@ -95,16 +89,13 @@ export default function RecentEmails({ limit = 12 }) {
             onClick={handleBackClick}
             style={{
               padding: '8px 16px',
-              background: '#fb923c',
-              color: '#fff',
+              background: 'white',
+              color: 'black',
               border: 'none',
               borderRadius: 8,
               fontSize: 14,
               fontWeight: 500,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6
+              cursor: 'pointer'
             }}
           >
             ← Back to List
@@ -113,13 +104,15 @@ export default function RecentEmails({ limit = 12 }) {
       </div>
       
       <div style={{ 
-        background: '#fff', 
+        background: '#101010', 
         borderRadius: 12, 
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        boxShadow: '0 0 10px rgba(0,0,0,0.6)',
         overflow: 'hidden'
       }}>
         {displayRows.map((r, index) => {
           const originalIndex = rows.findIndex(row => row.id === r.id);
+          const active = selectedEmail?.id === r.id;
+
           return (
             <div key={r.id}>
               {/* Email List Item */}
@@ -129,14 +122,15 @@ export default function RecentEmails({ limit = 12 }) {
                   display: 'flex',
                   alignItems: 'center',
                   padding: '16px 20px',
-                  borderBottom: selectedEmail ? 'none' : '1px solid #f3f4f6',
+                  borderBottom: '1px solid #1f1f1f',
                   gap: 16,
                   cursor: selectedEmail ? 'default' : 'pointer',
-                  background: '#fff',
+                  background: active ? '#181818' : '#101010',
+                  color: '#fff',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => !selectedEmail && (e.currentTarget.style.background = '#f9fafb')}
-                onMouseLeave={(e) => !selectedEmail && (e.currentTarget.style.background = '#fff')}
+                onMouseEnter={(e) => !active && (e.currentTarget.style.background = '#181818')}
+                onMouseLeave={(e) => !active && (e.currentTarget.style.background = '#101010')}
               >
                 {/* Number Badge */}
                 <div style={{
@@ -146,8 +140,8 @@ export default function RecentEmails({ limit = 12 }) {
                   width: 40,
                   height: 40,
                   borderRadius: '50%',
-                  background: '#fb923c',
-                  color: '#fff',
+                  background: 'white',
+                  color: 'black',
                   fontSize: 16,
                   fontWeight: 600,
                   flexShrink: 0
@@ -160,11 +154,11 @@ export default function RecentEmails({ limit = 12 }) {
                   flex: 1, 
                   fontSize: 15,
                   fontWeight: 500,
-                  color: '#111827',
                   minWidth: 0,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  color: '#fff'
                 }}>
                   {r.email}
                 </div>
@@ -182,15 +176,9 @@ export default function RecentEmails({ limit = 12 }) {
                   fontWeight: 500,
                   flexShrink: 0
                 }}>
-                  {r.state === 'Undeliverable' && (
-                    <span style={{ fontSize: 16 }}>✕</span>
-                  )}
-                  {r.state === 'Deliverable' && (
-                    <span style={{ fontSize: 16 }}>✓</span>
-                  )}
-                  {r.state === 'Risky' && (
-                    <span style={{ fontSize: 16 }}>⚠</span>
-                  )}
+                  {r.state === 'Undeliverable' && <span style={{ fontSize: 16, color:'#fff' }}>✕</span>}
+                  {r.state === 'Deliverable' && <span style={{ fontSize: 16, color:'#fff' }}>✓</span>}
+                  {r.state === 'Risky' && <span style={{ fontSize: 16, color:'#fff' }}>⚠</span>}
                   {r.state}
                 </div>
 
@@ -198,8 +186,8 @@ export default function RecentEmails({ limit = 12 }) {
                 <div style={{
                   padding: '6px 14px',
                   borderRadius: 20,
-                  background: r.score !== null ? getScoreBadgeStyle(r.score).bg : '#f3f4f6',
-                  color: r.score !== null ? getScoreBadgeStyle(r.score).color : '#6b7280',
+                  background: getScoreBadgeStyle(r.score).bg,
+                  color: getScoreBadgeStyle(r.score).color,
                   fontSize: 14,
                   fontWeight: 600,
                   flexShrink: 0,
@@ -211,12 +199,13 @@ export default function RecentEmails({ limit = 12 }) {
               </div>
 
               {/* Expanded Detail View */}
-              {selectedEmail?.id === r.id && (
+              {active && (
                 <div style={{ 
                   padding: '24px 20px',
-                  background: '#fafafa'
+                  background: '#181818',
+                  color: '#fff'
                 }}>
-                  {/* Advanced Score Gauge */}
+                  {/* Score Gauge */}
                   {r.score !== null && (
                     <div style={{ marginBottom: 24 }}>
                       <ScoreGauge score={r.score} getScoreColor={getScoreColor} />
@@ -224,79 +213,36 @@ export default function RecentEmails({ limit = 12 }) {
                   )}
 
                   {/* General Section */}
-                  <div style={{ marginBottom: 24 }}>
-                    <h3 style={{ 
-                      fontSize: 16, 
-                      fontWeight: 600, 
-                      marginBottom: 12,
-                      color: '#111827'
-                    }}>
-                      General
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <DetailRow label="Full Name" value={r.full_name || '—'} />
-                      <DetailRow label="Gender" value={r.gender || '—'} />
-                      <DetailRow 
-                        label="State" 
-                        value={r.state}
-                        badge={true}
-                        badgeStyle={getStateBadgeStyle(r.state)}
-                      />
-                      <DetailRow 
-                        label="Reason" 
-                        value={r.reason || 'accepted_email'}
-                        pill={true}
-                      />
-                      <DetailRow 
-                        label="Domain" 
-                        value={r.email?.split('@')[1] || '—'}
-                        link={true}
-                      />
-                    </div>
-                  </div>
+                  <Section title="General">
+                    <DetailRow label="Full Name" value={r.full_name || '—'} />
+                    <DetailRow label="Gender" value={r.gender || '—'} />
+                    <DetailRow label="State" value={r.state} badge={true} badgeStyle={getStateBadgeStyle(r.state)} />
+                    <DetailRow label="Reason" value={r.reason || 'accepted_email'} pill={true} />
+                    <DetailRow label="Domain" value={r.email?.split('@')[1] || '—'} link={true} />
+                  </Section>
 
                   {/* Attributes Section */}
-                  <div style={{ marginBottom: 24 }}>
-                    <h3 style={{ 
-                      fontSize: 16, 
-                      fontWeight: 600, 
-                      marginBottom: 12,
-                      color: '#111827'
-                    }}>
-                      Attributes
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <DetailRow label="Free" value={r.is_free ? 'Yes' : 'No'} icon="💰" badge={r.is_free} />
-                      <DetailRow label="Role" value={r.is_role ? 'Yes' : 'No'} icon="👤" />
-                      <DetailRow label="Disposable" value={r.is_disposable ? 'Yes' : 'No'} icon="😊" />
-                      <DetailRow label="Accept All" value={r.accept_all ? 'Yes' : 'No'} icon="🔍" />
-                      <DetailRow label="Tag" value={r.tag || '—'} icon="🏷️" />
-                      <DetailRow label="Numerical Characters" value={r.numerical_chars || '0'} icon="🔢" badge={r.numerical_chars > 0} />
-                      <DetailRow label="Alphabetical Characters" value={r.alphabetical_chars || '0'} icon="🔤" />
-                      <DetailRow label="Unicode Symbols" value={r.unicode_symbols || '0'} icon="🌐" />
-                      <DetailRow label="Mailbox Full" value={r.mailbox_full ? 'Yes' : 'No'} icon="📧" />
-                      <DetailRow label="No Reply" value={r.no_reply ? 'Yes' : 'No'} icon="🚫" />
-                      <DetailRow label="Secure Email Gateway" value={r.secure_gateway ? 'Yes' : 'No'} icon="🔒" />
-                    </div>
-                  </div>
+                  <Section title="Attributes">
+                    <DetailRow label="Free" value={r.is_free ? 'Yes' : 'No'} icon="💰" />
+                    <DetailRow label="Role" value={r.is_role ? 'Yes' : 'No'} icon="👤" />
+                    <DetailRow label="Disposable" value={r.is_disposable ? 'Yes' : 'No'} icon="😊" />
+                    <DetailRow label="Accept All" value={r.accept_all ? 'Yes' : 'No'} icon="🔍" />
+                    <DetailRow label="Tag" value={r.tag || '—'} icon="🏷️" />
+                    <DetailRow label="Numerical Characters" value={r.numerical_chars || '0'} icon="🔢" />
+                    <DetailRow label="Alphabetical Characters" value={r.alphabetical_chars || '0'} icon="🔤" />
+                    <DetailRow label="Unicode Symbols" value={r.unicode_symbols || '0'} icon="🌐" />
+                    <DetailRow label="Mailbox Full" value={r.mailbox_full ? 'Yes' : 'No'} icon="📧" />
+                    <DetailRow label="No Reply" value={r.no_reply ? 'Yes' : 'No'} icon="🚫" />
+                    <DetailRow label="Secure Email Gateway" value={r.secure_gateway ? 'Yes' : 'No'} icon="🔒" />
+                  </Section>
 
                   {/* Mail Server Section */}
-                  <div>
-                    <h3 style={{ 
-                      fontSize: 16, 
-                      fontWeight: 600, 
-                      marginBottom: 12,
-                      color: '#111827'
-                    }}>
-                      Mail Server
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <DetailRow label="SMTP Provider" value={r.smtp_provider || '---'} />
-                      <DetailRow label="MX Record" value={r.mx_record || '---'} />
-                      <DetailRow label="Implicit MX Record" value={r.implicit_mx_record ? 'Yes' : 'No'} />
-                      <DetailRow label="Verified On" value={r.timestamp || '—'} />
-                    </div>
-                  </div>
+                  <Section title="Mail Server">
+                    <DetailRow label="SMTP Provider" value={r.smtp_provider || '---'} />
+                    <DetailRow label="MX Record" value={r.mx_record || '---'} />
+                    <DetailRow label="Implicit MX" value={r.implicit_mx_record ? 'Yes' : 'No'} />
+                    <DetailRow label="Verified On" value={r.timestamp || '—'} />
+                  </Section>
 
                 </div>
               )}
@@ -308,9 +254,27 @@ export default function RecentEmails({ limit = 12 }) {
   );
 }
 
-// Score Gauge Component with Inverse Water Drop Shape
+/* Smaller reusable section */
+function Section({ title, children }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <h3 style={{ 
+        fontSize: 16, 
+        fontWeight: 600, 
+        marginBottom: 12,
+        color: '#fff'
+      }}>
+        {title}
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Score Gauge Component
 function ScoreGauge({ score, getScoreColor }) {
-  // Calculate positions for markers
   const markers = [
     { value: 0, label: '0' },
     { value: 5, label: '5' },
@@ -321,11 +285,7 @@ function ScoreGauge({ score, getScoreColor }) {
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Color Bar */}
-      <div style={{ 
-        position: 'relative',
-        marginBottom: 8
-      }}>
+      <div style={{ position: 'relative', marginBottom: 8 }}>
         <div className="deliverability-meter">
           <div className="deliverability-meter-bar" style={{
             width: '100%',
@@ -334,7 +294,6 @@ function ScoreGauge({ score, getScoreColor }) {
             position: 'relative',
             overflow: 'visible'
           }}>
-            {/* Inverse Water Drop Indicator */}
             <div style={{
               position: 'absolute',
               left: `${score}%`,
@@ -344,20 +303,13 @@ function ScoreGauge({ score, getScoreColor }) {
               height: 0,
               borderLeft: '8px solid transparent',
               borderRight: '8px solid transparent',
-              borderTop: `14px solid ${getScoreColor(score)}`,
-              zIndex: 10,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))'
+              borderTop: `14px solid ${getScoreColor(score)}`
             }} />
           </div>
         </div>
       </div>
 
-      {/* Score Markers Below Bar */}
-      <div style={{ 
-        position: 'relative',
-        height: 24,
-        marginTop: 8
-      }}>
+      <div style={{ position: 'relative', height: 24, marginTop: 8 }}>
         {markers.map((marker) => (
           <div
             key={marker.value}
@@ -371,7 +323,7 @@ function ScoreGauge({ score, getScoreColor }) {
             <div style={{
               fontSize: 12,
               fontWeight: 600,
-              color: '#6b7280'
+              color: '#aaa'
             }}>
               {marker.label}
             </div>
@@ -382,7 +334,8 @@ function ScoreGauge({ score, getScoreColor }) {
   );
 }
 
-// Helper component for detail rows
+
+// Helper detail row component
 function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
   return (
     <div style={{ 
@@ -392,16 +345,17 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
       fontSize: 14
     }}>
       <div style={{ 
-        color: '#6b7280',
+        color: '#bbb',
         display: 'flex',
         alignItems: 'center',
         gap: 6
       }}>
-        {icon && <span>{icon}</span>}
+        {icon && <span style={{filter: 'brightness(1.7)'}}>{icon}</span>}
         {label}
       </div>
-      <div style={{ 
-        color: '#111827',
+
+      <div style={{
+        color: '#fff',
         fontWeight: 500,
         display: 'flex',
         alignItems: 'center',
@@ -422,27 +376,12 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
           <span style={{
             padding: '4px 10px',
             borderRadius: 12,
-            background: '#e0e7ff',
-            color: '#4f46e5',
-            fontSize: 12,
-            fontWeight: 500
+            background: '#3b3c8f',
+            color: '#fff',
+            fontSize: 12
           }}>
             {value}
           </span>
-        ) : badge && typeof badge === 'boolean' ? (
-          <>
-            {value}
-            <span style={{
-              padding: '2px 8px',
-              borderRadius: 10,
-              background: '#e0e7ff',
-              color: '#4f46e5',
-              fontSize: 11,
-              fontWeight: 600
-            }}>
-              PAID
-            </span>
-          </>
         ) : link ? (
           <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{
             color: '#fb923c',

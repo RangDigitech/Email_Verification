@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaGoogle, FaGithub, FaLinkedinIn, FaFacebookF, FaApple } from "react-icons/fa";
 import "./Auth.css";
 import { login } from "./api"; // UPDATED: Import the real login function from your api.js
+import { oauthStartUrl } from "./api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -60,11 +61,24 @@ export default function Login() {
         <p>Sign in to continue your journey with Verifier</p>
 
         <div className="social-login">
-          <button className="social-btn" title="Sign in with Google"><FaGoogle /></button>
-          <button className="social-btn" title="Sign in with GitHub"><FaGithub /></button>
-          <button className="social-btn" title="Sign in with LinkedIn"><FaLinkedinIn /></button>
-          <button className="social-btn" title="Sign in with Facebook"><FaFacebookF /></button>
-          <button className="social-btn" title="Sign in with Apple"><FaApple /></button>
+          <button
+            className="social-btn"
+            onClick={() => { window.location.href = oauthStartUrl("google"); }}
+            title="Continue with Google"
+          >
+            <FaGoogle />
+          </button>
+
+          <button
+            className="social-btn"
+            onClick={() => { window.location.href = oauthStartUrl("github"); }}
+            title="Continue with GitHub"
+          >
+            <FaGithub />
+          </button>
+          {/* <button className="social-btn" title="Sign in with LinkedIn" disabled><FaLinkedinIn /></button>
+          <button className="social-btn" title="Sign in with Facebook" disabled><FaFacebookF /></button>
+          <button className="social-btn" title="Sign in with Apple" disabled><FaApple /></button> */}
         </div>
 
         <p className="divider">OR SIGN IN USING EMAIL</p>

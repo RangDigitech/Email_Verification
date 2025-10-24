@@ -134,14 +134,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #E95729;
+  background: #000000;
   transform: translateY(100%);
   transition: transform 0.3s ease;
   z-index: -1;
 }
 
 .social-btn:hover {
-  border-color: #E95729;
+  border-color: #000000;
   color: #ffffff;
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(233, 87, 41, 0.25);
@@ -211,7 +211,7 @@
 }
 
 .auth-form input:focus {
-  border-color: #E95729;
+  border-color: #000000;
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(233, 87, 41, 0.1);
 }
@@ -225,7 +225,7 @@
 ============================== */
 .submit-btn {
   width: 100%;
-  background: #E95729;
+  background: #000000;
   border: none;
   color: #ffffff;
   padding: 12px;
@@ -236,13 +236,13 @@
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
   margin-top: 4px;
-  box-shadow: 0 4px 12px rgba(233, 87, 41, 0.3);
+  /* box-shadow: 0 4px 12px rgba(233, 87, 41, 0.3); */
 }
 
 .submit-btn:hover {
-  background: #ff6f40;
+  background: black;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(233, 87, 41, 0.4);
+  /* box-shadow: 0 6px 20px rgba(233, 87, 41, 0.4); */
 }
 
 .submit-btn:active {
@@ -260,7 +260,7 @@
 }
 
 .switch-auth a {
-  color: #E95729;
+  color: #000000;
   text-decoration: none;
   font-weight: 700;
   transition: all 0.3s ease;
@@ -274,12 +274,12 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: #E95729;
+  background: #000000;
   transition: width 0.3s ease;
 }
 
 .switch-auth a:hover {
-  color: #ff6f40;
+  color: black;
 }
 
 .switch-auth a:hover::after {

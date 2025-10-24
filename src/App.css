@@ -34,8 +34,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 20px 80px;
-  background: #E95729;
-  box-shadow: 0 4px 12px rgba(233, 87, 41, 0.15);
+  background: #000000;
+  box-shadow: 0 4px 12px rgba(124, 77, 255, 0.15);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -43,7 +43,7 @@ body {
 }
 
 .navbar:hover {
-  box-shadow: 0 6px 16px rgba(233, 87, 41, 0.25);
+  box-shadow: 0 6px 16px rgba(124, 77, 255, 0.25);
 }
 
 .nav-logo {
@@ -51,7 +51,7 @@ body {
   align-items: center;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #000000;
+  color: #ffffff !important;
   letter-spacing: 0.3px;
   cursor: pointer;
   transition: transform 0.3s ease;
@@ -78,7 +78,7 @@ body {
 
 .nav-links li {
   cursor: pointer;
-  color: #000000;
+  color: #ffffff !important;
   transition: all 0.3s ease;
   position: relative;
   padding: 8px 0;
@@ -105,6 +105,11 @@ body {
   width: 100%;
 }
 
+.nav-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .nav-actions {
   display: flex;
   gap: 12px;
@@ -122,29 +127,25 @@ body {
 }
 
 .login-btn {
-  background: transparent;
-  color: #000000;
-  border: 2px solid #000000;
+  background: #ffffff;
+  color: #ffffff !important;
+  border: 2px solid #ffffff;
 }
 
 .login-btn:hover {
-  background: #000000;
+  background: #ffffff;
   color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .signup-btn {
-  background: #000000;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .signup-btn:hover {
   background: #ffffff;
-  color: #E95729;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  color: #000000;
 }
 
 /* ==============================
@@ -156,7 +157,7 @@ body {
   justify-content: center;
   min-height: 88vh;
   text-align: center;
-  background: var(--buzz-orange);
+  background: var(--brand-primary);
   position: relative;
   padding: 40px 20px;
 }
@@ -262,13 +263,13 @@ body {
 }
 
 .verify-box input:focus {
-  border-color: #E95729;
+  border-color: #000000;
   background: #ffffff;
 }
 
 .verify-btn {
-  background: #E95729;
-  border: 2px solid #E95729;
+  background: #000000;
+  border: 2px solid #000000;
   border-left: none;
   border-radius: 0 12px 12px 0;
   color: #ffffff;
@@ -315,8 +316,8 @@ body {
 }
 
 .verify-btn:hover {
-  background: #ff6f40;
-  border-color: #ff6f40;
+  background: #000000;
+  border-color: #000000;
 }
 
 .verify-btn:active {
@@ -390,7 +391,7 @@ body {
   transform: translateY(-50%);
   width: 0;
   height: 2px;
-  background: #E95729;
+  background: #000000;
   transition: width 0.3s ease;
 }
 
@@ -629,7 +630,7 @@ body {
 
   .verify-btn {
     border-radius: 12px;
-    border: 2px solid #E95729;
+    border: 2px solid #000000;
     width: 100%;
     margin-top: 12px;
     
@@ -783,26 +784,26 @@ body {
 }
 
 /* ===========================================
-   BUZZ MIDDLE SECTIONS (Bulk / Metrics / Features / Integrations)
+   AI EMAIL VERIFIER MIDDLE SECTIONS (Bulk / Metrics / Features / Integrations)
    =========================================== */
    :root {
-    --buzz-orange: #E95729;
-    --buzz-dark: #34302F;
-    --buzz-muted: #6f6b69;
-    --buzz-bg: #ffffff;
+    --brand-primary: #000000;
+    --brand-dark: #34302F;
+    --brand-muted: #6f6b69;
+    --brand-bg: #ffffff;
   }
   
   /* Universal section styling */
   .section {
     padding: 60px 7%;
-    background: var(--buzz-bg);
-    color: var(--buzz-dark);
+    background: var(--brand-bg);
+    color: var(--brand-dark);
   }
   
   .section h2 {
     font-size: 2.2rem;
     font-weight: 800;
-    color: var(--buzz-dark);
+    color: var(--brand-dark);
     margin-bottom: 16px;
     position: relative;
   }
@@ -812,7 +813,7 @@ body {
     position: absolute;
     width: 60px;
     height: 3px;
-    background: var(--buzz-orange);
+    background: var(--brand-primary);
     bottom: -8px;
     left: 0;
     border-radius: 4px;
@@ -822,12 +823,12 @@ body {
     font-size: 1.3rem;
     font-weight: 700;
     margin: 28px 0 14px;
-    color: var(--buzz-dark);
+    color: var(--brand-dark);
   }
   
   .section p,
   .section .muted {
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
     font-size: 1.05rem;
     line-height: 1.7;
   }
@@ -857,7 +858,7 @@ body {
   }
   
   .primary-cta {
-    background: var(--buzz-orange);
+    background: var(--brand-primary);
     color: #fff;
     padding: 14px 28px;
     border: none;
@@ -870,8 +871,8 @@ body {
   
   .primary-cta:hover {
     transform: translateY(-3px);
-    background: #ff6d3d;
-    box-shadow: 0 12px 26px rgba(233, 87, 41, 0.25);
+    background: rgb(2, 2, 100);
+    box-shadow: 0 12px 26px rgba(71, 91, 244, 0.25);
   }
   
   /* Donut chart mock */
@@ -892,7 +893,7 @@ body {
     width: 220px;
     height: 220px;
     border-radius: 50%;
-    background: conic-gradient(var(--buzz-orange) 0% 60%, #efefef 60%);
+    background: conic-gradient(var(--brand-primary) 0% 60%, #efefef 60%);
     display: grid;
     place-items: center;
     position: relative;
@@ -920,12 +921,12 @@ body {
   
   .donut-label {
     font-size: 0.9rem;
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
   }
   
   .donut-legend {
     margin-top: 16px;
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
     font-size: 0.95rem;
   }
   .donut-legend.modern {
@@ -957,7 +958,7 @@ body {
     text-align: center;
     display: inline-block;
   }
-  .badge-deliverable { background: var(--buzz-orange); }
+  .badge-deliverable { background: var(--brand-primary); }
   .badge-undeliverable { background: #999; }
   .badge-risky { background: #f4a261; }
   .badge-unknown { background: #ccc; color: #333; }
@@ -970,7 +971,7 @@ body {
     display: inline-block;
     margin-right: 6px;
   }
-  .legend-dot.deliverable { background: var(--buzz-orange); }
+  .legend-dot.deliverable { background: var(--brand-primary); }
   .legend-dot.undeliverable { background: #999; }
   .legend-dot.risky { background: #f4a261; }
   .legend-dot.unknown { background: #ccc; }
@@ -1006,7 +1007,7 @@ body {
     overflow: visible;
   }
   .insights-image {
-    width: 110%;
+    width: 90%;
     max-width: none;
     height: auto;
     display: block;
@@ -1034,23 +1035,23 @@ body {
     border-radius: 8px;
     background: #fafafa;
     font-size: 0.95rem;
-    color: var(--buzz-dark);
+    color: var(--brand-dark);
     border-left: 3px solid transparent;
   }
   
   .inbox-item.header {
     font-weight: 700;
     background: rgba(233,87,41,0.08);
-    border-left-color: var(--buzz-orange);
+    border-left-color: var(--brand-primary);
   }
   
   .inbox-item.lighter {
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
   }
   
   .inbox-footer {
     font-size: 0.85rem;
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
     margin-top: 10px;
   }
 
@@ -1089,7 +1090,7 @@ body {
      GUARANTEES SECTION
   ========================= */
   .guarantees-section {
-    background: var(--buzz-orange);
+    background: var(--brand-primary);
     color: #ffffff;
   }
   .guarantees-section h2 {
@@ -1185,19 +1186,22 @@ body {
   }
   
   .feature-icon {
-    color: var(--buzz-orange);
+    color: var(--brand-primary);
     margin-bottom: 10px;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
   }
   
   .feature-title {
     font-weight: 700;
     font-size: 1rem;
-    color: var(--buzz-dark);
+    color: var(--brand-dark);
     margin-bottom: 6px;
   }
   
   .feature-desc {
-    color: var(--buzz-muted);
+    color: var(--brand-muted);
     font-size: 0.95rem;
     line-height: 1.6;
   }
@@ -1249,7 +1253,7 @@ body {
   ========================= */
   .cta-section {
     text-align: center;
-    background: var(--buzz-orange);
+    background: var(--brand-primary);
   }
   
   .cta-inner h2 {

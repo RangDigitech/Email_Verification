@@ -1,0 +1,330 @@
+/* Buy Credits Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #2a2828;
+  border-radius: 16px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-close svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pricing-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  min-height: 500px;
+}
+
+/* Left Panel - Credit Selection */
+.credit-selector {
+  flex: 1;
+  color: #ffffff;
+}
+
+.credit-selector h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #000000;
+}
+
+.email-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #ffffff;
+  background: #1a1a1a;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.email-input::placeholder {
+  color: #888;
+}
+
+.email-input:focus::placeholder {
+  color: #666;
+}
+
+.selector-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+.credit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .credit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .credit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.credit-option {
+  padding: 16px;
+  border: 2px solid #333333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #1a1a1a;
+  text-align: center;
+}
+
+.credit-option:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.credit-option.active {
+  border-color: #ffffff;
+  background: #ffffff;
+}
+
+.credit-option.active .amount {
+  color: #000000;
+}
+
+.credit-option.active .label {
+  color: #000000;
+}
+
+.credit-option .amount {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.credit-option .label {
+  font-size: 0.85rem;
+  color: #cccccc;
+}
+
+.credit-option .price {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.credit-option.active .price {
+  color: #000000;
+}
+
+/* Right Panel - Pricing Card */
+.pricing-card {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  flex: 0 0 350px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid #333333;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.toggle-label {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+  color: #ffffff;
+}
+
+.toggle-label.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+
+.toggle-switch.monthly::after {
+  transform: translateX(24px);
+}
+
+.price-display {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.price-details {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.price-detail {
+  text-align: center;
+}
+
+.price-detail .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #ffffff;
+}
+
+.price-detail .label {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  color: #cccccc;
+}
+
+.cta-button {
+  width: 100%;
+  padding: 1rem;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 1rem;
+}
+
+.cta-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+}
+
+.free-credits {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  color: #cccccc;
+}
+
+.benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefits li {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.benefits li::before {
+  content: '✓';
+  color: #ffffff;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pricing-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .pricing-card {
+    flex: none;
+  }
+  
+  .credit-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    margin: 10px;
+    max-height: calc(100vh - 20px);
+  }
+}

@@ -12,13 +12,15 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 import Pricing from "./Pricing";
+import AboutUs from "./components/AboutUs";
 import { Navigate } from 'react-router-dom';
 import { isAuthenticated, getUser, logout } from './auth';
 import ProtectedRoute from './ProtectedRoute'; // Import the new component
+import Hero from "./Hero";
 
 export default function App() {
   return (
-    <Router>
+    <Router>  
       <MainApp />
     </Router>
   );
@@ -29,7 +31,8 @@ function MainApp() {
   const hideNavbarAndFooter =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
-    location.pathname === "/dashboard";
+    location.pathname === "/dashboard" ||
+    location.pathname === "/about";
 
   return (
     <div className="app">
@@ -47,6 +50,7 @@ function MainApp() {
         </Route>
 
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<AboutUs />} />
       </Routes>
 
       {!hideNavbarAndFooter && <Footer />}
@@ -61,13 +65,13 @@ function Navbar() {
     <nav className="navbar">
       <div className="nav-logo">
         <img src="/src/assets/email_logo.png" alt="Verifier Logo" className="logo" />
-        <span>Buzz</span>
+        <span>AI Email Verifier</span>
       </div>
       <ul className="nav-links">
-        <li>Products</li>
+        {/* <li>Products</li> */}
         <li><Link to="/pricing">Pricing</Link></li>
-        <li>Integrations</li>
-        <li>Developers</li>
+        {/* <li>Integrations</li> */}
+        {/* <li>Developers</li> */}
       </ul>
       <div className="nav-actions">
         {!user ? (
@@ -93,16 +97,18 @@ function Navbar() {
 function Home() {
   return (
     <>
-      <section className="hero">
+      {/* <section className="hero">
         <div className="hero-content">
           <h1>The Ultimate Email Verification</h1>
           <p>
             Ensure your emails reach the inbox. Our real-time verification cleans
             your lists, reduces bounces, and protects your sender reputation.
+            skjabsashlnaelknfLKWnlekfnlkWnlkvnwklv
           </p>
           <AnimatedEmailDemo />
         </div>
-      </section>
+      </section> */}
+      <Hero />
 
       {/* Bulk Verification */}
       <section className="section bulk-section">
@@ -129,7 +135,9 @@ function Home() {
             </ul>
 
             <div style={{ marginTop: 18 }}>
-              <button className="primary-cta">Get Started Free</button>
+              <Link to="/signup">
+                <button className="primary-cta">Get Started Free</button>
+              </Link>
             </div>
           </div>
 
@@ -150,7 +158,7 @@ function Home() {
               const dp = (duplicate / total) * 360;
 
               const gradient = `conic-gradient(
-                var(--buzz-orange) 0deg ${d}deg,
+                var(--brand-primary) 0deg ${d}deg,
                 #999 ${d}deg ${d + u}deg,
                 #f4a261 ${d + u}deg ${d + u + r}deg,
                 #ccc ${d + u + r}deg ${d + u + r + un}deg,
@@ -207,7 +215,7 @@ function Home() {
         <div className="section-inner insights-grid">
           <div className="insights-media" aria-hidden>
             <div className="insights-visual">
-              <img src="/src/eMAIL.png" alt="Inbox Placements Visual" className="insights-image" />
+              <img src="/src/image.png" alt="Inbox Placements Visual" className="insights-image" />
             </div>
           </div>
 
@@ -226,7 +234,9 @@ function Home() {
             </ul>
 
             <div style={{ marginTop: 18 }}>
-              <button className="primary-cta">Get Started Free</button>
+              <Link to="/signup">
+                <button className="primary-cta">Get Started Free</button>
+              </Link>
             </div>
           </div>
         </div>
@@ -494,8 +504,10 @@ function Home() {
       {/* CTA Join */}
       <section className="section cta-section">
         <div className="section-inner cta-inner">
-          <h2>Join the world's largest companies that rely on Buzz to protect their sender reputation</h2>
-          <button className="primary-cta large">Get Started Free</button>
+          <h2>Join the world's largest companies that rely on AI Email Verifier to protect their sender reputation</h2>
+          <Link to="/signup">
+            <button className="primary-cta large">Get Started Free</button>
+          </Link>
           <p className="muted small">Includes 250 free credits</p>
         </div>
       </section>
@@ -563,7 +575,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer-grid">
         <div className="footer-section">
-          <h3>📧 Buzz</h3>
+          <h3>📧 AI Email Verifier</h3>
           <p>The best way to verify emails.</p>
         </div>
 
@@ -579,7 +591,7 @@ function Footer() {
         <div className="footer-section">
           <h4>Company</h4>
           <ul>
-            <li>About Us</li>
+            <li><Link to="/about">About Us</Link></li>
             <li>Contact</li>
             <li>Careers</li>
           </ul>

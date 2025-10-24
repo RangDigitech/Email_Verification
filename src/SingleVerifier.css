@@ -4,12 +4,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background .2s ease, color .2s ease;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f8f9fa;
-  color: #1f2937;
+  background: black;
+  color: #e5e7eb;
 }
 
 .single-verifier {
@@ -18,12 +19,14 @@ body {
   padding: 40px 20px;
 }
 
+/* MAIN RESULT BOX */
 .verifier-card {
-  background: white;
+  background: #121212;
   border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
   margin-bottom: 24px;
+  color: white;
 }
 
 .verifier-header {
@@ -33,57 +36,58 @@ body {
 .verifier-header h2 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
-}
-
-.verifier-form {
-  width: 100%;
+  color: white;
 }
 
 .input-group {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: stretch; /* ✅ CHANGED: ensures both elements stretch to same height */
 }
 
 .email-input {
   flex: 1;
   padding: 12px 16px;
   height: 44px;
-  border: 1.5px solid #e5e7eb;
+  background: #1c1c1c;
+  border: 1.5px solid #303030;
   border-radius: 8px;
   font-size: 15px;
-  font-family: 'Inter', sans-serif;
-  transition: all 0.2s ease;
+  color: #fff;
   outline: none;
+  transition: all 0.2s ease;
+}
+
+.email-input::placeholder {
+  color: #888;
 }
 
 .email-input:focus {
-  border-color: #fb923c;
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+  border-color: white;
 }
 
 .verify-button {
   height: 44px;
   padding: 0 18px;
-  background: #fb923c;
-  color: white;
-  border: none;
+  background: #fffefe;
+  color: rgb(0, 0, 0);
+  border: 1.5px solid #222;
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* ✅ ADDED: prevents button from shrinking */
+  margin: 0; /* ✅ ADDED: removes any default margin */
+  line-height: 1; /* ✅ ADDED: ensures consistent line height */
 }
 
 .verify-button:hover:not(:disabled) {
-  background: #f97316;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+  background: #9c9b9b;
 }
 
 .verify-button:disabled {
@@ -105,8 +109,8 @@ body {
 }
 
 .api-error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #4c0000;
+  color: #ffbaba;
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -116,13 +120,48 @@ body {
 
 .recent-wrapper {
   margin-top: 24px;
+  color: #fff;
 }
 
+/* ✅ RESULT CARD (MATCHES RecentEmails DARK THEME) */
 .result-card {
-  background: white;
+  background: #000 !important;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none !important;
+  border: none !important;
   overflow: hidden;
+  color: #fff !important;
+}
+
+/* ✅ Rows inside card */
+.result-card > div {
+  background: #000 !important;
+  color: #fff !important;
+  border-bottom: 1px solid #111 !important;
+}
+
+/* ✅ Hover — slightly lighter so user sees interaction */
+.result-card > div:hover {
+  background: #111 !important;
+}
+
+/* ✅ Title, icons, labels */
+.result-card span,
+.result-card h3,
+.result-card strong,
+.result-card p,
+.result-card div {
+  color: #fff !important;
+}
+
+/* Fix nested text */
+.result-card p {
+  color: #e6e6e6;
+}
+
+/* Pills / score chips remain bright */
+.result-card .badge {
+  color: white !important;
 }
 
 .fade-in {
@@ -130,14 +169,8 @@ body {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Deliverability Meter */
@@ -148,30 +181,58 @@ body {
 .deliverability-meter-bar {
   background: linear-gradient(
     90deg,
-    #549ee7 0%,
-    #549ee7 calc(5% - 0.0625rem),
-    #fff calc(5% - 0.0625rem),
-    #fff calc(5% + 0.0625rem),
+    #549ee7 calc(0% - 0.0625rem),
+    #000 calc(5% - 0.0625rem),
+    #000 calc(5% + 0.0625rem),
     #ff5f7d calc(5% + 0.0625rem),
     #ff5f7d calc(10% - 0.0625rem),
-    #fff calc(10% - 0.0625rem),
-    #fff calc(10% + 0.0625rem),
+    #000 calc(10% - 0.0625rem),
+    #000 calc(10% + 0.0625rem),
     #ffcb60 calc(10% + 0.0625rem),
     #ffcb60 calc(80% - 0.0625rem),
-    #fff calc(80% - 0.0625rem),
-    #fff calc(80% + 0.0625rem),
+    #000 calc(80% - 0.0625rem),
+    #000 calc(80% + 0.0625rem),
     #3ed299 calc(80% + 0.0625rem),
     #3ed299 100%
   );
 }
 
+/* Marker text color */
+.deliverability-meter div {
+  color: #bbb;
+}
+
+/* MOBILE FIXES */
 @media (max-width: 768px) {
   .input-group {
     flex-direction: column;
   }
-  
+
   .verify-button {
     width: 100%;
     justify-content: center;
   }
+
+  html, body,
+  #root,
+  .app,
+  .main-wrapper,
+  .content-wrapper {
+    background: #000 !important;
+    color: #fff !important;
+  }
+
+  .result-card {
+    background: #121212 !important;
+  }
+  /* === DARK-MODE SCORE BADGE FIX === */
+
+.result-card div[style*="border-radius: 20px"],
+.result-card span[style*="border-radius: 20px"] {
+  background: #dfdf0e !important; /* dark warm yellow */
+  color: #000 !important;         /* black text */
+  border: 1px solid #443a00 !important;
+}
+
+
 }

@@ -52,9 +52,10 @@ export default function SingleVerifier() {
   };
 
   const getScoreBadgeStyle = (score) => {
-    if (score >= 80) return { bg: '#d1fae5', color: '#065f46' };
-    if (score >= 50) return { bg: '#fef3c7', color: '#92400e' };
-    return { bg: '#fee2e2', color: '#991b1b' };
+    // COPY — Same logic as RecentEmails dark version
+    if (score >= 80) return { bg: '#1b3c33', color: '#8ff7ce' };
+    if (score >= 50) return { bg: '#3c321b', color: '#ffdd8a' };
+    return { bg: '#3c1b1b', color: '#ff8a8a' };
   };
 
   const getScoreColor = (score) => {
@@ -122,7 +123,7 @@ export default function SingleVerifier() {
           <strong>Error:</strong> {errorMsg}
         </div>
       )}
-      
+
       {!result && !isVerifying && (
         <div className="recent-wrapper">
           <RecentEmails limit={12} />
@@ -131,23 +132,22 @@ export default function SingleVerifier() {
 
       {result && (
         <div className="result-card fade-in">
-          {/* Email Header with Score Badge */}
-          <div 
+          {/* Email Header */}
+          <div
             onClick={() => setResult(null)}
-            style={{ 
+            style={{
               display: 'flex',
               alignItems: 'center',
               padding: '16px 20px',
-              borderBottom: '1px solid #f3f4f6',
+              borderBottom: '1px solid #1b1b1b',
               gap: 16,
               cursor: 'pointer',
-              background: '#fff',
+              background: '#000',
               transition: 'background 0.2s'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#f9fafb')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#111')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#000')}
           >
-            {/* Avatar Badge */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -164,12 +164,11 @@ export default function SingleVerifier() {
               ✓
             </div>
 
-            {/* Email */}
-            <div style={{ 
-              flex: 1, 
+            <div style={{
+              flex: 1,
               fontSize: 15,
               fontWeight: 500,
-              color: '#111827',
+              color: '#fff',
               minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -178,7 +177,7 @@ export default function SingleVerifier() {
               {result.email}
             </div>
 
-            {/* State Badge */}
+            {/* State Badge — unchanged */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -191,24 +190,15 @@ export default function SingleVerifier() {
               fontWeight: 500,
               flexShrink: 0
             }}>
-              {result.state === 'Undeliverable' && (
-                <span style={{ fontSize: 16 }}>✕</span>
-              )}
-              {result.state === 'Deliverable' && (
-                <span style={{ fontSize: 16 }}>✓</span>
-              )}
-              {result.state === 'Risky' && (
-                <span style={{ fontSize: 16 }}>⚠</span>
-              )}
               {result.state}
             </div>
 
-            {/* Score Badge */}
+            {/* ✅ Score Badge (Dark Mode) */}
             <div style={{
               padding: '6px 14px',
               borderRadius: 20,
-              background: result.score !== null ? getScoreBadgeStyle(result.score).bg : '#f3f4f6',
-              color: result.score !== null ? getScoreBadgeStyle(result.score).color : '#6b7280',
+              background: getScoreBadgeStyle(result.score).bg,
+              color: getScoreBadgeStyle(result.score).color,
               fontSize: 14,
               fontWeight: 600,
               flexShrink: 0,
@@ -219,59 +209,48 @@ export default function SingleVerifier() {
             </div>
           </div>
 
-          {/* Expanded Detail View */}
-          <div style={{ 
-            padding: '24px 20px',
-            background: '#fafafa'
-          }}>
-            {/* Advanced Score Gauge */}
+          {/* Expanded */}
+          <div style={{ padding: '24px 20px', background: '#000' }}>
+
             {result.score !== null && (
               <div style={{ marginBottom: 24 }}>
                 <ScoreGauge score={result.score} getScoreColor={getScoreColor} />
               </div>
             )}
 
-            {/* General Section */}
+            {/* Section styling identical to RecentEmails */}
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ 
-                fontSize: 16, 
-                fontWeight: 600, 
+              <h3 style={{
+                fontSize: 16,
+                fontWeight: 600,
                 marginBottom: 12,
-                color: '#111827'
+                color: '#fff'
               }}>
                 General
               </h3>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <DetailRow label="Full Name" value={result.full_name || '—'} />
-                <DetailRow 
-                  label="State" 
-                  value={result.state}
-                  badge={true}
-                  badgeStyle={getStateBadgeStyle(result.state)}
-                />
-                <DetailRow 
-                  label="Reason" 
-                  value={result.reason || 'accepted_email'}
-                  pill={true}
-                />
-                <DetailRow 
-                  label="Domain" 
-                  value={result.domain || '—'}
-                  link={true}
-                />
+                <DetailRow label="State" value={result.state} badge={true} badgeStyle={getStateBadgeStyle(result.state)} />
+
+                {/* ✅ Reason pill dark mode */}
+                <DetailRow label="Reason" value={result.reason} pill={true} />
+
+                <DetailRow label="Domain" value={result.domain || '—'} link={true} />
               </div>
             </div>
 
-            {/* Attributes Section */}
+            {/* Attributes */}
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ 
-                fontSize: 16, 
-                fontWeight: 600, 
+              <h3 style={{
+                fontSize: 16,
+                fontWeight: 600,
                 marginBottom: 12,
-                color: '#111827'
+                color: '#fff'
               }}>
                 Attributes
               </h3>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <DetailRow label="Free" value={result.is_free ? 'Yes' : 'No'} icon="💰" badge={result.is_free} />
                 <DetailRow label="Role" value={result.is_role ? 'Yes' : 'No'} icon="👤" />
@@ -287,16 +266,16 @@ export default function SingleVerifier() {
               </div>
             </div>
 
-            {/* Mail Server Section */}
             <div>
-              <h3 style={{ 
-                fontSize: 16, 
-                fontWeight: 600, 
+              <h3 style={{
+                fontSize: 16,
+                fontWeight: 600,
                 marginBottom: 12,
-                color: '#111827'
+                color: '#fff'
               }}>
                 Mail Server
               </h3>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <DetailRow label="SMTP Provider" value={result.smtp_provider || '---'} />
                 <DetailRow label="MX Record" value={result.mx_record || '---'} />
@@ -304,6 +283,7 @@ export default function SingleVerifier() {
                 <DetailRow label="Verified On" value={result.timestamp || '—'} />
               </div>
             </div>
+
           </div>
         </div>
       )}
@@ -311,11 +291,11 @@ export default function SingleVerifier() {
   );
 }
 
-// Score Gauge Component
+// ---- ScoreGauge & DetailRow left unchanged ----
 function ScoreGauge({ score, getScoreColor }) {
   const markers = [
-    { value: 0, label: '0' },
-    { value: 5, label: '5' },
+    { value: 0, label: '?' },
+    { value: 5, label: '0' },
     { value: 10, label: '10' },
     { value: 80, label: '80' },
     { value: 100, label: '100' }
@@ -323,11 +303,7 @@ function ScoreGauge({ score, getScoreColor }) {
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Color Bar */}
-      <div style={{ 
-        position: 'relative',
-        marginBottom: 8
-      }}>
+      <div style={{ position: 'relative', marginBottom: 8 }}>
         <div className="deliverability-meter">
           <div className="deliverability-meter-bar" style={{
             width: '100%',
@@ -336,7 +312,6 @@ function ScoreGauge({ score, getScoreColor }) {
             position: 'relative',
             overflow: 'visible'
           }}>
-            {/* Inverted Water Drop Indicator */}
             <div style={{
               position: 'absolute',
               left: `${score}%`,
@@ -354,12 +329,7 @@ function ScoreGauge({ score, getScoreColor }) {
         </div>
       </div>
 
-      {/* Score Markers Below Bar */}
-      <div style={{ 
-        position: 'relative',
-        height: 24,
-        marginTop: 8
-      }}>
+      <div style={{ position: 'relative', height: 24, marginTop: 8 }}>
         {markers.map((marker) => (
           <div
             key={marker.value}
@@ -370,11 +340,7 @@ function ScoreGauge({ score, getScoreColor }) {
               textAlign: 'center'
             }}
           >
-            <div style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#6b7280'
-            }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#bbb' }}>
               {marker.label}
             </div>
           </div>
@@ -384,31 +350,32 @@ function ScoreGauge({ score, getScoreColor }) {
   );
 }
 
-// Detail Row Component
 function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
   return (
-    <div style={{ 
-      display: 'flex', 
+    <div style={{
+      display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       fontSize: 14
     }}>
-      <div style={{ 
-        color: '#6b7280',
+      <div style={{
+        color: '#bbb',
         display: 'flex',
         alignItems: 'center',
         gap: 6
       }}>
-        {icon && <span>{icon}</span>}
+        {icon && <span style={{ color: '#fff' }}>{icon}</span>}
         {label}
       </div>
-      <div style={{ 
-        color: '#111827',
+
+      <div style={{
+        color: '#fff',
         fontWeight: 500,
         display: 'flex',
         alignItems: 'center',
         gap: 8
       }}>
+
         {badge && badgeStyle ? (
           <span style={{
             padding: '4px 10px',
@@ -424,8 +391,8 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
           <span style={{
             padding: '4px 10px',
             borderRadius: 12,
-            background: '#e0e7ff',
-            color: '#4f46e5',
+            background: '#292d3e',
+            color: '#9aa5ce',
             fontSize: 12,
             fontWeight: 500
           }}>
@@ -437,8 +404,8 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
             <span style={{
               padding: '2px 8px',
               borderRadius: 10,
-              background: '#e0e7ff',
-              color: '#4f46e5',
+              background: '#292d3e',
+              color: '#9aa5ce',
               fontSize: 11,
               fontWeight: 600
             }}>

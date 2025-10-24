@@ -102,7 +102,7 @@
   width: 56px;
   height: 56px;
   margin: 0 auto 24px;
-  color: #FF7A00;
+  color: black;
 }
 
 .upload-icon svg {
@@ -136,7 +136,7 @@
 }
 
 .file-drop-zone.dragging {
-  border-color: #FF7A00;
+  border-color:black;
   background: rgba(255, 122, 0, 0.05);
 }
 
@@ -173,7 +173,7 @@
 .file-selected svg {
   width: 24px;
   height: 24px;
-  color: #FF7A00;
+  color: black
 }
 
 .file-name {
@@ -182,7 +182,7 @@
 }
 
 .validate-btn {
-  background: linear-gradient(90deg, #FF7A00, #FFAA33);
+  background: linear-gradient(90deg, black ,black);
   color: #FFFFFF;
   padding: 14px 32px;
   border-radius: 10px;
@@ -358,7 +358,7 @@
 }
 
 .view-results-btn {
-  background: linear-gradient(90deg, #FF7A00, #FFAA33);
+  background: linear-gradient(90deg, black);
   color: #FFFFFF;
   padding: 14px 32px;
   border-radius: 10px;
@@ -372,7 +372,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.25);
+  /* box-shadow: 0 4px 12px rgba(255, 122, 0, 0.25); */
 }
 
 .view-results-btn svg {
@@ -380,14 +380,14 @@
   height: 18px;
 }
 
-.view-results-btn:hover {
+/* .view-results-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 122, 0, 0.35);
-}
+} */
 
-.view-results-btn:active {
+/* .view-results-btn:active {
   transform: translateY(0);
-}
+} */
 
 /* ==============================
    LIST SECTION
@@ -405,7 +405,7 @@
 }
 
 .new-list-btn {
-  background: linear-gradient(90deg, #FF7A00, #FFAA33);
+  background: linear-gradient(90deg, black);
   color: #FFFFFF;
   padding: 12px 24px;
   border-radius: 10px;
@@ -427,7 +427,7 @@
 
 .new-list-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .search-bar {
@@ -464,7 +464,7 @@
 
 .search-bar input:focus {
   outline: none;
-  border-color: #FF7A00;
+  border-color: black;
   box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
 }
 
@@ -623,7 +623,7 @@
 }
 
 .verify-btn {
-  background: linear-gradient(90deg, #FF7A00, #FFAA33);
+  background: linear-gradient(90deg, black);
   color: #FFFFFF;
   padding: 12px 24px;
   border-radius: 10px;
@@ -637,7 +637,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(255, 122, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .verify-btn svg {
@@ -662,6 +662,10 @@
   border-radius: 16px;
   padding: 40px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+  max-width: 1800px;
+  margin: 0 auto;
+  margin-left: 260px; /* Further reduced spacing from sidebar */
+  margin-right: 5px; /* Minimal right margin */
 }
 
 .results-header {
@@ -696,10 +700,11 @@
 
 .chart-section {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 48px;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
   margin-bottom: 40px;
   align-items: center;
+  max-width: 100%;
 }
 
 /* Emails card/table styling to match screenshot */
@@ -752,8 +757,8 @@
 
 .main-chart {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 360px;
+  height: 360px;
   margin: 0 auto;
   flex-shrink: 0;
 }
@@ -843,8 +848,9 @@
 
 .breakdown-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 100%;
 }
 
 .breakdown-card {
@@ -965,6 +971,11 @@
     justify-content: center;
   }
 
+  .breakdown-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
   .list-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
@@ -1010,4 +1021,78 @@
   .results-view {
     padding: 24px;
   }
+  /* -----------------------------------------
+   FIX: Results card visible when sidebar open
+------------------------------------------ */
+
+/* Remove margin since sidebar is now below header */
+.bulk-verifier {
+  margin-left: 0;               /* No margin needed since sidebar is below header */
+  padding-top: 20px;            /* avoid header cut */
+  width: 100%;                  /* Full width available */
+}
+
+/* When sidebar is hidden, go full width */
+.sidebar-collapsed .bulk-verifier {
+  margin-left: 0;
+  width: 100%;
+}
+
+.sidebar-collapsed .results-view {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1800px;
+}
+
+/* Make results card scroll independent */
+.results-view {
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+/* Ensure header stays visible */
+.results-view .back-link {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #fff;
+  padding: 12px 0;
+}
+
+/* Ensure full width on all screen sizes */
+@media (max-width: 1024px) {
+  .bulk-verifier {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .results-view {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+@media (max-width: 880px) {
+  .dashboard-header {
+    flex-wrap: wrap !important;
+    gap: 8px;
+    margin-left: 0 !important;
+  }
+
+  .bulk-verifier {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    white-space: normal;
+  }
+}
+
+
 }

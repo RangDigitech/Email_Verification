@@ -7,6 +7,10 @@ import SingleVerifier from "./SingleVerifier";
 import RecentEmails from "./components/RecentEmails";
 import { useCredits } from "./CreditsContext";
 import ProfileSection from "./components/ProfileSection";
+import AccountSection from "./components/AccountSection";
+import BillingSection from "./components/BillingSection";
+import ReferralsSection from "./components/ReferralsSection";
+import BuyCreditsModal from "./components/BuyCreditsModal";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("single");
@@ -14,6 +18,7 @@ export default function Dashboard() {
   const [resetBulkView, setResetBulkView] = useState(0);
   const { credits } = useCredits?.() ?? { credits: { remaining_credits: Number(localStorage.getItem("credits") || 0) } };
   const [bulkPanel, setBulkPanel] = useState("overview");
+  const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -46,14 +51,50 @@ export default function Dashboard() {
       navigate("/dashboard", { replace: true });
     };
 
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === "#referrals") setActiveTab("referrals");
+      else if (hash === "#billing") setActiveTab("billing");
+      else if (hash === "#account") setActiveTab("account");
+      else if (hash === "#profile") setActiveTab("profile");
+      else if (hash === "#integrations") setActiveTab("integrations");
+    };
+
     window.addEventListener("popstate", handlePopState);
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
     return () => window.removeEventListener("popstate", handlePopState);
   }, [navigate]);
 
   useEffect(() => {
     const handleProfileEvent = () => setActiveTab("profile");
+    const handleAccountEvent = () => setActiveTab("account");
+    const handleIntegrationsEvent = () => setActiveTab("integrations");
+    const handleBillingEvent = () => setActiveTab("billing");
+    const handleReferralsEvent = () => setActiveTab("referrals");
+    // expose helpers on window for direct calls
+    window.openReferralsTab = () => { window.location.hash = "#referrals"; setActiveTab("referrals"); };
+    window.openBillingTab = () => { window.location.hash = "#billing"; setActiveTab("billing"); };
+    window.openAccountTab = () => { window.location.hash = "#account"; setActiveTab("account"); };
+    window.openProfileTab = () => { window.location.hash = "#profile"; setActiveTab("profile"); };
+    window.openIntegrationsTab = () => { window.location.hash = "#integrations"; setActiveTab("integrations"); };
     window.addEventListener("openProfileTab", handleProfileEvent);
-    return () => window.removeEventListener("openProfileTab", handleProfileEvent);
+    window.addEventListener("openAccountTab", handleAccountEvent);
+    window.addEventListener("openIntegrationsTab", handleIntegrationsEvent);
+    window.addEventListener("openBillingTab", handleBillingEvent);
+    window.addEventListener("openReferralsTab", handleReferralsEvent);
+    return () => {
+      window.removeEventListener("openProfileTab", handleProfileEvent);
+      window.removeEventListener("openAccountTab", handleAccountEvent);
+      window.removeEventListener("openIntegrationsTab", handleIntegrationsEvent);
+      window.removeEventListener("openBillingTab", handleBillingEvent);
+      window.removeEventListener("openReferralsTab", handleReferralsEvent);
+      delete window.openReferralsTab;
+      delete window.openBillingTab;
+      delete window.openAccountTab;
+      delete window.openProfileTab;
+      delete window.openIntegrationsTab;
+    };
   }, []);
 
   const handleLogoClick = () => {
@@ -144,17 +185,17 @@ export default function Dashboard() {
         <header className="dashboard-header">
           <div className="header-left">
             <div className="dashboard-logo" onClick={handleLogoClick}>
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <rect x="30" y="60" width="140" height="100" fill="#E95729" rx="8" />
+              <svg viewBox="0 0 200 200" xmlns="src/assets/logo1.png">
+                <rect x="30" y="60" width="140" height="100" fill="#fffdfdff" rx="8" />
                 <path
                   d="M 30 60 L 100 110 L 170 60"
-                  stroke="#ffffff"
+                  stroke="#000000ff"
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle cx="150" cy="50" r="25" fill="#23c882" />
+                <circle cx="150" cy="50" r="25" fill="#5d1590ff" />
                 <path
                   d="M 140 50 L 147 57 L 160 44"
                   stroke="#ffffff"
@@ -164,7 +205,7 @@ export default function Dashboard() {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span className="logo-text">Verifier</span>
+              <span className="logo-text">AI Email Verifier</span>
             </div>
 
             <nav className="dashboard-tabs">
@@ -199,12 +240,16 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-actions">
-            <button className="buy-credits-btn">BUY CREDITS</button>
+            <button className="buy-credits-btn" onClick={() => setShowBuyCreditsModal(true)}>BUY CREDITS</button>
             <UserToggle
               userEmail={userEmail}
               userInitial={userInitial}
               creditCount={credits?.remaining_credits ?? Number(localStorage.getItem("credits") || 0)}
               displayName={displayName}
+              onOpenProfile={() => setActiveTab("profile")}
+              onOpenAccount={() => setActiveTab("account")}
+              onOpenIntegrations={() => setActiveTab("integrations")}
+              onOpenBilling={() => setActiveTab("billing")}
             />
           </div>
         </header>
@@ -219,13 +264,22 @@ export default function Dashboard() {
           )}
           {activeTab === "single" && <SingleVerifier />}
           {activeTab === "profile" && <ProfileSection />}
+          {activeTab === "account" && <AccountSection />}
+          {activeTab === "integrations" && <ProfileSection />}
+          {activeTab === "billing" && <BillingSection />}
+          {activeTab === "referrals" && <ReferralsSection />}
         </div>
       </div>
+      
+      {/* Buy Credits Modal */}
+      {showBuyCreditsModal && (
+        <BuyCreditsModal onClose={() => setShowBuyCreditsModal(false)} />
+      )}
     </div>
   );
 }
 
-function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = null }) {
+function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = null, onOpenProfile, onOpenAccount, onOpenIntegrations, onOpenBilling }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
   const navigate = useNavigate();
@@ -247,30 +301,45 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
 
   const handleProfileClick = () => {
     setOpen(false);
-    window.dispatchEvent(new CustomEvent("openProfileTab"));
+    onOpenProfile?.();
   };
 
   const handleBillingClick = () => {
     setOpen(false);
-    // Route to pricing page from the dropdown
-    navigate('/pricing');
+    onOpenBilling?.();
+  };
+
+  const handleAccountClick = () => {
+    setOpen(false);
+    onOpenAccount?.();
+  };
+
+  const handleIntegrationsClick = () => {
+    setOpen(false);
+    onOpenIntegrations?.();
+  };
+
+  const handleReferralsClick = () => {
+    setOpen(false);
+    if (window.openReferralsTab) window.openReferralsTab();
+    else window.dispatchEvent(new CustomEvent("openReferralsTab"));
   };
 
   return (
     <div className="user-toggle relative" ref={ref}>
       <button className="user-toggle-btn flex items-center gap-2" onClick={() => setOpen((s) => !s)}>
-        <div className="user-avatar bg-[#E95729] text-white">{userInitial}</div>
+        <div className="user-avatar bg-[#000000] text-white">{userInitial}</div>
         <span className={`chev ${open ? "open" : ""}`}>&#x25BE;</span>
       </button>
 
       {open && (
-        <div className="user-panel absolute right-0 top-12 bg-white rounded-xl shadow-lg border border-gray-200 w-56 z-50">
+        <div className="user-panel absolute right-0 top-12 bg-white rounded-xl shadow-lg border border-black-200 w-56 z-50">
           <div className="panel-top flex items-center gap-3 p-4 border-b border-gray-100">
-            <div className="panel-avatar bg-[#E95729] text-white w-10 h-10 rounded-full grid place-items-center font-bold">
+            <div className="panel-avatar bg-[#000000] text-white w-10 h-10 rounded-full grid place-items-center font-bold">
               {userInitial}
             </div>
             <div>
-              <div className="panel-name font-semibold">{displayName || userEmail}</div>
+              <div className="panel-name font-semibold" style={{ color: '#000000' }}>{displayName || userEmail}</div>
               <div className="panel-credits text-xs text-gray-500">
                 CREDIT BALANCE <strong>{creditCount}</strong>
               </div>
@@ -287,7 +356,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Profile</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleAccountClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
@@ -296,7 +365,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Account</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleIntegrationsClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="14" rx="2" />
@@ -314,7 +383,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Billing</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleReferralsClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 20V10" />
@@ -323,7 +392,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Referrals</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+            {/* <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" />
@@ -331,12 +400,12 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
                 </svg>
               </span>
               <span>Help</span>
-            </li>
+            </li> */}
           </ul>
 
           <div className="panel-footer border-t border-gray-100 p-3">
             <button
-              className="w-full text-left text-[#E95729] font-semibold flex items-center gap-2"
+              className="w-full text-left text-[#000000] font-semibold flex items-center gap-2"
               onClick={() => { logout(); window.location.href = '/'; }}
             >
               <span className="signout-icon" aria-hidden>

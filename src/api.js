@@ -7,6 +7,15 @@ export function apiUrl(path) {
   return `${BASE_URL.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+// Public utility: quick disposable/syntax check for signup
+export async function checkEmailDisposable(email) {
+  const url = apiUrl(`/utils/check-email?email=${encodeURIComponent(email)}`);
+  const res = await fetch(url, { method: "GET", headers: { Accept: "application/json" }, credentials: "include" });
+  // The endpoint always returns 200 with {ok: boolean, disposable, syntax_ok...}
+  const data = await res.json();
+  return data;
+}
+
 // ----------------------
 // Auth helpers
 // ----------------------
@@ -285,5 +294,88 @@ export async function getMe() {
     return me;
   } catch {
     return null;
+  }
+}
+
+// --- OAUTH HELPERS ---
+
+export function oauthStartUrl(provider) {
+  // We’ll always land back here after backend finishes
+  const next = encodeURIComponent(`${window.location.origin}/oauth/callback`);
+  return `${apiUrl(`/oauth/${provider}/start`)}?next=${next}`;
+}
+
+export async function finishOAuthLogin(token) {
+  if (!token) throw new Error("Missing token");
+  localStorage.setItem("accessToken", token);
+  // Hydrate profile and credits, and persist the canonical email for UI
+  let me = null;
+  try {
+    if (typeof getMe === "function") me = await getMe();
+  } catch {}
+  if (me?.email) {
+    localStorage.setItem("userEmail", me.email);
+  }
+  try {
+    if (typeof refreshCredits === "function") await refreshCredits();
+  } catch {}
+  return true;
+}
+export function openOAuthPopup(provider) {
+  const url = oauthStartUrl(provider);
+  const w = 520, h = 600;
+  const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
+  const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
+  window.open(url, "oauth", `width=${w},height=${h},left=${x},top=${y}`);
+}
+
+
+// Fetch user profile data for Team section
+export async function getUserProfile() {
+  try {
+    const res = await fetch(apiUrl("/me/profile"), {
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const profile = await res.json();
+    return profile;
+  } catch (error) {
+    console.error("Failed to fetch user profile:", error);
+    // Fallback to basic user data if profile endpoint doesn't exist
+    const basicUser = await getMe();
+    return basicUser ? {
+      firstName: basicUser.first_name || '',
+      lastName: basicUser.last_name || '',
+      email: basicUser.email || '',
+      phone: basicUser.phone || '',
+      role: 'Account Owner',
+      status: 'Active',
+      twoFactor: basicUser.two_factor_enabled || false,
+      joinDate: basicUser.created_at ? new Date(basicUser.created_at).toLocaleDateString() : new Date().toLocaleDateString()
+    } : null;
+  }
+}
+
+// Update user profile data
+export async function updateUserProfile(profileData) {
+  try {
+    const res = await fetch(apiUrl("/me/profile"), {
+      method: "PUT",
+      headers: { 
+        ...authHeaders(), 
+        "Content-Type": "application/json",
+        Accept: "application/json" 
+      },
+      body: JSON.stringify(profileData),
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const updatedProfile = await res.json();
+    return updatedProfile;
+  } catch (error) {
+    console.error("Failed to update user profile:", error);
+    throw error;
   }
 }

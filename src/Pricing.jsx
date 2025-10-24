@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './pricing.css';
 
 function Pricing() {
@@ -7,19 +8,25 @@ function Pricing() {
   const [email, setEmail] = useState('');
 
   const creditOptions = [
-    { amount: 100, label: '100 Credits' },
-    { amount: 500, label: '500 Credits' },
-    { amount: 1000, label: '1K Credits' },
-    { amount: 2500, label: '2.5K Credits' },
-    { amount: 5000, label: '5K Credits' },
-    { amount: 10000, label: '10K Credits' },
-    { amount: 25000, label: '25K Credits' },
-    { amount: 50000, label: '50K Credits' }
+    { amount: 100, label: '100 Credits', price: 2.99, perCredit: 0.0299 },
+    { amount: 500, label: '500 Credits', price: 9.99, perCredit: 0.0199 },
+    { amount: 1000, label: '1K Credits', price: 15.99, perCredit: 0.0159 },
+    { amount: 2500, label: '2.5K Credits', price: 29.99, perCredit: 0.0119 },
+    { amount: 5000, label: '5K Credits', price: 49.99, perCredit: 0.0099 },
+    { amount: 10000, label: '10K Credits', price: 79.99, perCredit: 0.0079 },
+    { amount: 25000, label: '25K Credits', price: 149.99, perCredit: 0.0059 },
+    { amount: 50000, label: '50K Credits', price: 249.99, perCredit: 0.0049 }
   ];
 
   const calculatePrice = () => {
-    const basePrice = selectedCredits * 0.01; // $0.01 per credit
+    const selectedOption = creditOptions.find(option => option.amount === selectedCredits);
+    const basePrice = selectedOption ? selectedOption.price : selectedCredits * 0.01;
     return isMonthly ? basePrice : basePrice * 0.8; // 20% discount for yearly
+  };
+
+  const getPerCreditPrice = () => {
+    const selectedOption = creditOptions.find(option => option.amount === selectedCredits);
+    return selectedOption ? selectedOption.perCredit : 0.01;
   };
 
   const formatPrice = (price) => {
@@ -65,6 +72,7 @@ function Pricing() {
                 >
                   <span className="amount">{option.amount.toLocaleString()}</span>
                   <span className="label">{option.label}</span>
+                  <span className="price">${option.price}</span>
                 </div>
               ))}
             </div>
@@ -80,22 +88,24 @@ function Pricing() {
           </div>
 
           <div className="price-display">
-            <div className="price">{formatPrice(calculatePrice())}</div>
+            <div className="price-value">{formatPrice(getPerCreditPrice())}</div>
             <div className="price-details">
+              <div className="price-detail">
+                <span className="value">{formatPrice(calculatePrice())}</span>
+                <span className="label">Total Price</span>
+              </div>
               <div className="price-detail">
                 <span className="value">{selectedCredits.toLocaleString()}</span>
                 <span className="label">Credits</span>
               </div>
-              <div className="price-detail">
-                <span className="value">{formatPrice(calculatePrice() / selectedCredits)}</span>
-                <span className="label">Per Credit</span>
-              </div>
             </div>
           </div>
 
-          <button className="cta-button" onClick={handleSubmit}>
-            Get Started
-          </button>
+          <Link to="/signup">
+            <button className="cta-button">
+              Get Started
+            </button>
+          </Link>
           <div className="free-credits">250 free credits included</div>
 
           <ul className="benefits">
