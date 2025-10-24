@@ -140,14 +140,21 @@ import { register, checkEmailDisposable } from "./api";
           <p>Join Verifier and get 250 free credits instantly</p>
 
           <div className="social-login">
-            <button onClick={(e) => { e.preventDefault(); window.location.href = oauthStartUrl("google"); }}>
-              Continue with Google
+            <button
+              className="social-btn"
+              onClick={() => { window.location.href = oauthStartUrl("google"); }}
+              title="Continue with Google"
+            >
+              <FaGoogle />
             </button>
-
-            <button onClick={(e) => { e.preventDefault(); window.location.href = oauthStartUrl("github"); }}>
-              Continue with GitHub
+  
+            <button
+              className="social-btn"
+              onClick={() => { window.location.href = oauthStartUrl("github"); }}
+              title="Continue with GitHub"
+            >
+              <FaGithub />
             </button>
-            {/* keep others disabled or wire later */}
             {/* <button className="social-btn" title="Sign in with LinkedIn" disabled><FaLinkedinIn /></button>
             <button className="social-btn" title="Sign in with Facebook" disabled><FaFacebookF /></button>
             <button className="social-btn" title="Sign in with Apple" disabled><FaApple /></button> */}
