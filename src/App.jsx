@@ -64,7 +64,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-logo">
-        <img src="/src/assets/email_logo.png" alt="Verifier Logo" className="logo" />
+        <img src="/email_logo.png" alt="Verifier Logo" className="logo" />
         <span>AI Email Verifier</span>
       </div>
       <ul className="nav-links">
@@ -215,7 +215,7 @@ function Home() {
         <div className="section-inner insights-grid">
           <div className="insights-media" aria-hidden>
             <div className="insights-visual">
-              <img src="/src/image.png" alt="Inbox Placements Visual" className="insights-image" />
+              <img src="/image.png" alt="Inbox Placements Visual" className="insights-image" />
             </div>
           </div>
 
