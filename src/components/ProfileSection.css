@@ -409,7 +409,7 @@
 .sso-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: White;
   margin-bottom: 4px;
 }
 
@@ -446,7 +446,7 @@
 .two-factor-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: White;
   margin-bottom: 4px;
 }
 
@@ -468,7 +468,7 @@
 .notify-section-title {
   font-size: 11px;
   font-weight: 700;
-  color: var(--muted-text);
+  color: white;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 16px;
@@ -494,13 +494,13 @@
 .notify-label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: white;
   margin-bottom: 4px;
 }
 
 .notify-helper {
   font-size: 13px;
-  color: var(--muted-text);
+  color: white;
   line-height: 1.5;
 }
 

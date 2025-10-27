@@ -7,14 +7,14 @@ export default function AboutUs() {
       {/* Header/Navigation */}
       <nav className="navbar">
         <div className="nav-logo">
-          <img src="/src/assets/email_logo.png" alt="Verifier Logo" className="logo" />
+          <img src="/email_logo.png" alt="Verifier Logo" className="logo" />
           <span>AI Email Verifier</span>
         </div>
         <ul className="nav-links">
-          <li>Products</li>
+          <li>Soltions</li>
           <li><a href="/pricing">Pricing</a></li>
-          <li>Integrations</li>
-          <li>Developers</li>
+          <li>About us</li>
+          <li>Help</li>
         </ul>
         <div className="nav-actions">
           <button className="login-btn">Login</button>
@@ -153,7 +153,7 @@ export default function AboutUs() {
         <div className="cta-container">
           <h2 className="cta-title">Join the companies that will rely on AI Email Verifier to protect their sender reputation.</h2>
           <a href="/signup">
-            <button className="cta-button">Get Started Free ></button>
+            <button className="cta-button">Get Started Free</button>
           </a>
           <p className="cta-subtext">Includes 250 free credits</p>
         </div>

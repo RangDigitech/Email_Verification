@@ -1,3 +1,4 @@
+
 /* ==============================
    MODERN SAAS EMAIL VERIFIER
    Color Palette: #FF7A00, #F2F2F2, #333, #999, #FFF
@@ -40,6 +41,10 @@
   }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .fade-in {
   animation: fadeIn 0.5s ease-out;
 }
@@ -56,14 +61,15 @@
   align-items: center;
   gap: 8px;
   background: transparent;
-  border: none;
-  color: #999;
-  font-size: 14px;
+  border: black;
+  border-radius: 20%;
+  color: #000000;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 32px;
-  padding: 0;
+  padding: 10px;
 }
 
 .back-link svg {
@@ -71,9 +77,15 @@
   height: 18px;
 }
 
-.back-link:hover {
-  color: #FF7A00;
+.back-link:hover:not(:disabled) {
+  color: #ffffff;
   transform: translateX(-4px);
+  background: rgb(0, 0, 0);
+}
+
+.back-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ==============================
@@ -136,7 +148,7 @@
 }
 
 .file-drop-zone.dragging {
-  border-color:black;
+  border-color: black;
   background: rgba(255, 122, 0, 0.05);
 }
 
@@ -173,7 +185,7 @@
 .file-selected svg {
   width: 24px;
   height: 24px;
-  color: black
+  color: black;
 }
 
 .file-name {
@@ -182,7 +194,7 @@
 }
 
 .validate-btn {
-  background: linear-gradient(90deg, black ,black);
+  background: linear-gradient(90deg, black, black);
   color: #FFFFFF;
   padding: 14px 32px;
   border-radius: 10px;
@@ -212,7 +224,137 @@
 }
 
 /* ==============================
-   COMPLETION VIEW - REDESIGNED
+   UPLOADING VIEW - SMALL CARD
+============================== */
+.uploading-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 40px 20px;
+}
+
+.uploading-card {
+  background: #FFFFFF;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.uploading-header {
+  margin-bottom: 32px;
+}
+
+.uploading-header h3 {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.uploading-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.uploading-meta svg {
+  width: 14px;
+  height: 14px;
+}
+
+.uploading-chart-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 28px;
+  height: 200px;
+}
+
+.uploading-donut-svg {
+  width: 180px;
+  height: 180px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+}
+
+.uploading-progress-circle {
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.uploading-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploading-percentage {
+  font-size: 44px;
+  font-weight: 800;
+  color: #7C3AED;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.uploading-label {
+  font-size: 13px;
+  color: #999;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.uploading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.uploading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #F2F2F2;
+  border-top-color: #7C3AED;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.verify-btn-uploading {
+  background: linear-gradient(90deg, black, black);
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: not-allowed;
+  width: 100%;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0.5;
+}
+
+.verify-btn-uploading svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==============================
+   COMPLETION VIEW
 ============================== */
 .completion-section {
   display: flex;
@@ -358,7 +500,7 @@
 }
 
 .view-results-btn {
-  background: linear-gradient(90deg, black);
+  background: linear-gradient(90deg, black, black);
   color: #FFFFFF;
   padding: 14px 32px;
   border-radius: 10px;
@@ -372,7 +514,6 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  /* box-shadow: 0 4px 12px rgba(255, 122, 0, 0.25); */
 }
 
 .view-results-btn svg {
@@ -380,14 +521,13 @@
   height: 18px;
 }
 
-/* .view-results-btn:hover {
+.view-results-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.35);
-} */
+}
 
-/* .view-results-btn:active {
+.view-results-btn:active {
   transform: translateY(0);
-} */
+}
 
 /* ==============================
    LIST SECTION
@@ -405,7 +545,7 @@
 }
 
 .new-list-btn {
-  background: linear-gradient(90deg, black);
+  background: linear-gradient(90deg, black, black);
   color: #FFFFFF;
   padding: 12px 24px;
   border-radius: 10px;
@@ -500,7 +640,7 @@
 }
 
 /* ==============================
-   VALIDATION CARD - REDESIGNED
+   VALIDATION CARD
 ============================== */
 .validation-card {
   background: #FFFFFF;
@@ -623,7 +763,7 @@
 }
 
 .verify-btn {
-  background: linear-gradient(90deg, black);
+  background: linear-gradient(90deg, black, black);
   color: #FFFFFF;
   padding: 12px 24px;
   border-radius: 10px;
@@ -664,8 +804,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
   max-width: 1800px;
   margin: 0 auto;
-  margin-left: 260px; /* Further reduced spacing from sidebar */
-  margin-right: 5px; /* Minimal right margin */
+  margin-left: 260px;
+  margin-right: 5px;
 }
 
 .results-header {
@@ -707,12 +847,11 @@
   max-width: 100%;
 }
 
-/* Emails card/table styling to match screenshot */
 .card {
   background: #ffffff;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   margin-bottom: 20px;
 }
 
@@ -723,7 +862,12 @@
   margin-bottom: 12px;
 }
 
-.chips { display: flex; gap: 8px; align-items: center; }
+.chips {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .chip {
   background: transparent;
   border: none;
@@ -733,27 +877,103 @@
   color: #6b5b9a;
   cursor: pointer;
 }
-.chip:hover { background: rgba(107,91,154,0.06); }
 
-.table { border-top: 1px solid #F0F0F2; border-radius: 6px; overflow: hidden; }
-.thead { display: grid; grid-template-columns: 2fr 1fr 120px 160px; gap: 0; background: #FAF9FF; padding: 14px 18px; font-weight: 700; color: #6b5b9a; }
-.thead div { align-self: center; }
-.tbody { display: flex; flex-direction: column; }
-.tr { display: grid; grid-template-columns: 2fr 1fr 120px 160px; padding: 14px 18px; border-bottom: 1px solid #F3F3F5; align-items: center; }
-.tr:last-child { border-bottom: none; }
-.reason-cell { color: #777; }
+.chip:hover {
+  background: rgba(107, 91, 154, 0.06);
+}
 
-/* Exports card tweaks */
-.exports-card .primary { background: #6b5b9a; color: #fff; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; }
-.empty-table { padding: 30px; color: #8b7fb3; }
+.table {
+  border-top: 1px solid #F0F0F2;
+  border-radius: 6px;
+  overflow: hidden;
+}
 
-/* Settings form tweaks */
-.settings-card .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-.settings-card input[type="text"] { padding: 12px 14px; border-radius: 8px; border: 1px solid #eee; }
-.actions { display:flex; justify-content: space-between; gap: 12px; }
-.primary { background: #6b5b9a; color: #fff; padding: 10px 18px; border-radius: 10px; border: none; font-weight:700; cursor:pointer; }
-.danger { background: transparent; border: 1px solid #e6d9f5; padding: 10px 18px; border-radius: 10px; color: #6b5b9a; cursor:pointer; }
+.thead {
+  display: grid;
+  grid-template-columns: 2fr 1fr 120px 160px;
+  gap: 0;
+  background: #FAF9FF;
+  padding: 14px 18px;
+  font-weight: 700;
+  color: #6b5b9a;
+}
 
+.thead div {
+  align-self: center;
+}
+
+.tbody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tr {
+  display: grid;
+  grid-template-columns: 2fr 1fr 120px 160px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #F3F3F5;
+  align-items: center;
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.reason-cell {
+  color: #777;
+}
+
+.exports-card .primary {
+  background: #6b5b9a;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.empty-table {
+  padding: 30px;
+  color: #8b7fb3;
+}
+
+.settings-card .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.settings-card input[type="text"] {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.primary {
+  background: #6b5b9a;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger {
+  background: transparent;
+  border: 1px solid #e6d9f5;
+  padding: 10px 18px;
+  border-radius: 10px;
+  color: #6b5b9a;
+  cursor: pointer;
+}
 
 .main-chart {
   position: relative;
@@ -964,7 +1184,7 @@
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  
+
   .chart-legend {
     flex-direction: row;
     flex-wrap: wrap;
@@ -985,13 +1205,14 @@
   .results-header {
     grid-template-columns: 1fr;
   }
-  
+
   .breakdown-section {
     grid-template-columns: 1fr;
   }
 
   .upload-card,
-  .completion-card {
+  .completion-card,
+  .uploading-card {
     padding: 32px 24px;
   }
 
@@ -1020,79 +1241,28 @@
 
   .results-view {
     padding: 24px;
+    margin-left: 0;
+    margin-right: 0;
   }
-  /* -----------------------------------------
-   FIX: Results card visible when sidebar open
------------------------------------------- */
 
-/* Remove margin since sidebar is now below header */
-.bulk-verifier {
-  margin-left: 0;               /* No margin needed since sidebar is below header */
-  padding-top: 20px;            /* avoid header cut */
-  width: 100%;                  /* Full width available */
-}
-
-/* When sidebar is hidden, go full width */
-.sidebar-collapsed .bulk-verifier {
-  margin-left: 0;
-  width: 100%;
-}
-
-.sidebar-collapsed .results-view {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1800px;
-}
-
-/* Make results card scroll independent */
-.results-view {
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  padding-bottom: 40px;
-}
-
-/* Ensure header stays visible */
-.results-view .back-link {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: #fff;
-  padding: 12px 0;
-}
-
-/* Ensure full width on all screen sizes */
-@media (max-width: 1024px) {
   .bulk-verifier {
     margin-left: 0;
     width: 100%;
   }
-  
-  .results-view {
-    margin-left: 0;
-    margin-right: 0;
-    max-width: 100%;
-  }
-}
-@media (max-width: 880px) {
-  .dashboard-header {
-    flex-wrap: wrap !important;
-    gap: 8px;
-    margin-left: 0 !important;
-  }
-
-  .bulk-verifier {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
 }
 
 @media (max-width: 600px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    white-space: normal;
+  .uploading-card {
+    max-width: 100%;
+    padding: 28px 20px;
   }
-}
 
+  .uploading-donut-svg {
+    width: 150px;
+    height: 150px;
+  }
 
+  .uploading-percentage {
+    font-size: 36px;
+  }
 }

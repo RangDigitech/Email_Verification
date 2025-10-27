@@ -1,0 +1,203 @@
+
+.single-page {
+  font-family: "Inter", sans-serif;
+  background: #fff;
+  color: #000;
+}
+
+/* HERO */
+.single-hero {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 120px 20px 80px;
+}
+
+.single-hero h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.single-hero p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 auto 30px;
+  max-width: 700px;
+}
+
+.email-check-box {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.email-check-box input {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  width: 280px;
+  font-size: 1rem;
+}
+
+.email-check-box button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.email-check-box button:hover {
+  opacity: 0.9;
+}
+
+.trusted-text {
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+}
+
+/* GUARANTEE */
+.single-guarantee {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.single-guarantee h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.single-guarantee p {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  color: #555;
+}
+
+/* OTHER WAYS */
+.single-otherways {
+  background: #f8f8f8;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.otherways-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.other-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: 0.3s;
+}
+
+.other-card:hover {
+  transform: translateY(-4px);
+}
+
+.icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.learn-more {
+  display: inline-block;
+  margin-top: 10px;
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* FAQ */
+.single-faq {
+  background: #fff;
+  padding: 80px 20px;
+}
+
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.faq-item {
+  border-bottom: 1px solid #ddd;
+  padding: 16px 0;
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.faq-answer {
+  margin-top: 10px;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* TESTIMONIAL */
+.single-testimonial {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.single-testimonial blockquote {
+  font-size: 1.2rem;
+  font-style: italic;
+  max-width: 700px;
+  margin: 0 auto 20px;
+  line-height: 1.7;
+}
+
+.single-testimonial .author {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* FINAL CTA */
+.single-final {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.single-final h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.white-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 14px 34px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.white-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}

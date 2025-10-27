@@ -52,7 +52,6 @@ export default function SingleVerifier() {
   };
 
   const getScoreBadgeStyle = (score) => {
-    // COPY — Same logic as RecentEmails dark version
     if (score >= 80) return { bg: '#1b3c33', color: '#8ff7ce' };
     if (score >= 50) return { bg: '#3c321b', color: '#ffdd8a' };
     return { bg: '#3c1b1b', color: '#ff8a8a' };
@@ -108,11 +107,7 @@ export default function SingleVerifier() {
               required
             />
             <button type="submit" className="verify-button" disabled={isVerifying}>
-              {isVerifying ? (
-                <div className="spinner"></div>
-              ) : (
-                "Verify"
-              )}
+              Verify
             </button>
           </div>
         </form>
@@ -124,13 +119,22 @@ export default function SingleVerifier() {
         </div>
       )}
 
-      {!result && !isVerifying && (
+      {/* ✅ CENTERED LOADING SPINNER - Shows between input and recent verifications */}
+      {isVerifying && (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
+      {/* ✅ Recent Emails - Shows ONLY when NOT verifying AND no result */}
+      {!isVerifying && !result && (
         <div className="recent-wrapper">
           <RecentEmails limit={12} />
         </div>
       )}
 
-      {result && (
+      {/* ✅ Result Card - Shows ONLY when there's a result */}
+      {result && !isVerifying && (
         <div className="result-card fade-in">
           {/* Email Header */}
           <div
@@ -177,7 +181,6 @@ export default function SingleVerifier() {
               {result.email}
             </div>
 
-            {/* State Badge — unchanged */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -193,7 +196,6 @@ export default function SingleVerifier() {
               {result.state}
             </div>
 
-            {/* ✅ Score Badge (Dark Mode) */}
             <div style={{
               padding: '6px 14px',
               borderRadius: 20,
@@ -218,7 +220,6 @@ export default function SingleVerifier() {
               </div>
             )}
 
-            {/* Section styling identical to RecentEmails */}
             <div style={{ marginBottom: 24 }}>
               <h3 style={{
                 fontSize: 16,
@@ -232,15 +233,11 @@ export default function SingleVerifier() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <DetailRow label="Full Name" value={result.full_name || '—'} />
                 <DetailRow label="State" value={result.state} badge={true} badgeStyle={getStateBadgeStyle(result.state)} />
-
-                {/* ✅ Reason pill dark mode */}
                 <DetailRow label="Reason" value={result.reason} pill={true} />
-
                 <DetailRow label="Domain" value={result.domain || '—'} link={true} />
               </div>
             </div>
 
-            {/* Attributes */}
             <div style={{ marginBottom: 24 }}>
               <h3 style={{
                 fontSize: 16,
@@ -291,7 +288,6 @@ export default function SingleVerifier() {
   );
 }
 
-// ---- ScoreGauge & DetailRow left unchanged ----
 function ScoreGauge({ score, getScoreColor }) {
   const markers = [
     { value: 0, label: '?' },

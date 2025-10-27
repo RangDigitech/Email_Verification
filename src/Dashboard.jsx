@@ -209,20 +209,26 @@ export default function Dashboard() {
             </div>
 
             <nav className="dashboard-tabs">
-              <button
-                className={`dashboard-tab ${activeTab === "bulk" ? "active" : ""}`}
-                onClick={() => handleTabChange("bulk")}
-              >
-                <span className="tab-icon bulk-icon">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    {/* Stacked envelopes for Bulk */}
-                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                    <path d="M20 8H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 4l-8 5-8-5v2l8 5 8-5v-2z" opacity="0.6" />
-                    <path d="M20 12H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm0 4l-8 5-8-5v2l8 5 8-5v-2z" opacity="0.3" />
-                  </svg>
-                </span>
-                Bulk
-              </button>
+            <button
+              className={`dashboard-tab ${activeTab === "bulk" ? "active" : ""}`}
+              onClick={() => handleTabChange("bulk")}
+            >
+              <span className="tab-icon bulk-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  {/* Stack of 3 envelopes */}
+                  <g opacity="0.4">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </g>
+                  <g opacity="0.6" transform="translate(0, 2)">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </g>
+                  <g transform="translate(0, 4)">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </g>
+                </svg>
+              </span>
+              Bulk
+            </button>
 
               <button
                 className={`dashboard-tab ${activeTab === "single" ? "active" : ""}`}

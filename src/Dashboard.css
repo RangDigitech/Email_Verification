@@ -164,7 +164,7 @@
 }
 
 .dashboard-tab.active {
-  background: white;
+  background: rgb(255, 255, 255);
   color: black;
   /* box-shadow: 0 6px 18px rgba(233,87,41,0.12); */
   

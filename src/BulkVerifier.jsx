@@ -9,6 +9,8 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const [validations, setValidations] = useState([]);
   const [currentResult, setCurrentResult] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [emailCount, setEmailCount] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem("bulkValidations");
@@ -40,9 +42,20 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     const selectedFile = e.target.files && e.target.files[0];
     if (selectedFile && (selectedFile.type === "text/csv" || selectedFile.name.endsWith(".csv"))) {
       setFile(selectedFile);
+      countEmailsInCSV(selectedFile);
     } else {
       alert("Please upload a valid CSV file");
     }
+  };
+
+  const countEmailsInCSV = (csvFile) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim());
+      setEmailCount(Math.max(0, lines.length - 1));
+    };
+    reader.readAsText(csvFile);
   };
 
   const handleDragOver = (e) => {
@@ -56,31 +69,52 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (droppedFile && (droppedFile.type === "text/csv" || droppedFile.name.endsWith(".csv"))) setFile(droppedFile);
-    else alert("Please upload a valid CSV file");
+    if (droppedFile && (droppedFile.type === "text/csv" || droppedFile.name.endsWith(".csv"))) {
+      setFile(droppedFile);
+      countEmailsInCSV(droppedFile);
+    } else {
+      alert("Please upload a valid CSV file");
+    }
   };
 
   const handleValidate = async () => {
     if (!file) return alert("Please choose a CSV file first");
-    setView("completed"); // show processing card immediately
-    // optimistic placeholder so UI doesn't feel blocked
-    const placeholder = { id: Date.now(), name: file.name.replace('.csv',''), fileName: file.name, source: 'My Computer', totalEmails: 0, uploadDate: new Date().toLocaleDateString(), processing: true };
-    setCurrentResult(placeholder);
+    
+    setView("uploading");
+    setUploadProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + Math.random() * 15;
+      });
+    }, 300);
 
     try {
       const data = await validateBulk({ file });
-      const updatedValidations = [data, ...validations];
-      setValidations(updatedValidations);
-      localStorage.setItem("bulkValidations", JSON.stringify(updatedValidations));
-      setCurrentResult(data);
-      setView("results");
-      setFile(null);
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      setTimeout(() => {
+        const updatedValidations = [data, ...validations];
+        setValidations(updatedValidations);
+        localStorage.setItem("bulkValidations", JSON.stringify(updatedValidations));
+        setCurrentResult(data);
+        setView("completed");
+        setFile(null);
+        setUploadProgress(0);
+        setEmailCount(0);
+      }, 800);
     } catch (err) {
+      clearInterval(progressInterval);
       console.error(err);
       alert(err.message || "Bulk verification failed. Please try again.");
-      // revert to upload view
       setView("upload");
       setCurrentResult(null);
+      setUploadProgress(0);
     }
   };
 
@@ -102,6 +136,7 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const handleNewList = () => {
     setView("upload");
     setFile(null);
+    setEmailCount(0);
   };
 
   const filteredValidations = validations.filter(
@@ -122,6 +157,14 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
           handleDrop={handleDrop}
           handleValidate={handleValidate}
           onBackToList={validations.length > 0 ? handleBackToList : null}
+        />
+      )}
+
+      {view === "uploading" && (
+        <UploadingView 
+          fileName={file?.name || "File"} 
+          progress={uploadProgress}
+          emailCount={emailCount}
         />
       )}
 
@@ -218,6 +261,70 @@ function UploadView({
             </svg>
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// NEW: Uploading View Component - Small Card
+function UploadingView({ fileName, progress, emailCount }) {
+  const circumference = 2 * Math.PI * 85;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="uploading-section fade-in">
+      <div className="uploading-card">
+        <div className="uploading-header">
+          <h3>{fileName.replace('.csv', '')}</h3>
+          <div className="uploading-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>My Computer</span>
+          </div>
+        </div>
+
+        <div className="uploading-chart-wrapper">
+          <svg className="uploading-donut-svg" viewBox="0 0 200 200">
+            <circle
+              cx="100"
+              cy="100"
+              r="85"
+              fill="none"
+              stroke="#F2F2F2"
+              strokeWidth="18"
+            />
+            <circle
+              cx="100"
+              cy="100"
+              r="85"
+              fill="none"
+              stroke="#7C3AED"
+              strokeWidth="18"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              transform="rotate(-90 100 100)"
+              className="uploading-progress-circle"
+            />
+          </svg>
+          <div className="uploading-center">
+            <div className="uploading-percentage">{Math.round(progress)}%</div>
+            <div className="uploading-label">Uploading</div>
+          </div>
+        </div>
+
+        <div className="uploading-spinner-container">
+          <div className="uploading-spinner"></div>
+        </div>
+
+        <button className="verify-btn-uploading" disabled>
+          View Results
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -409,7 +516,7 @@ function ValidationCard({ validation, onViewResult }) {
   );
 }
 
-// Results View Component (middle card switches by "panel")
+// Results View Component
 function ResultsView({ results, onBack, panel = "overview", setValidations, validations, setCurrentResult }) {
   const totalEmails = results.totalEmails;
   const deliverableCount = Math.round((totalEmails * results.deliverable) / 100);
@@ -432,7 +539,6 @@ function ResultsView({ results, onBack, panel = "overview", setValidations, vali
         Back
       </button>
 
-      {/* Shared top stats row (stays the same for all panels) */}
       <div className="results-header">
         <div className="stat-card">
           <div className="stat-label">Name</div>
@@ -448,7 +554,6 @@ function ResultsView({ results, onBack, panel = "overview", setValidations, vali
         </div>
       </div>
 
-      {/* Only the middle card below changes */}
       {panel === "overview" && (
         <>
           <div className="chart-section">
@@ -509,20 +614,6 @@ function ResultsView({ results, onBack, panel = "overview", setValidations, vali
                 { label: "Low Deliverability", count: results.breakdown.risky.lowDeliverability },
               ]}
             />
-
-            {/* <BreakdownCard
-              title="Unknown"
-              icon="?"
-              color="#9E9E9E"
-              percentage={results.unknown}
-              count={unknownCount}
-              items={[
-                { label: "No Connect", count: results.breakdown.unknown.noConnect },
-                { label: "Timeout", count: results.breakdown.unknown.timeout },
-                { label: "Unavailable SMTP", count: results.breakdown.unknown.unavailableSMTP },
-                { label: "Unexpected Error", count: results.breakdown.unknown.unexpectedError },
-              ]}
-            /> */}
           </div>
         </>
       )}
@@ -566,14 +657,12 @@ function ResultsView({ results, onBack, panel = "overview", setValidations, vali
           <div className="card-header">
             <h3>Exports</h3>
             <button className="primary" onClick={async () => {
-              // prefer backend-provided CSV if present
               if (results.files && results.files.results_csv) {
                 const url = apiUrl(results.files.results_csv);
                 window.open(url, '_blank');
                 return;
               }
 
-              // fallback: generate CSV client-side from resultsArray
               const rows = results.resultsArray || [];
               if (rows.length === 0) return alert('No results to export');
               const csv = [Object.keys(rows[0]).join(','), ...rows.map(r => Object.values(r).map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','))].join('\n');
@@ -680,15 +769,12 @@ function BreakdownCard({ title, icon, color, percentage, count, items }) {
   );
 }
 
-// Settings form: rename list + save to validations and localStorage
 function SettingsForm({ results, setCurrentResult, setValidations, validations }) {
   const [name, setName] = useState(results.name || "");
 
   const handleSave = () => {
     const updated = { ...results, name };
-    // update current result in parent
     setCurrentResult(updated);
-    // update validations array in parent and persist
     const updatedValidations = validations.map(v => (v.id === updated.id ? updated : v));
     setValidations(updatedValidations);
     localStorage.setItem("bulkValidations", JSON.stringify(updatedValidations));
@@ -717,4 +803,3 @@ function SettingsForm({ results, setCurrentResult, setValidations, validations }
     </>
   );
 }
-

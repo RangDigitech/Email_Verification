@@ -7,7 +7,6 @@ const AnimatedEmailDemo = () => {
   const [focused, setFocused] = React.useState(false);
   const wrapRef = React.useRef(null);
 
-  // Entrance animation
   React.useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -149,11 +148,9 @@ export default function Hero() {
     const dprClamp = () =>
       Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
 
-    // Build uniforms
     const uniforms = {
       uTime: { value: 0.0 },
       uResolution: { value: new THREE.Vector2(1, 1) },
-      uActualResolution: { value: new THREE.Vector2(1, 1) },
       uMousePosition: { value: new THREE.Vector2(0.5, 0.5) },
       uCursorSphere: { value: new THREE.Vector3(0, 0, 0) },
       uCursorRadius: { value: 0.1 },
@@ -216,7 +213,6 @@ export default function Hero() {
           precision highp float;
           uniform float uTime; 
           uniform vec2 uResolution; 
-          uniform vec2 uActualResolution;
           uniform vec2 uMousePosition; 
           uniform vec3 uCursorSphere; 
           uniform float uCursorRadius;
@@ -262,12 +258,9 @@ export default function Hero() {
           }
 
           vec3 screenToWorld(vec2 n){
-            // Convert normalized coords [0,1] to NDC [-1,1]
             vec2 uv = n * 2.0 - 1.0;
-            // Apply aspect ratio
             float aspect = uResolution.x / uResolution.y;
             uv.x *= aspect;
-            // Scale to world space (matching the ray origin calculation)
             return vec3(uv * 2.0, 0.0);
           }
 
@@ -354,8 +347,7 @@ export default function Hero() {
           }
 
           void main(){
-            // Calculate UV exactly the same way as screenToWorld and handlePointer
-            vec2 uv = (gl_FragCoord.xy * 2.0 - uActualResolution.xy) / uActualResolution.y;
+            vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution) / uResolution.y;
             
             vec3 ro = vec3(uv * 2.0, -1.0);
             vec3 rd = vec3(0.0, 0.0, 1.0);
@@ -408,7 +400,6 @@ export default function Hero() {
       renderer.setSize(w, h, false);
       
       uniforms.uResolution.value.set(w, h);
-      uniforms.uActualResolution.value.set(w * pr, h * pr);
     }
 
     function handlePointer(evt) {
@@ -419,30 +410,28 @@ export default function Hero() {
       const clientY = evt.clientY ?? evt.touches?.[0]?.clientY;
       if (clientX == null || clientY == null) return;
 
-      // Get pixel ratio
-      const pr = dprClamp();
-      
-      // Mouse position relative to canvas
-      const mx = (clientX - rect.left) * pr;
-      const my = (clientY - rect.top) * pr;
-      
-      // Canvas dimensions with pixel ratio
-      const w = rect.width * pr;
-      const h = rect.height * pr;
+      // Get mouse position relative to canvas
+      const mx = clientX - rect.left;
+      const my = clientY - rect.top;
       
       // Normalized coordinates [0, 1]
-      const nx = (clientX - rect.left) / rect.width;
-      const ny = 1 - ((clientY - rect.top) / rect.height);
+      const nx = mx / rect.width;
+      const ny = 1 - (my / rect.height); // Flip Y for shader
       uniforms.uMousePosition.value.set(nx, ny);
 
-      // Convert to shader UV space - exact same calculation as in fragment shader
-      const uvx = (mx * 2.0 - w) / h;
-      const uvy = (my * 2.0 - h) / h;
+      // Convert to shader UV space - EXACT match with fragment shader
+      const w = rect.width;
+      const h = rect.height;
+      
+      // Fragment shader does: (gl_FragCoord.xy * 2.0 - uResolution) / uResolution.y
+      // gl_FragCoord.xy goes from (0,0) at bottom-left to (w,h) at top-right
+      // But mouse Y goes from 0 at top to h at bottom, so we need to flip it
+      const shaderX = (mx * 2.0 - w) / h;
+      const shaderY = ((h - my) * 2.0 - h) / h; // Flip Y axis here
       
       // Scale to world space (matching shader's ro calculation)
-      uniforms.uCursorSphere.value.set(uvx * 2.0, uvy * 2.0, 0);
+      uniforms.uCursorSphere.value.set(shaderX * 2.0, shaderY * 2.0, 0);
     }
-
     function renderLoop() {
       const { renderer, scene, camera, clock, uniforms } = threeRef.current;
       if (!renderer) return;

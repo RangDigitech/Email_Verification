@@ -3,134 +3,172 @@ import { Link } from 'react-router-dom';
 import './BuyCreditsModal.css';
 
 function BuyCreditsModal({ onClose }) {
-  const [selectedCredits, setSelectedCredits] = useState(1000);
-  const [isMonthly, setIsMonthly] = useState(true);
+  const [selectedCredits, setSelectedCredits] = useState(5000);
+  const [isMonthly, setIsMonthly] = useState(false);
   const [email, setEmail] = useState('');
 
   const creditOptions = [
-    { amount: 100, label: '100 Credits', price: 2.99, perCredit: 0.0299 },
-    { amount: 500, label: '500 Credits', price: 9.99, perCredit: 0.0199 },
-    { amount: 1000, label: '1K Credits', price: 15.99, perCredit: 0.0159 },
-    { amount: 2500, label: '2.5K Credits', price: 29.99, perCredit: 0.0119 },
-    { amount: 5000, label: '5K Credits', price: 49.99, perCredit: 0.0099 },
-    { amount: 10000, label: '10K Credits', price: 79.99, perCredit: 0.0079 },
-    { amount: 25000, label: '25K Credits', price: 149.99, perCredit: 0.0059 },
-    { amount: 50000, label: '50K Credits', price: 249.99, perCredit: 0.0049 }
+    { amount: 5000, price: 10.00, perCreditPayg: 0.0021, perCreditMonthly: 0.001785 },
+    { amount: 10000, price: 15.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 20000, price: 30.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 40000, price: 60.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 80000, price: 80.00, perCreditPayg: 0.0010, perCreditMonthly: 0.00085 },
+    { amount: 100000, price: 100.00, perCreditPayg: 0.0010, perCreditMonthly: 0.000765 },
+    { amount: 200000, price: 180.00, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
+    { amount: 1000000, price: 900.00, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
   ];
 
   const calculatePrice = () => {
-    const selectedOption = creditOptions.find(option => option.amount === selectedCredits);
-    const basePrice = selectedOption ? selectedOption.price : selectedCredits * 0.01;
-    return isMonthly ? basePrice : basePrice * 0.8; // 20% discount for yearly
+    const option = creditOptions.find(o => o.amount === selectedCredits);
+    const base = option ? option.price : selectedCredits * 0.01;
+    return isMonthly ? base * 0.85 : base; // 15% monthly discount
   };
 
   const getPerCreditPrice = () => {
-    const selectedOption = creditOptions.find(option => option.amount === selectedCredits);
-    return selectedOption ? selectedOption.perCredit : 0.01;
+    const option = creditOptions.find(o => o.amount === selectedCredits);
+    
+    if (option) {
+      // Use the fixed per-credit rate from the CSV data
+      const perCredit = isMonthly ? option.perCreditMonthly : option.perCreditPayg;
+      
+      if (perCredit >= 0.01) {
+        return `$${perCredit.toFixed(2)}`;
+      } else if (perCredit >= 0.001) {
+        return `$${perCredit.toFixed(4)}`;
+      } else {
+        return `$${perCredit.toFixed(6)}`;
+      }
+    } else {
+      // For custom amounts, calculate dynamically
+      const totalPrice = calculatePrice();
+      const perCredit = totalPrice / selectedCredits;
+      
+      if (perCredit >= 0.01) {
+        return `$${perCredit.toFixed(2)}`;
+      } else if (perCredit >= 0.001) {
+        return `$${perCredit.toFixed(4)}`;
+      } else {
+        return `$${perCredit.toFixed(6)}`;
+      }
+    }
   };
 
-  const formatPrice = (price) => {
-    return price < 1 ? `$${price.toFixed(2)}` : `$${Math.round(price)}`;
-  };
+  const handleToggle = () => setIsMonthly(!isMonthly);
+  const handleSelect = (amt) => setSelectedCredits(amt);
+  const formatPrice = (p) => `$${p.toFixed(2)}`;
 
-  const handleCreditSelect = (amount) => {
-    setSelectedCredits(amount);
-  };
+  const option = creditOptions.find(o => o.amount === selectedCredits);
+  const basePrice = option ? option.price : selectedCredits * 0.01;
+  const discounted = basePrice * 0.85;
+  const save = (basePrice - discounted).toFixed(2);
 
-  const handleToggle = () => {
-    setIsMonthly(!isMonthly);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log('Email:', email, 'Credits:', selectedCredits, 'Billing:', isMonthly ? 'Monthly' : 'Yearly');
-    onClose(); // Close modal after submission
-  };
-
-  // Prevent background scroll when modal is open
   React.useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
+    return () => { document.body.style.overflow = originalOverflow; };
   }, []);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Close button */}
         <button className="modal-close" onClick={onClose}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
 
+        <div className="modal-header">
+          <h1>Buy Credits</h1>
+        </div>
+
         <div className="pricing-container">
-          {/* Left Panel - Credit Selection */}
+          {/* LEFT SIDE – PACKAGE GRID */}
           <div className="credit-selector">
-            <h2>Choose Your Credits</h2>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="email"
-                className="email-input"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <div className="selector-label">Select credit package:</div>
-              <div className="credit-grid">
+            <h2 className="section-title">CHOOSE A PACKAGE</h2>
+            
+            <div className="credit-grid">
               {creditOptions.map((option) => (
                 <div
                   key={option.amount}
-                  className={`credit-option ${selectedCredits === option.amount ? 'active' : ''}`}
-                  onClick={() => handleCreditSelect(option.amount)}
+                  className={`credit-card ${selectedCredits === option.amount ? 'active' : ''}`}
+                  onClick={() => handleSelect(option.amount)}
                 >
-                  <span className="amount">{option.amount.toLocaleString()}</span>
-                  <span className="label">{option.label}</span>
-                  <span className="price">${option.price}</span>
+                  {selectedCredits === option.amount && (
+                    <div className="checkmark">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="credit-amount">{option.amount.toLocaleString()}</div>
+                  <div className="credit-text">Credits</div>
                 </div>
               ))}
-              </div>
-            </form>
+            </div>
+
+            <div className="custom-amount-section">
+              <p className="custom-label">OR ENTER AN AMOUNT OF CREDITS</p>
+              <input
+                type="number"
+                className="custom-input"
+                placeholder="5,000"
+                min="1"
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val > 0) setSelectedCredits(val);
+                }}
+              />
+            </div>
           </div>
 
-          {/* Right Panel - Pricing Card */}
+          {/* RIGHT SIDE – PRICE CARD */}
           <div className="pricing-card">
             <div className="toggle-container">
-              <span className={`toggle-label ${!isMonthly ? 'active' : ''}`}>Yearly</span>
-              <div className={`toggle-switch ${isMonthly ? '' : 'monthly'}`} onClick={handleToggle}></div>
-              <span className={`toggle-label ${isMonthly ? 'active' : ''}`}>Monthly</span>
+              <span className={`toggle-label ${!isMonthly ? 'active' : ''}`}>Pay-As-You-Go</span>
+              <div className={`toggle-switch ${isMonthly ? 'monthly' : ''}`} onClick={handleToggle}>
+                <div className="toggle-slider"></div>
+              </div>
+              <span className={`toggle-label ${isMonthly ? 'active' : ''}`}>Subscription</span>
             </div>
 
             <div className="price-display">
-              <div className="price-value">{formatPrice(getPerCreditPrice())}</div>
-              <div className="price-details">
-                <div className="price-detail">
-                  <span className="value">{formatPrice(calculatePrice())}</span>
-                  <span className="label">Total Price</span>
-                </div>
-                <div className="price-detail">
-                  <span className="value">{selectedCredits.toLocaleString()}</span>
-                  <span className="label">Credits</span>
-                </div>
+              {isMonthly && (
+                <>
+                  <div className="old-price">{formatPrice(basePrice)}</div>
+                  <div className="save-badge">SAVE ${save}</div>
+                </>
+              )}
+              
+              <div className="new-price">
+                {formatPrice(isMonthly ? discounted : basePrice)}
+                {isMonthly && <span className="per-month">/month</span>}
+              </div>
+
+              <div className="per-credit">
+                COST PER CREDIT
+                <div className="per-credit-value">{getPerCreditPrice()}</div>
+              </div>
+            </div>
+
+            <div className="price-breakdown">
+              <div className="breakdown-row">
+                <span>{selectedCredits.toLocaleString()} credits</span>
+                <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
+              </div>
+              <div className="breakdown-row total">
+                <span>Total</span>
+                <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
               </div>
             </div>
 
             <Link to="/signup">
-              <button className="cta-button">
-                Get Started
-              </button>
+              <button className="cta-button">NEXT</button>
             </Link>
-            <div className="free-credits">250 free credits included</div>
 
             <ul className="benefits">
               <li>Real-time email validation</li>
               <li>Bulk verification support</li>
               <li>API access included</li>
-              <li>99.9% accuracy guarantee</li>
               <li>24/7 customer support</li>
             </ul>
           </div>

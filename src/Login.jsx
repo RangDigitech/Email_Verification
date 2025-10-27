@@ -56,7 +56,7 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <img src="/src/assets/email_logo.png" alt="Verifier Logo" className="auth-logo" />
+        <img src="/email_logo.png" alt="Verifier Logo" className="auth-logo" />
         <h2>Welcome Back</h2>
         <p>Sign in to continue your journey with Verifier</p>
 

@@ -130,7 +130,7 @@ import { register, checkEmailDisposable } from "./api";
         <div className="auth-card">
           <div className="signup-logo">
             <img
-              src="/src/assets/email_logo.png"
+              src="/email_logo.png"
               alt="Email Verifier Logo"
               className="auth-logo"
             />
