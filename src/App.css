@@ -126,22 +126,23 @@ body {
   font-size: 0.95rem;
   letter-spacing: 0.3px;
 }
-
 .login-btn {
-  background: #ffffff;
+  background: transparent;
   color: #ffffff !important;
   border: 2px solid #ffffff;
+  transition: all 0.3s ease;
 }
 
 .login-btn:hover {
-  background: #ffffff;
-  color: #ffffff;
+  background: #ffffff !important;
+  color: #000000 !important;
 }
 
 .signup-btn {
   background: #ffffff;
   color: #000000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
 .signup-btn:hover {

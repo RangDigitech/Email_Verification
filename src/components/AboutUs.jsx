@@ -46,43 +46,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Market Positioning */}
-      <section className="market-section">
-        <div className="market-container">
-          <h2 className="market-title">We are setting new standards and raising the bar for the email validation market.</h2>
-          <div className="market-chart">
-            <div className="chart-area">
-              <div className="chart-line others">Others</div>
-              <div className="chart-line buzz">AI Email Verifier</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Problem Section */}
-      <section className="problem-section">
-        <div className="problem-container">
-          <h2 className="problem-title">$20+ billion in sales opportunities are lost each year.</h2>
-          <p className="problem-description">
-            According to SendGrid, about 20% of emails never end up reaching their intended recipients, 
-            resulting in tens of billions of dollars in estimated revenue loss opportunities globally each year.
-          </p>
-        </div>
-      </section>
-
-      {/* Trust Section */}
-      <section className="trust-section">
-        <div className="trust-container">
-          <h2 className="trust-title">Coming soon to businesses worldwide</h2>
-          <div className="trust-logos">
-            <div className="logo-placeholder">Partner 1</div>
-            <div className="logo-placeholder">Partner 2</div>
-            <div className="logo-placeholder">Partner 3</div>
-            <div className="logo-placeholder">Partner 4</div>
-            <div className="logo-placeholder">Partner 5</div>
-          </div>
-        </div>
-      </section>
 
       {/* Global Team */}
       <section className="global-team-section">
@@ -94,45 +58,6 @@ export default function AboutUs() {
             affordable and straightforward. Headquartered in New York with offices in Miami, Los Angeles, and 
             São Paulo, AI Email Verifier is a global team spread across Europe, South America, and Asia.
           </p>
-        </div>
-      </section>
-
-      {/* Our Team */}
-      <section className="team-section">
-        <div className="team-container">
-          <h2 className="team-title">Our Team</h2>
-          <div className="team-grid">
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">John Smith</div>
-              <div className="member-title">Chief Executive Officer</div>
-            </div>
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">Sarah Johnson</div>
-              <div className="member-title">Chief Technology Officer</div>
-            </div>
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">Mike Chen</div>
-              <div className="member-title">VP of Engineering</div>
-            </div>
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">Lisa Rodriguez</div>
-              <div className="member-title">VP of Operations</div>
-            </div>
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">David Kim</div>
-              <div className="member-title">Head of Marketing</div>
-            </div>
-            <div className="team-member">
-              <div className="member-avatar"></div>
-              <div className="member-name">Emma Wilson</div>
-              <div className="member-title">Lead Software Engineer</div>
-            </div>
-          </div>
         </div>
       </section>
 

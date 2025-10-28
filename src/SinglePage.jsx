@@ -151,7 +151,7 @@ export default function SinglePage() {
       </section>
 
       {/* TESTIMONIAL */}
-      <section className="single-testimonial">
+      {/* <section className="single-testimonial">
         <div className="container">
           <blockquote>
             “Being a smaller company, every email send is crucial to us. This
@@ -160,7 +160,7 @@ export default function SinglePage() {
           </blockquote>
           <p className="author">— R. Rajendra, Marketing Director</p>
         </div>
-      </section>
+      </section> */}
 
       {/* FINAL CTA */}
       <section className="single-final">
