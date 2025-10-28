@@ -1,26 +1,14 @@
+
 import React from "react";
+import { Navbar } from "../App"; // Import the Navbar from App.jsx
+import { Footer } from "../App"; // ADD THIS - Import Footer
 import "./AboutUs.css";
 
 export default function AboutUs() {
   return (
     <div className="about-us">
-      {/* Header/Navigation */}
-      <nav className="navbar">
-        <div className="nav-logo">
-          <img src="/email_logo.png" alt="Verifier Logo" className="logo" />
-          <span>AI Email Verifier</span>
-        </div>
-        <ul className="nav-links">
-          <li>Soltions</li>
-          <li><a href="/pricing">Pricing</a></li>
-          <li>About us</li>
-          <li>Help</li>
-        </ul>
-        <div className="nav-actions">
-          <button className="login-btn">Login</button>
-          <button className="signup-btn">Sign Up Free</button>
-        </div>
-      </nav>
+      {/* Use the imported Navbar component */}
+      <Navbar />
 
       {/* Hero Section */}
       <section className="hero-section">
@@ -159,68 +147,9 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="about-footer">
-        <div className="footer-container">
-          <div className="footer-columns">
-            <div className="footer-column">
-              <h3>Solutions</h3>
-              <ul>
-                <li><a href="#bulk">Bulk</a></li>
-                <li><a href="#verifier">Verifier</a></li>
-                <li><a href="#api">API</a></li>
-                <li><a href="#widget">Widget</a></li>
-                <li><a href="#deliverability">Deliverability</a></li>
-              </ul>
-            </div>
-            <div className="footer-column">
-              <h3>Product</h3>
-              <ul>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#pricing">Pricing</a></li>
-                <li><a href="#integrations">Integrations</a></li>
-                <li><a href="#api-docs">API Documentation</a></li>
-              </ul>
-            </div>
-            <div className="footer-column">
-              <h3>Company</h3>
-              <ul>
-                <li><a href="#about">About</a></li>
-                <li><a href="#careers">Careers</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="#press">Press</a></li>
-              </ul>
-            </div>
-            <div className="footer-column">
-              <h3>Resources</h3>
-              <ul>
-                <li><a href="#blog">Blog</a></li>
-                <li><a href="#help">Help Center</a></li>
-                <li><a href="#guides">Guides</a></li>
-                <li><a href="#status">Status</a></li>
-              </ul>
-            </div>
-            <div className="footer-column">
-              <h3>Legal</h3>
-              <ul>
-                <li><a href="#privacy">Privacy Policy</a></li>
-                <li><a href="#terms">Terms of Service</a></li>
-                <li><a href="#security">Security</a></li>
-                <li><a href="#compliance">Compliance</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <div className="footer-copyright">
-              Copyright © 2024 AI Email Verifier, LLC. All rights reserved.
-            </div>
-            <div className="footer-badges">
-              <span className="badge">SOC 2 TYPE II CERTIFIED</span>
-              <span className="badge">GDPR COMPLIANT</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* ADD FOOTER HERE */}
+      <Footer />
+
     </div>
   );
 }

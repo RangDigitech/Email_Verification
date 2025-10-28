@@ -1,4 +1,3 @@
-/* Buy Credits Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -6,13 +5,15 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 20px;
 }
-
+ 
 .modal-content {
   background: #0a0a0a;
   border-radius: 12px;
@@ -23,7 +24,7 @@
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
-
+ 
 .modal-close {
   position: absolute;
   top: 24px;
@@ -37,52 +38,52 @@
   transition: all 0.2s ease;
   z-index: 10;
 }
-
+ 
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
-
+ 
 .modal-close svg {
   width: 20px;
   height: 20px;
 }
-
+ 
 .modal-header {
   padding: 2rem 2.5rem 1rem;
   border-bottom: 1px solid #1a1a1a;
 }
-
+ 
 .modal-header h1 {
   font-size: 1.5rem;
   font-weight: 600;
   color: #fff;
   margin: 0;
 }
-
+ 
 .pricing-container {
   display: flex;
   gap: 3rem;
   padding: 2.5rem;
   min-height: 500px;
 }
-
+ 
 /* ===== LEFT SIDE - CREDIT SELECTOR ===== */
 .credit-selector {
   flex: 1;
   color: #fff;
-  max-width: 680px; /* Increased width for better spacing */
+  max-width: 680px;
 }
-
+ 
 .section-title {
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #999;
+  color: #ffffff;
   margin-bottom: 1.5rem;
   text-transform: uppercase;
 }
-
+ 
 /* Package Grid */
 .credit-grid {
   display: grid;
@@ -90,7 +91,7 @@
   gap: 1rem;
   margin-bottom: 2rem;
 }
-
+ 
 .credit-card {
   background: #0a0a0a;
   border: 2px solid #222;
@@ -106,18 +107,18 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .credit-card:hover {
   border-color: #444;
   background: #111;
 }
-
+ 
 .credit-card.active {
   border-color: #fff;
   background: #1a1a1a;
   box-shadow: 0 0 0 1px #fff;
 }
-
+ 
 .checkmark {
   position: absolute;
   top: 8px;
@@ -130,13 +131,13 @@
   align-items: center;
   justify-content: center;
 }
-
+ 
 .checkmark svg {
   width: 12px;
   height: 12px;
   color: #000;
 }
-
+ 
 .credit-amount {
   font-size: 1.5rem;
   font-weight: 700;
@@ -144,51 +145,51 @@
   line-height: 1.2;
   margin-bottom: 0.25rem;
 }
-
+ 
 .credit-text {
   font-size: 0.85rem;
   color: #999;
   font-weight: 400;
 }
-
+ 
 /* Custom Amount Section */
 .custom-amount-section {
   margin-top: 2rem;
 }
-
+ 
 .custom-label {
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #e20202; /* Changed to black */
+  color: #ffffff;
   margin-bottom: 1rem;
   text-transform: uppercase;
 }
-
+ 
 .custom-input {
   width: 100%;
-  max-width: 100%; /* Full width of container */
+  max-width: 100%;
   padding: 0.875rem 1rem;
-  border: 2px solid #000; /* Black border */
+  border: 2px solid #000;
   border-radius: 8px;
   font-size: 1rem;
-  color: #fff; /* White text */
-  background: #000; /* Black background */
+  color: #fff;
+  background: #000;
   transition: all 0.2s ease;
   text-align: center;
   font-weight: 500;
 }
-
+ 
 .custom-input:focus {
   outline: none;
   border-color: #333;
   background: #0a0a0a;
 }
-
+ 
 .custom-input::placeholder {
-  color: #ffffff; /* Gray placeholder */
+  color: #666;
 }
-
+ 
 /* ===== RIGHT SIDE - PRICING CARD ===== */
 .pricing-card {
   background: #141414;
@@ -200,7 +201,74 @@
   display: flex;
   flex-direction: column;
 }
-
+ 
+/* ===== CONTACT CARD (when exceeds max) ===== */
+.pricing-card.contact-card {
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+ 
+.contact-message {
+  text-align: center;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+ 
+.contact-message h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+ 
+.contact-message p {
+  font-size: 1.1rem;
+  color: #999;
+  margin: 0;
+  font-weight: 400;
+}
+ 
+.contact-button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 16px 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+ 
+.contact-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+  background: #f0f0f0;
+}
+ 
+.contact-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+ 
 /* ===== Toggle Switch ===== */
 .toggle-container {
   display: flex;
@@ -211,19 +279,19 @@
   padding-bottom: 2rem;
   border-bottom: 1px solid #222;
 }
-
+ 
 .toggle-label {
   font-size: 0.9rem;
   color: #666;
   transition: all 0.3s;
   font-weight: 500;
 }
-
+ 
 .toggle-label.active {
   color: #fff;
   font-weight: 600;
 }
-
+ 
 .toggle-switch {
   width: 52px;
   height: 28px;
@@ -234,12 +302,12 @@
   transition: background 0.3s;
   border: 2px solid #444;
 }
-
+ 
 .toggle-switch.monthly {
   background: #fff;
   border-color: #fff;
 }
-
+ 
 .toggle-slider {
   position: absolute;
   width: 20px;
@@ -251,29 +319,29 @@
   transition: transform 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
+ 
 .toggle-switch.monthly .toggle-slider {
   transform: translateX(24px);
   background: #000;
 }
-
+ 
 /* ===== Price Display ===== */
 .price-display {
   text-align: center;
   margin-bottom: 2rem;
 }
-
+ 
 .old-price {
   font-size: 1rem;
   color: #666;
   text-decoration: line-through;
   margin-bottom: 0.5rem;
 }
-
+ 
 .save-badge {
   display: inline-block;
-  background: #10b981;
-  color: #fff;
+  background: #fff;
+  color: #000;
   font-weight: 700;
   border-radius: 4px;
   padding: 4px 12px;
@@ -281,7 +349,7 @@
   margin-bottom: 0.75rem;
   letter-spacing: 0.05em;
 }
-
+ 
 .new-price {
   font-size: 3rem;
   font-weight: 700;
@@ -289,14 +357,14 @@
   line-height: 1;
   margin-bottom: 1rem;
 }
-
+ 
 .per-month {
   font-size: 1.25rem;
   color: #999;
   font-weight: 400;
   margin-left: 4px;
 }
-
+ 
 .per-credit {
   font-size: 0.75rem;
   font-weight: 600;
@@ -305,7 +373,7 @@
   text-transform: uppercase;
   margin-top: 1rem;
 }
-
+ 
 .per-credit-value {
   font-size: 1rem;
   color: #fff;
@@ -314,7 +382,7 @@
   letter-spacing: normal;
   text-transform: none;
 }
-
+ 
 /* ===== Price Breakdown ===== */
 .price-breakdown {
   background: #0a0a0a;
@@ -322,7 +390,7 @@
   padding: 1.25rem;
   margin-bottom: 1.5rem;
 }
-
+ 
 .breakdown-row {
   display: flex;
   justify-content: space-between;
@@ -331,7 +399,7 @@
   font-size: 0.9rem;
   color: #ccc;
 }
-
+ 
 .breakdown-row.total {
   border-top: 1px solid #2a2a2a;
   margin-top: 0.5rem;
@@ -340,13 +408,13 @@
   font-size: 1rem;
   color: #fff;
 }
-
+ 
 /* ===== CTA Button ===== */
 .cta-button {
   width: 100%;
   padding: 1rem;
-  background: #6366f1;
-  color: #fff;
+  background: #fff;
+  color: #000;
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -357,20 +425,20 @@
   margin-bottom: 1.5rem;
   text-transform: uppercase;
 }
-
+ 
 .cta-button:hover {
-  background: #5558e3;
+  background: #e6e6e6;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
-
+ 
 /* ===== Benefits List ===== */
 .benefits {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
+ 
 .benefits li {
   padding: 0.625rem 0;
   font-size: 0.875rem;
@@ -378,79 +446,92 @@
   display: flex;
   align-items: center;
 }
-
+ 
 .benefits li::before {
   content: '✓';
-  color: #10b981;
+  color: #fff;
   font-weight: 700;
   margin-right: 0.75rem;
   font-size: 1rem;
 }
-
+ 
 /* ===== Responsive Design ===== */
 @media (max-width: 968px) {
   .pricing-container {
     flex-direction: column;
     gap: 2rem;
   }
-
+ 
   .pricing-card {
     flex: 1;
     max-width: 100%;
   }
-
+ 
   .credit-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
+ 
 @media (max-width: 640px) {
   .modal-header {
     padding: 1.5rem 1.5rem 0.75rem;
   }
-
+ 
   .pricing-container {
     padding: 1.5rem;
   }
-
+ 
   .credit-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
-
+ 
   .credit-card {
     padding: 1.25rem 0.75rem;
     min-height: 80px;
   }
-
+ 
   .credit-amount {
     font-size: 1.25rem;
   }
-
+ 
   .credit-text {
     font-size: 0.75rem;
   }
-
+ 
   .new-price {
     font-size: 2.5rem;
   }
-
+ 
   .pricing-card {
     padding: 1.5rem;
   }
+ 
+  .contact-message {
+    padding: 30px 20px;
+  }
+ 
+  .contact-message h2 {
+    font-size: 1.5rem;
+  }
+ 
+  .contact-message p {
+    font-size: 1rem;
+  }
 }
-
+ 
 @media (max-width: 480px) {
   .credit-grid {
     grid-template-columns: 1fr;
   }
-
+ 
   .toggle-container {
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-
+ 
   .new-price {
     font-size: 2rem;
   }
 }
+ 

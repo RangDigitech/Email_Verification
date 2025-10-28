@@ -1,14 +1,15 @@
+ 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
-
+ 
 body {
   background: #ffffff;
 }
-
+ 
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -16,25 +17,25 @@ body {
   background: #ffffff;
   min-height: 100vh;
 }
-
+ 
 /* Hero Section */
 .pricing-hero {
   text-align: center;
   padding: 3rem 1rem 4rem;
 }
-
+ 
 .pricing-hero h1 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #000000;
   margin-bottom: 1rem;
 }
-
+ 
 .pricing-hero p {
   font-size: 1.1rem;
   color: #000000;
 }
-
+ 
 /* Pricing Container */
 .pricing-container {
   display: flex;
@@ -43,14 +44,14 @@ body {
   width: 100%;
   margin: 0 auto 4rem;
 }
-
+ 
 /* Left Panel - Credit Selection */
 .credit-selector {
   flex: 1;
   color: #fff;
   max-width: 680px;
 }
-
+ 
 .section-title {
   font-size: 0.75rem;
   font-weight: 600;
@@ -59,7 +60,7 @@ body {
   margin-bottom: 1.5rem;
   text-transform: uppercase;
 }
-
+ 
 /* Package Grid */
 .credit-grid {
   display: grid;
@@ -67,7 +68,7 @@ body {
   gap: 1rem;
   margin-bottom: 2rem;
 }
-
+ 
 .credit-card {
   background: #0a0a0a;
   border: 2px solid #222;
@@ -83,18 +84,18 @@ body {
   align-items: center;
   justify-content: center;
 }
-
+ 
 .credit-card:hover {
   border-color: #444;
   background: #111;
 }
-
+ 
 .credit-card.active {
   border-color: #fff;
   background: #1a1a1a;
   box-shadow: 0 0 0 1px #fff;
 }
-
+ 
 .checkmark {
   position: absolute;
   top: 8px;
@@ -107,13 +108,13 @@ body {
   align-items: center;
   justify-content: center;
 }
-
+ 
 .checkmark svg {
   width: 12px;
   height: 12px;
   color: #000;
 }
-
+ 
 .credit-amount {
   font-size: 1.5rem;
   font-weight: 700;
@@ -121,18 +122,18 @@ body {
   line-height: 1.2;
   margin-bottom: 0.25rem;
 }
-
+ 
 .credit-text {
   font-size: 0.85rem;
   color: #999;
   font-weight: 400;
 }
-
+ 
 /* Custom Amount Section */
 .custom-amount-section {
   margin-top: 2rem;
 }
-
+ 
 .custom-label {
   font-size: 0.75rem;
   font-weight: 600;
@@ -141,7 +142,7 @@ body {
   margin-bottom: 1rem;
   text-transform: uppercase;
 }
-
+ 
 .custom-input {
   width: 100%;
   max-width: 100%;
@@ -155,17 +156,17 @@ body {
   text-align: center;
   font-weight: 500;
 }
-
+ 
 .custom-input:focus {
   outline: none;
   border-color: #333;
   background: #0a0a0a;
 }
-
+ 
 .custom-input::placeholder {
   color: #666;
 }
-
+ 
 /* Right Panel - Pricing Card */
 .pricing-card {
   background: #0a0a0a;
@@ -177,7 +178,7 @@ body {
   display: flex;
   flex-direction: column;
 }
-
+ 
 /* Toggle Switch */
 .toggle-container {
   display: flex;
@@ -188,19 +189,19 @@ body {
   padding-bottom: 2rem;
   border-bottom: 1px solid #222;
 }
-
+ 
 .toggle-label {
   font-size: 0.9rem;
   color: #666;
   transition: all 0.3s;
   font-weight: 500;
 }
-
+ 
 .toggle-label.active {
   color: #fff;
   font-weight: 600;
 }
-
+ 
 .toggle-switch {
   width: 52px;
   height: 28px;
@@ -211,12 +212,12 @@ body {
   transition: background 0.3s;
   border: 2px solid #444;
 }
-
+ 
 .toggle-switch.monthly {
   background: #fff;
   border-color: #fff;
 }
-
+ 
 .toggle-slider {
   position: absolute;
   width: 20px;
@@ -228,25 +229,25 @@ body {
   transition: transform 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
+ 
 .toggle-switch.monthly .toggle-slider {
   transform: translateX(24px);
   background: #000;
 }
-
+ 
 /* Price Display */
 .price-display {
   text-align: center;
   margin-bottom: 2rem;
 }
-
+ 
 .old-price {
   font-size: 1rem;
   color: #666;
   text-decoration: line-through;
   margin-bottom: 0.5rem;
 }
-
+ 
 .save-badge {
   display: inline-block;
   background: #fff;
@@ -258,7 +259,7 @@ body {
   margin-bottom: 0.75rem;
   letter-spacing: 0.05em;
 }
-
+ 
 .new-price {
   font-size: 3rem;
   font-weight: 700;
@@ -266,14 +267,14 @@ body {
   line-height: 1;
   margin-bottom: 1rem;
 }
-
+ 
 .per-month {
   font-size: 1.25rem;
   color: #999;
   font-weight: 400;
   margin-left: 4px;
 }
-
+ 
 .per-credit {
   font-size: 0.75rem;
   font-weight: 600;
@@ -282,7 +283,7 @@ body {
   text-transform: uppercase;
   margin-top: 1rem;
 }
-
+ 
 .per-credit-value {
   font-size: 1rem;
   color: #fff;
@@ -291,7 +292,7 @@ body {
   letter-spacing: normal;
   text-transform: none;
 }
-
+ 
 /* Price Breakdown */
 .price-breakdown {
   background: #000;
@@ -300,7 +301,7 @@ body {
   margin-bottom: 1.5rem;
   border: 1px solid #222;
 }
-
+ 
 .breakdown-row {
   display: flex;
   justify-content: space-between;
@@ -309,7 +310,7 @@ body {
   font-size: 0.9rem;
   color: #ccc;
 }
-
+ 
 .breakdown-row.total {
   border-top: 1px solid #222;
   margin-top: 0.5rem;
@@ -318,7 +319,7 @@ body {
   font-size: 1rem;
   color: #fff;
 }
-
+ 
 /* CTA Button */
 .cta-button {
   width: 100%;
@@ -333,20 +334,20 @@ body {
   transition: all 0.2s;
   margin-bottom: 1.5rem;
 }
-
+ 
 .cta-button:hover {
   background: #e6e6e6;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
-
+ 
 /* Benefits List */
 .benefits {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
+ 
 .benefits li {
   padding: 0.625rem 0;
   font-size: 0.875rem;
@@ -354,7 +355,7 @@ body {
   display: flex;
   align-items: center;
 }
-
+ 
 .benefits li::before {
   content: '✓';
   color: #fff;
@@ -362,7 +363,133 @@ body {
   margin-right: 0.75rem;
   font-size: 1rem;
 }
-
+ 
+/* Modal Overlay - appears when credits exceed limit */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+ 
+.modal-overlay.active {
+  display: flex;
+}
+ 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+ 
+/* Contact Modal Card */
+.contact-modal {
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 60px 50px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  animation: slideUp 0.4s ease;
+  position: relative;
+}
+ 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+.contact-modal h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+ 
+.contact-modal p {
+  font-size: 1.1rem;
+  color: #999;
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+}
+ 
+.contact-button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 16px 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+ 
+.contact-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+  background: #f0f0f0;
+}
+ 
+.contact-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+ 
+/* Close button for modal */
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+ 
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+ 
 /* Included Section */
 .included-section {
   background: #0a0a0a;
@@ -371,7 +498,7 @@ body {
   padding: 3rem 2rem;
   margin-bottom: 4rem;
 }
-
+ 
 .included-section h2 {
   text-align: center;
   font-size: 1.8rem;
@@ -379,14 +506,14 @@ body {
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
-
+ 
 .included-section .subtitle {
   text-align: center;
   color: #999;
   font-size: 0.95rem;
   margin-bottom: 3rem;
 }
-
+ 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -394,11 +521,11 @@ body {
   max-width: 900px;
   margin: 0 auto;
 }
-
+ 
 .feature-item {
   text-align: center;
 }
-
+ 
 .feature-icon {
   width: 60px;
   height: 60px;
@@ -410,20 +537,20 @@ body {
   justify-content: center;
   font-size: 1.8rem;
 }
-
+ 
 .feature-item h3 {
   font-size: 1.1rem;
   color: #fff;
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
-
+ 
 .feature-item p {
   color: #999;
   font-size: 0.9rem;
   line-height: 1.5;
 }
-
+ 
 /* FAQ Section */
 .faq-section {
   background: #0a0a0a;
@@ -431,7 +558,7 @@ body {
   border-radius: 16px;
   padding: 3rem 2rem;
 }
-
+ 
 .faq-section h2 {
   text-align: center;
   font-size: 1.8rem;
@@ -439,7 +566,7 @@ body {
   margin-bottom: 2.5rem;
   font-weight: 600;
 }
-
+ 
 .faq-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -447,18 +574,18 @@ body {
   max-width: 1000px;
   margin: 0 auto;
 }
-
+ 
 .faq-item {
   padding-bottom: 1.5rem;
 }
-
+ 
 .faq-question {
   display: flex;
   align-items: flex-start;
   gap: 0.8rem;
   margin-bottom: 0.8rem;
 }
-
+ 
 .faq-icon {
   width: 24px;
   height: 24px;
@@ -472,93 +599,107 @@ body {
   color: #000;
   font-weight: 700;
 }
-
+ 
 .faq-question h3 {
   font-size: 1rem;
   color: #fff;
   font-weight: 600;
   line-height: 1.4;
 }
-
+ 
 .faq-answer {
   color: #999;
   font-size: 0.9rem;
   line-height: 1.6;
   padding-left: 2rem;
 }
-
+ 
 /* Responsive Design */
 @media (max-width: 968px) {
   .pricing-container {
     flex-direction: column;
     gap: 2rem;
   }
-
+ 
   .pricing-card {
     flex: 1;
     max-width: 100%;
   }
-
+ 
   .credit-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
+ 
 @media (max-width: 640px) {
   .pricing-hero h1 {
     font-size: 2rem;
   }
-
+ 
   .pricing-hero p {
     font-size: 1rem;
   }
-
+ 
   .credit-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
-
+ 
   .credit-card {
     padding: 1.25rem 0.75rem;
     min-height: 80px;
   }
-
+ 
   .credit-amount {
     font-size: 1.25rem;
   }
-
+ 
   .credit-text {
     font-size: 0.75rem;
   }
-
+ 
   .new-price {
     font-size: 2.5rem;
   }
-
+ 
   .pricing-card {
     padding: 1.5rem;
   }
-
+ 
   .faq-grid {
     grid-template-columns: 1fr;
   }
-
+ 
   .features-grid {
     grid-template-columns: 1fr;
   }
+ 
+  .contact-modal {
+    padding: 40px 30px;
+    max-width: 90%;
+  }
+ 
+  .contact-modal h2 {
+    font-size: 1.5rem;
+  }
+ 
+  .contact-modal p {
+    font-size: 1rem;
+  }
 }
-
+ 
 @media (max-width: 480px) {
   .credit-grid {
     grid-template-columns: 1fr;
   }
-
+ 
   .toggle-container {
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-
+ 
   .new-price {
     font-size: 2rem;
   }
 }
+ 

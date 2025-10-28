@@ -358,6 +358,22 @@ export async function getUserProfile() {
   }
 }
 
+//API helper to fetch one verification
+export async function getVerificationById(id) {
+  const res = await fetch(apiUrl(`/verifications/${id}`), {
+    method: "GET",
+    headers: { ... (localStorage.getItem("accessToken") ? { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } : {}), Accept: "application/json" },
+    credentials: "include",
+    cache: "no-cache",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  return await res.json();
+}
+
+
 // Update user profile data
 export async function updateUserProfile(profileData) {
   try {

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { Link } from "react-router-dom";
 
+/* ----------------------- Inline mini component ----------------------- */
 const AnimatedEmailDemo = () => {
   const [email, setEmail] = React.useState("");
   const [score, setScore] = React.useState(0);
@@ -10,11 +12,11 @@ const AnimatedEmailDemo = () => {
   React.useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
+    el.style.opacity = "0";
+    el.style.transform = "translateY(20px)";
     const t = setTimeout(() => {
-      el.style.opacity = '1';
-      el.style.transform = 'translateY(0)';
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
     }, 60);
     return () => clearTimeout(t);
   }, []);
@@ -24,7 +26,6 @@ const AnimatedEmailDemo = () => {
       setScore(0);
       return;
     }
-
     const cleaned = email.trim().toLowerCase();
     let base = 60;
     if (cleaned.includes("@gmail")) base += 12;
@@ -40,96 +41,155 @@ const AnimatedEmailDemo = () => {
   const showBadge = focused || Boolean(email);
 
   return (
-    <div style={{
-      marginTop: '40px',
-      width: '100%',
-      maxWidth: '600px',
-      marginInline: 'auto'
-    }}>
-      <div 
-        ref={wrapRef}
+    <div
+      style={{
+        marginTop: "28px",
+        width: "100%",
+        maxWidth: "min(640px, 92vw)",
+        marginInline: "auto",
+      }}
+    >
+      {/* WRAPPER FOR INPUT + BUTTON - Changed to column layout */}
+      <div
         style={{
-          position: 'relative',
-          width: '100%',
-          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          alignItems: "center",
         }}
       >
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Try hello@company.com"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+        {/* INPUT FIELD */}
+        <div
+          ref={wrapRef}
           style={{
-            width: '100%',
-            padding: '18px 24px',
-            fontSize: '18px',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '2px solid #9a7bff',
-            borderRadius: '16px',
-            color: '#fff',
-            outline: 'none',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(10px)',
-            boxShadow: '0 0 0 4px rgba(154, 123, 255, 0.1)'
+            position: "relative",
+            width: "100%",
+            maxWidth: "640px",
+            transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
-        />
-
-        <div style={{
-          position: 'absolute',
-          right: '16px',
-          top: '50%',
-          transform: `translateY(-50%) scale(${showBadge ? 1 : 0.8})`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '8px 16px',
-          background: 'rgba(0, 0, 0, 0.5)',
-          borderRadius: '12px',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          opacity: showBadge ? 1 : 0,
-          pointerEvents: 'none',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          <span style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
-            background: dotColor,
-            boxShadow: `0 0 12px ${dotColor}`,
-            transition: 'all 0.3s ease'
-          }} />
-          <div style={{ textAlign: 'right' }}>
-            <div style={{
-              fontSize: '16px',
-              fontWeight: '700',
-              color: '#fff',
-              lineHeight: 1.2
-            }}>
-              {score ? `${score}%` : "--"}
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: '#999',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              lineHeight: 1
-            }}>
-              Quality
+        >
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Try hello@company.com"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            inputMode="email"
+            style={{
+              width: "100%",
+              padding: "16px clamp(16px, 3vw, 24px)",
+              fontSize: "clamp(16px, 2.5vw, 18px)",
+              fontFamily:
+                "system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif",
+              background: "rgba(255, 255, 255, 0.06)",
+              border: "2px solid #9a7bff",
+              borderRadius: "16px",
+              color: "#fff",
+              outline: "none",
+              transition: "all 0.25s ease",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 0 0 4px rgba(154, 123, 255, 0.1)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              right: "12px",
+              top: "50%",
+              transform: `translateY(-50%) scale(${showBadge ? 1 : 0.8})`,
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "8px 12px",
+              background: "rgba(0, 0, 0, 0.5)",
+              borderRadius: "12px",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              opacity: showBadge ? 1 : 0,
+              pointerEvents: "none",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            <span
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: dotColor,
+                boxShadow: `0 0 12px ${dotColor}`,
+                transition: "all 0.25s ease",
+              }}
+            />
+            <div style={{ textAlign: "right" }}>
+              <div
+                style={{
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#fff",
+                  lineHeight: 1.2,
+                }}
+              >
+                {score ? `${score}%` : "--"}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#999",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  lineHeight: 1,
+                }}
+              >
+                Quality
+              </div>
             </div>
           </div>
         </div>
+
+        {/* GET STARTED BUTTON - Now below the input */}
+        <Link to="/signup" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              padding: "16px 32px",
+              fontSize: "16px",
+              fontWeight: 700,
+              fontFamily:
+                "system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif",
+              background: "black",
+              color: "#fff",
+              border: "none",
+              borderRadius: "16px",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 16px rgba(154, 123, 255, 0.3)",
+              whiteSpace: "nowrap",
+              boxShadow : "0 6px 20px rgba(220, 220, 220, 1)",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = "black";
+              e.target.style.transform = "translateY(-2px)";
+              // e.target.style.boxShadow = "0 6px 20px rgba(220, 220, 220, 1)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "black";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "0 6px 20px rgba(220, 220, 220, 1)";
+            }}
+          >
+            Get Started Free
+          </button>
+        </Link>
       </div>
     </div>
   );
 };
 
-export default function Hero() {  
+/* ----------------------------- Hero section ----------------------------- */
+export default function Hero() {
   const heroRef = useRef(null);
   const canvasRef = useRef(null);
   const ioRef = useRef(null);
+  const cursorTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const threeRef = useRef({
     scene: null,
     camera: null,
@@ -142,44 +202,65 @@ export default function Hero() {
   });
 
   useEffect(() => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const dprClamp = () =>
       Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
 
     const uniforms = {
       uTime: { value: 0.0 },
       uResolution: { value: new THREE.Vector2(1, 1) },
+
       uMousePosition: { value: new THREE.Vector2(0.5, 0.5) },
       uCursorSphere: { value: new THREE.Vector3(0, 0, 0) },
-      uCursorRadius: { value: 0.1 },
-      uSphereCount: { value: isMobile ? 4 : 8 },
+      uCursorRadius: { value: 0.12 },
+
+      uSphereCount: { value: isMobile ? 6 : 12 },
+
       uFixedTopLeftRadius: { value: 0.85 },
-      uFixedBottomRightRadius: { value: 0.95 },
       uSmallTopLeftRadius: { value: 0.32 },
+      uFixedBottomRightRadius: { value: 0.95 },
       uSmallBottomRightRadius: { value: 0.36 },
+      uFixedTopCenterRadius: { value: 0.5 },
+      uSmallTopCenterRadius: { value: 0.22 },
+      uFixedRightCenterRadius: { value: 0.7 },
+      uSmallRightCenterRadius: { value: 0.28 },
+
+      uFixedTopRightRadius: { value: 0.55 },
+      uSmallTopRightRadius: { value: 0.24 },
+
       uMergeDistance: { value: 1.5 },
       uSmoothness: { value: 0.6 },
-      uAmbientIntensity: { value: 0.1 },
+      uAmbientIntensity: { value: 0.12 },
       uDiffuseIntensity: { value: 1.0 },
-      uSpecularIntensity: { value: 2.0 },
+      uSpecularIntensity: { value: 1.8 },
       uSpecularPower: { value: 4.0 },
-      uFresnelPower: { value: 1.0 },
+      uFresnelPower: { value: 1.2 },
+      uContrast: { value: 1.5 },
+      uFogDensity: { value: 0.06 },
+
+      uAnimationSpeed: { value: prefersReduced ? 0.0 : 0.6 },
+      uMovementScale: { value: prefersReduced ? 0.0 : 1.15 },
+      uMouseProximityEffect: { value: !prefersReduced },
+      uMinMovementScale: { value: 0.3 },
+      uMaxMovementScale: { value: 1.1 },
+
       uBackgroundColor: { value: new THREE.Color(0x000000) },
       uSphereColor: { value: new THREE.Color(0x050510) },
       uLightColor: { value: new THREE.Color(0x9a7bff) },
       uLightPosition: { value: new THREE.Vector3(0.9, 0.9, 1.2) },
-      uContrast: { value: 1.6 },
-      uFogDensity: { value: 0.06 },
-      uAnimationSpeed: { value: 0.6 },
-      uMovementScale: { value: 1.2 },
-      uMouseProximityEffect: { value: true },
-      uMinMovementScale: { value: 0.3 },
-      uMaxMovementScale: { value: 1.0 },
+
       uCursorGlowIntensity: { value: 1.1 },
       uCursorGlowRadius: { value: 2.0 },
       uCursorGlowColor: { value: new THREE.Color(0xaa77ff) },
+
       uIsMobile: { value: isMobile ? 1.0 : 0.0 },
     };
 
@@ -194,6 +275,7 @@ export default function Hero() {
         alpha: true,
         antialias: !isMobile,
         canvas: canvasRef.current,
+        powerPreference: "high-performance",
       });
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -204,9 +286,9 @@ export default function Hero() {
         uniforms,
         vertexShader: `
           varying vec2 vUv;
-          void main() {
+          void main(){
             vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
           }
         `,
         fragmentShader: `
@@ -217,11 +299,21 @@ export default function Hero() {
           uniform vec3 uCursorSphere; 
           uniform float uCursorRadius;
           uniform int uSphereCount; 
+
           uniform float uFixedTopLeftRadius; 
-          uniform float uFixedBottomRightRadius;
           uniform float uSmallTopLeftRadius; 
-          uniform float uSmallBottomRightRadius; 
-          uniform float uMergeDistance;
+          uniform float uFixedBottomRightRadius;
+          uniform float uSmallBottomRightRadius;
+
+          uniform float uFixedTopCenterRadius;
+          uniform float uSmallTopCenterRadius;
+          uniform float uFixedRightCenterRadius;
+          uniform float uSmallRightCenterRadius;
+
+          uniform float uFixedTopRightRadius;
+          uniform float uSmallTopRightRadius;
+
+          uniform float uMergeDistance; 
           uniform float uSmoothness; 
           uniform float uAmbientIntensity; 
           uniform float uDiffuseIntensity;
@@ -246,16 +338,12 @@ export default function Hero() {
 
           const float PI=3.14159265359; 
           const float EPS=.001; 
-          const float MAXD=100.0;
 
-          float smin(float a,float b,float k){ 
-            float h=max(k-abs(a-b),0.0)/k; 
-            return min(a,b)-h*h*k*0.25; 
+          float smin(float a,float b,float k){
+            float h=max(k-abs(a-b),0.0)/k;
+            return min(a,b)-h*h*k*0.25;
           }
-          
-          float sdSphere(vec3 p,float r){ 
-            return length(p)-r; 
-          }
+          float sdSphere(vec3 p,float r){return length(p)-r;}
 
           vec3 screenToWorld(vec2 n){
             vec2 uv = n * 2.0 - 1.0;
@@ -265,12 +353,20 @@ export default function Hero() {
           }
 
           float sdf(vec3 p){
-            float res=MAXD;
+            float res=1e9;
 
             vec3 tl=screenToWorld(vec2(0.08,0.92));
             vec3 stl=screenToWorld(vec2(0.25,0.72));
             vec3 br=screenToWorld(vec2(0.92,0.08));
             vec3 sbr=screenToWorld(vec2(0.72,0.25));
+
+            vec3 tc=screenToWorld(vec2(0.50,0.92));
+            vec3 stc=screenToWorld(vec2(0.50,0.74));
+            vec3 rc=screenToWorld(vec2(0.92,0.50));
+            vec3 src=screenToWorld(vec2(0.78,0.56));
+
+            vec3 tr=screenToWorld(vec2(0.92,0.88));
+            vec3 str=screenToWorld(vec2(0.80,0.82));
 
             float t=uTime*uAnimationSpeed;
             float move=uMovementScale;
@@ -279,26 +375,34 @@ export default function Hero() {
               move = mix(uMinMovementScale, uMaxMovementScale, smoothstep(0.0,0.5,d));
             }
 
-            int steps=int(min(float(uSphereCount), uIsMobile>0.5?4.0:10.0));
-            for(int i=0;i<10;i++){
+            int steps=int(min(float(uSphereCount), uIsMobile>0.5?6.0:12.0));
+            for(int i=0;i<12;i++){
               if(i>=steps) break;
               float fi=float(i);
-              float speed=.4+fi*.12;
-              float rad=.12+mod(fi,3.0)*.06;
-              float orbit=(.3+mod(fi,3.0)*.15)*move;
+              float speed=.38+fi*.11;
+              float rad=.10+mod(fi,3.0)*.06;
+              float orbit=(.26+mod(fi,3.0)*.15)*move;
               float ph=fi*PI*.35;
               vec3 off=vec3(
-                sin(t*speed+ph)*orbit*.8,
-                cos(t*speed*.85+ph*1.3)*orbit*.6,
-                sin(t*speed*.5+ph)*.3
+                sin(t*speed+ph)*orbit*.9,
+                cos(t*speed*.85+ph*1.3)*orbit*.7,
+                sin(t*speed*.5+ph)*.35
               );
               res = smin(res, sdSphere(p-off, rad), .08);
             }
 
             float g1=smin(sdSphere(p-tl,uFixedTopLeftRadius), sdSphere(p-stl,uSmallTopLeftRadius), .4);
             float g2=smin(sdSphere(p-br,uFixedBottomRightRadius), sdSphere(p-sbr,uSmallBottomRightRadius), .4);
+            float g3=smin(sdSphere(p-rc,uFixedRightCenterRadius), sdSphere(p-src,uSmallRightCenterRadius), .38);
+            float g4=smin(sdSphere(p-tc,uFixedTopCenterRadius), sdSphere(p-stc,uSmallTopCenterRadius), .38);
+            float g5=smin(sdSphere(p-tr,uFixedTopRightRadius), sdSphere(p-str,uSmallTopRightRadius), .36);
+
             res=smin(res,g1,.3);
             res=smin(res,g2,.3);
+            res=smin(res,g3,.3);
+            res=smin(res,g4,.3);
+            res=smin(res,g5,.3);
+
             res=smin(res, sdSphere(p-uCursorSphere,uCursorRadius), uSmoothness);
             return res;
           }
@@ -314,8 +418,8 @@ export default function Hero() {
 
           float march(vec3 ro, vec3 rd){
             float t=0.0; 
-            int maxS=int(uIsMobile>0.5?16.0:48.0);
-            for(int i=0;i<48;i++){
+            int maxS=int(uIsMobile>0.5?18.0:52.0);
+            for(int i=0;i<52;i++){
               if(i>=maxS) break;
               vec3 p=ro+rd*t; 
               float d=sdf(p);
@@ -327,46 +431,48 @@ export default function Hero() {
           }
 
           vec3 shade(vec3 p, vec3 rd, float tt){
-            if(tt<0.0) return vec3(0.0);
+            if(tt<0.0) return uBackgroundColor;
             vec3 N=nrm(p), V=-rd, L=normalize(uLightPosition);
             float diff=max(dot(N,L),0.0);
             float spec=pow(max(dot(V,reflect(-L,N)),0.0), uSpecularPower);
             float fres=pow(1.0-max(dot(V,N),0.0), uFresnelPower);
             vec3 col = uSphereColor
-                     + uLightColor * (uAmbientIntensity + diff*uDiffuseIntensity + spec*uSpecularIntensity)
-                     + uLightColor * fres * .35;
+              + uLightColor*(uAmbientIntensity + diff*uDiffuseIntensity + spec*uSpecularIntensity)
+              + uLightColor*fres*.35;
             col = pow(col, vec3(uContrast*.9));
             col = col / (col + vec3(.8));
             return col;
           }
 
-          float glow(vec3 ro){
-            float d=length(ro.xy - uCursorSphere.xy);
+          float glow(vec2 frag){
+            float d=length(frag - uCursorSphere.xy);
             float g=1.0 - smoothstep(0.0, uCursorGlowRadius, d);
             return pow(g,2.0) * uCursorGlowIntensity;
           }
 
           void main(){
-            vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution) / uResolution.y;
-            
+            vec2 frag = gl_FragCoord.xy;
+            vec2 uv = (frag * 2.0 - uResolution) / uResolution.y;
+
+            vec3 base = uBackgroundColor;
+
             vec3 ro = vec3(uv * 2.0, -1.0);
             vec3 rd = vec3(0.0, 0.0, 1.0);
 
             float t = march(ro, rd);
             vec3 p = ro + rd * t;
-            vec3 col = shade(p, rd, t);
-
-            float g = glow(ro);
-            vec3 gcol = uCursorGlowColor * g;
+            vec3 col = base;
 
             if(t>0.0){
+              vec3 surf = shade(p, rd, t);
               float fog = 1.0 - exp(-t*uFogDensity);
-              col = mix(col, uBackgroundColor, fog*.3);
-              col += gcol*.3;
-              gl_FragColor = vec4(col, 1.0);
-            } else {
-              gl_FragColor = vec4(gcol, g*.8);
+              col = mix(surf, base, fog*0.35);
             }
+
+            float g = glow(frag / uResolution.y);
+            col += uCursorGlowColor * g * 0.3;
+
+            gl_FragColor = vec4(col, 1.0);
           }
         `,
         transparent: true,
@@ -385,7 +491,10 @@ export default function Hero() {
       });
 
       resizeToHero();
-      handlePointer({ clientX: heroRef.current.clientWidth / 2, clientY: heroRef.current.clientHeight / 2 });
+      handlePointer({
+        clientX: heroRef.current.clientWidth / 2,
+        clientY: heroRef.current.clientHeight / 2,
+      });
     }
 
     function resizeToHero() {
@@ -395,50 +504,46 @@ export default function Hero() {
       const rect = heroRef.current.getBoundingClientRect();
       const w = Math.max(1, Math.round(rect.width));
       const h = Math.max(1, Math.round(rect.height));
-
       renderer.setPixelRatio(pr);
       renderer.setSize(w, h, false);
-      
       uniforms.uResolution.value.set(w, h);
     }
 
     function handlePointer(evt) {
       if (!threeRef.current.inView || !heroRef.current) return;
-      const { uniforms } = threeRef.current;
       const rect = heroRef.current.getBoundingClientRect();
       const clientX = evt.clientX ?? evt.touches?.[0]?.clientX;
       const clientY = evt.clientY ?? evt.touches?.[0]?.clientY;
       if (clientX == null || clientY == null) return;
 
-      // Get mouse position relative to canvas
       const mx = clientX - rect.left;
       const my = clientY - rect.top;
-      
-      // Normalized coordinates [0, 1]
-      const nx = mx / rect.width;
-      const ny = 1 - (my / rect.height); // Flip Y for shader
-      uniforms.uMousePosition.value.set(nx, ny);
 
-      // Convert to shader UV space - EXACT match with fragment shader
+      const nx = mx / rect.width;
+      const ny = 1 - my / rect.height;
+      threeRef.current.uniforms.uMousePosition.value.set(nx, ny);
+
       const w = rect.width;
       const h = rect.height;
-      
-      // Fragment shader does: (gl_FragCoord.xy * 2.0 - uResolution) / uResolution.y
-      // gl_FragCoord.xy goes from (0,0) at bottom-left to (w,h) at top-right
-      // But mouse Y goes from 0 at top to h at bottom, so we need to flip it
       const shaderX = (mx * 2.0 - w) / h;
-      const shaderY = ((h - my) * 2.0 - h) / h; // Flip Y axis here
-      
-      // Scale to world space (matching shader's ro calculation)
-      uniforms.uCursorSphere.value.set(shaderX * 2.0, shaderY * 2.0, 0);
+      const shaderY = ((h - my) * 2.0 - h) / h;
+      cursorTargetRef.current.set(shaderX * 2.0, shaderY * 2.0, 0);
     }
+
     function renderLoop() {
       const { renderer, scene, camera, clock, uniforms } = threeRef.current;
       if (!renderer) return;
       uniforms.uTime.value = clock.getElapsedTime();
+
+      const cur = uniforms.uCursorSphere.value;
+      const target = cursorTargetRef.current;
+      cur.lerp(target, 0.2);
+
       renderer.render(scene, camera);
       threeRef.current.raf = requestAnimationFrame(renderLoop);
     }
+
+    const ro = new ResizeObserver(() => resizeToHero());
 
     function start() {
       if (threeRef.current.inView) return;
@@ -449,7 +554,7 @@ export default function Hero() {
       window.addEventListener("mousemove", handlePointer, { passive: true });
       window.addEventListener("touchstart", handlePointer, { passive: true });
       window.addEventListener("touchmove", handlePointer, { passive: true });
-      window.addEventListener("resize", resizeToHero, { passive: true });
+      ro.observe(heroRef.current);
     }
 
     function stop() {
@@ -459,7 +564,7 @@ export default function Hero() {
       window.removeEventListener("mousemove", handlePointer);
       window.removeEventListener("touchstart", handlePointer);
       window.removeEventListener("touchmove", handlePointer);
-      window.removeEventListener("resize", resizeToHero);
+      ro.disconnect();
     }
 
     ioRef.current = new IntersectionObserver(
@@ -477,46 +582,54 @@ export default function Hero() {
     };
   }, []);
 
+  /* ------------------------------- styles ------------------------------- */
   const heroStyle = {
     position: "relative",
-    height: "100vh",
+    height: "min(110svh, 1000px)",
+    minHeight: "92svh",
     width: "100%",
     overflow: "hidden",
     display: "grid",
     placeItems: "center",
-    padding: "clamp(24px, 4vw, 56px)",
+    padding: "clamp(20px, 4vw, 56px)",
     background: "#000",
   };
+
   const canvasWrapStyle = {
     position: "absolute",
     inset: 0,
     zIndex: 0,
     pointerEvents: "none",
   };
+
   const contentStyle = {
     position: "relative",
     zIndex: 1,
     textAlign: "center",
-    maxWidth: 900,
+    maxWidth: "min(980px, 92vw)",
     marginInline: "auto",
     color: "#fff",
+    paddingInline: "clamp(12px, 3vw, 24px)",
+    transform: "translateY(-50px)",
   };
+
   const h1Style = {
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif",
-    fontWeight: 700,
+    fontWeight: 800,
     letterSpacing: "-0.02em",
     lineHeight: 1.04,
-    fontSize: "clamp(44px, 8vw, 80px)",
-    marginBottom: 12,
+    fontSize: "clamp(36px, 7.5vw, 80px)",
+    marginBottom: 2,
   };
+
   const pStyle = {
-    color: "#bbbbbb",
+    color: "#cfcfe6",
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif",
-    fontSize: "clamp(18px, 3vw, 24px)",
+    fontSize: "clamp(16px, 2.8vw, 22px)",
     lineHeight: 1.6,
-    maxWidth: 780,
+    maxWidth: "min(820px, 92vw)",
     margin: "0 auto",
-    padding: '20px'
+    padding: "clamp(12px, 2.2vw, 20px)",
   };
 
   return (
@@ -526,7 +639,7 @@ export default function Hero() {
       </div>
 
       <div className="hero-content" style={contentStyle}>
-        <h1 style={h1Style}>The Ultimate Email Verification</h1>
+        <h1 style={h1Style}>Make Every Email <br /> Reach Its Inbox</h1>
         <p style={pStyle}>
           Ensure your emails reach the inbox. Our real-time verification cleans
           your lists, reduces bounces, and protects your sender reputation.

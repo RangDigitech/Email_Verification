@@ -144,7 +144,7 @@
   border-color: #000000;
   color: #ffffff;
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(233, 87, 41, 0.25);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .social-btn:hover::before {
@@ -213,7 +213,7 @@
 .auth-form input:focus {
   border-color: #000000;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(233, 87, 41, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .auth-form input:hover {
@@ -247,7 +247,7 @@
 
 .submit-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(233, 87, 41, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ==============================
@@ -399,6 +399,6 @@
 .auth-form input:focus-visible,
 .submit-btn:focus-visible,
 .switch-auth a:focus-visible {
-  outline: 3px solid #E95729;
+  outline: 3px solid #000000;
   outline-offset: 2px;
 }

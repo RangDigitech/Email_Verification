@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from './auth';
@@ -185,7 +186,7 @@ export default function Dashboard() {
         <header className="dashboard-header">
           <div className="header-left">
             <div className="dashboard-logo" onClick={handleLogoClick}>
-              <svg viewBox="0 0 200 200" xmlns="src/assets/logo1.png">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                 <rect x="30" y="60" width="140" height="100" fill="#fffdfdff" rx="8" />
                 <path
                   d="M 30 60 L 100 110 L 170 60"
@@ -209,38 +210,28 @@ export default function Dashboard() {
             </div>
 
             <nav className="dashboard-tabs">
-            <button
-              className={`dashboard-tab ${activeTab === "bulk" ? "active" : ""}`}
-              onClick={() => handleTabChange("bulk")}
-            >
-              <span className="tab-icon bulk-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  {/* Stack of 3 envelopes */}
-                  <g opacity="0.4">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                  </g>
-                  <g opacity="0.6" transform="translate(0, 2)">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                  </g>
-                  <g transform="translate(0, 4)">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                  </g>
-                </svg>
-              </span>
-              Bulk
-            </button>
-
               <button
                 className={`dashboard-tab ${activeTab === "single" ? "active" : ""}`}
                 onClick={() => handleTabChange("single")}
               >
-                <span className="tab-icon single-icon">
+                <span className="tab-icon">
                   <svg viewBox="0 0 24 24" fill="currentColor">
-                    {/* Single envelope */}
                     <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                   </svg>
                 </span>
                 Single
+              </button>
+              
+              <button
+                className={`dashboard-tab ${activeTab === "bulk" ? "active" : ""}`}
+                onClick={() => handleTabChange("bulk")}
+              >
+                <span className="tab-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                  </svg>                 
+                </span>
+                Bulk
               </button>
             </nav>
           </div>
@@ -398,15 +389,6 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Referrals</span>
             </li>
-            {/* <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2">
-              <span className="menu-icon" aria-hidden>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 8h.01M11 12h1v4h1" />
-                </svg>
-              </span>
-              <span>Help</span>
-            </li> */}
           </ul>
 
           <div className="panel-footer border-t border-gray-100 p-3">

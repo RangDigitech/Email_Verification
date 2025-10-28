@@ -646,14 +646,35 @@ body {
     gap: 35px;
     text-align: center;
   }
+  .footer-section li {
+    color: #ffffff;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding-left: 0;
+    position: relative;
+    font-size: 0.95rem;
+  }
 
   .footer-section li::before {
-    display: none;
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #ffffff;
+    transition: width 0.3s ease;
   }
 
   .footer-section li:hover {
-    padding-left: 0;
-    transform: translateX(0);
+    color: #ffffff;
+    padding-left: 15px;
+    transform: translateX(5px);
+  }
+
+  .footer-section li:hover::before {
+    width: 100%;
   }
 }
 

@@ -20,7 +20,7 @@ import Hero from "./Hero";
 import BulkPage from "./BulkPage";
 import SinglePage from "./SinglePage";
 import ContactPage from "./ContactPage";
-
+import Help from "./Help";
 export default function App() {
   return (
     <Router>  
@@ -47,6 +47,7 @@ function MainApp() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/bulk" element={<BulkPage />}/>
         <Route path="/Single" element={<SinglePage />}/>
+        
 
         {/* PROTECTED ROUTE FOR DASHBOARD */}
         <Route element={<ProtectedRoute />}>
@@ -57,6 +58,7 @@ function MainApp() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/help" element={<Help />} />
       </Routes>
 
       {!hideNavbarAndFooter && <Footer />}
@@ -64,7 +66,7 @@ function MainApp() {
   );
 }
 
-function Navbar() {
+export function Navbar() {
   const user = getUser();
   const [showSolutionsMenu, setShowSolutionsMenu] = React.useState(false);
   const solutionsRef = React.useRef(null);
@@ -82,10 +84,10 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="nav-logo">
+      <Link to="/" className="nav-logo" style={{ textDecoration: 'none', color: 'inherit' }}>
         <img src="/email_logo.png" alt="Verifier Logo" className="logo" />
         <span>AI Email Verifier</span>
-      </div>
+      </Link>
       <ul className="nav-links">
         <li 
           className="solutions-dropdown" 
@@ -839,22 +841,53 @@ function DemoVerify({ variant }) {
     </div>
   );
 }
-
-function Footer() {
+export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-grid">
         <div className="footer-section">
-          <h3>📧 AI Email Verifier</h3>
-          <p>The best way to verify emails.</p>
+          {/* <h3>AI Email Verifier</h3> */}
+          {/* <p>The best way to verify emails.</p> */}
+          
+          {/* NEW: Tagline with different sizes */}
+          <div style={{
+            marginTop: '0px',
+            lineHeight: '1.1',
+          }}>
+            <span style={{
+              fontSize: '40px',
+              fontWeight: '500',
+              color: '#ffffff',
+              margin: '0',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              letterSpacing: '-0.3px',
+            }}>
+              Verify Smart,
+            </span>
+            <p style={{
+              fontSize: '60px',
+              fontWeight: '700',
+              color: '#ffffff',
+              margin: '4px 0 0 0',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              letterSpacing: '-1px',
+              lineHeight: '1.1',
+              // paddingLeft:'10px'
+            }}>
+              Send Confident.
+            </p>
+          </div>
         </div>
 
         <div className="footer-section">
-          <h4>Products</h4>
+          <h4>Solutions</h4>
           <ul>
-            <li>Bulk Verification</li>
-            <li>Real-Time API</li>
-            <li>Integrations</li>
+            <Link to="/bulk">
+              <li>Bulk Verifier</li>
+            </Link>
+            <Link to="/single">
+              <li>Single Verifier</li>
+            </Link>
           </ul>
         </div>
 
@@ -863,24 +896,99 @@ function Footer() {
           <ul>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
-            <li>Careers</li>
+            <li><Link to="/help">Help / FAQs</Link></li>
           </ul>
         </div>
 
+        {/* Auth Buttons Section */}
         <div className="footer-section">
-          <h4>Legal</h4>
-          <ul>
-            <li>Privacy</li>
-            <li>Terms</li>
-          </ul>
+          {/* <h4>Get Started</h4> */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '12px', 
+            marginTop: '16px' 
+          }}>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <button
+                style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  fontFamily: 'Inter, sans-serif',
+                  background: '#ffffff',
+                  color: '#000000',
+                  border: '2px solid #ffffff',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#000000';
+                  e.target.style.color = '#ffffff';
+                  e.target.style.borderColor = '#ffffff';
+                  e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.25)';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ffffff';
+                  e.target.style.color = '#000000';
+                  e.target.style.borderColor = '#ffffff';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Login
+              </button>
+            </Link>
+
+            <Link to="/signup" style={{ textDecoration: 'none' }}>
+              <button
+                style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  fontFamily: 'Inter, sans-serif',
+                  background: '#ffffff',
+                  color: '#000000',
+                  border: '2px solid #ffffff',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#000000';
+                  e.target.style.color = '#ffffff';
+                  e.target.style.borderColor = '#ffffff';
+                  e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.25)';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ffffff';
+                  e.target.style.color = '#000000';
+                  e.target.style.borderColor = '#ffffff';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Sign Up Free
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
       <p className="footer-copy">
         © 2025 Developed and Designed by{' '}
         <a 
-          href="https://rangdigitech.com" target="_blank" rel="noopener noreferrer"
-          style={{ color: '#ff6b6b', textDecoration: 'underline' }}
+          href="https://rangdigitech.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ color: '#ffffffff', textDecoration: 'underline' }}
         >
           Rang Digitech LLC
         </a>.

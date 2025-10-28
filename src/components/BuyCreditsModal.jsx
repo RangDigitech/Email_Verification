@@ -1,91 +1,127 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './BuyCreditsModal.css';
-
+ 
 function BuyCreditsModal({ onClose }) {
+  const navigate = useNavigate();
   const [selectedCredits, setSelectedCredits] = useState(5000);
   const [isMonthly, setIsMonthly] = useState(false);
-  const [email, setEmail] = useState('');
-
+  const [currency, setCurrency] = useState('USD');
+  const [conversionRate, setConversionRate] = useState(83); // Default fallback
+  const [isFetchingRate, setIsFetchingRate] = useState(true);
+ 
+  // 🌍 Detect user's location
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.country_code === 'IN') {
+          setCurrency('INR');
+        } else {
+          setCurrency('USD');
+        }
+      })
+      .catch(() => setCurrency('USD'));
+  }, []);
+ 
+  // 💱 Fetch live USD→INR rate
+  useEffect(() => {
+    if (currency === 'INR') {
+      const fetchExchangeRate = async () => {
+        try {
+          const res = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=INR');
+          const data = await res.json();
+          if (data?.rates?.INR) {
+            setConversionRate(data.rates.INR);
+          }
+        } catch {
+          setConversionRate(83);
+        } finally {
+          setIsFetchingRate(false);
+        }
+      };
+      fetchExchangeRate();
+    } else {
+      setIsFetchingRate(false);
+    }
+  }, [currency]);
+ 
   const creditOptions = [
-    { amount: 5000, price: 10.00, perCreditPayg: 0.0021, perCreditMonthly: 0.001785 },
-    { amount: 10000, price: 15.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
-    { amount: 20000, price: 30.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
-    { amount: 40000, price: 60.00, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
-    { amount: 80000, price: 80.00, perCreditPayg: 0.0010, perCreditMonthly: 0.00085 },
-    { amount: 100000, price: 100.00, perCreditPayg: 0.0010, perCreditMonthly: 0.000765 },
-    { amount: 200000, price: 180.00, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
-    { amount: 1000000, price: 900.00, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
+    { amount: 5000, price: 11, perCreditPayg: 0.0021, perCreditMonthly: 0.001785 },
+    { amount: 10000, price: 15, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 20000, price: 31, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 40000, price: 60, perCreditPayg: 0.0015, perCreditMonthly: 0.001275 },
+    { amount: 80000, price: 80, perCreditPayg: 0.0010, perCreditMonthly: 0.00085 },
+    { amount: 100000, price: 100, perCreditPayg: 0.0010, perCreditMonthly: 0.00085 },
+    { amount: 200000, price: 180, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
+    { amount: 1000000, price: 900, perCreditPayg: 0.0009, perCreditMonthly: 0.000765 },
   ];
-
+ 
   const calculatePrice = () => {
+    if (selectedCredits < 5000) {
+      const minOption = creditOptions[0];
+      const price = isMonthly ? minOption.price * 0.85 : minOption.price;
+      return price;
+    }
     const option = creditOptions.find(o => o.amount === selectedCredits);
     const base = option ? option.price : selectedCredits * 0.01;
-    return isMonthly ? base * 0.85 : base; // 15% monthly discount
+    return isMonthly ? base * 0.85 : base;
   };
-
+ 
   const getPerCreditPrice = () => {
-    const option = creditOptions.find(o => o.amount === selectedCredits);
-    
-    if (option) {
-      // Use the fixed per-credit rate from the CSV data
-      const perCredit = isMonthly ? option.perCreditMonthly : option.perCreditPayg;
-      
-      if (perCredit >= 0.01) {
-        return `$${perCredit.toFixed(2)}`;
-      } else if (perCredit >= 0.001) {
-        return `$${perCredit.toFixed(4)}`;
-      } else {
-        return `$${perCredit.toFixed(6)}`;
-      }
-    } else {
-      // For custom amounts, calculate dynamically
-      const totalPrice = calculatePrice();
-      const perCredit = totalPrice / selectedCredits;
-      
-      if (perCredit >= 0.01) {
-        return `$${perCredit.toFixed(2)}`;
-      } else if (perCredit >= 0.001) {
-        return `$${perCredit.toFixed(4)}`;
-      } else {
-        return `$${perCredit.toFixed(6)}`;
-      }
-    }
+    const price = calculatePrice();
+    const effectiveCredits = selectedCredits < 5000 ? 5000 : selectedCredits;
+    const perCredit = price / effectiveCredits;
+    const displayPrice = currency === 'INR' ? perCredit * conversionRate : perCredit;
+ 
+    if (displayPrice >= 0.01) return `${currency === 'INR' ? '₹' : '$'}${displayPrice.toFixed(2)}`;
+    if (displayPrice >= 0.001) return `${currency === 'INR' ? '₹' : '$'}${displayPrice.toFixed(4)}`;
+    return `${currency === 'INR' ? '₹' : '$'}${displayPrice.toFixed(6)}`;
   };
-
+ 
+  const formatPrice = (p) => {
+    const converted = currency === 'INR' ? p * conversionRate : p;
+    const symbol = currency === 'INR' ? '₹' : '$';
+    return `${symbol}${Math.round(converted)}`;
+  };
+ 
   const handleToggle = () => setIsMonthly(!isMonthly);
   const handleSelect = (amt) => setSelectedCredits(amt);
-  const formatPrice = (p) => `$${p.toFixed(2)}`;
-
+ 
   const option = creditOptions.find(o => o.amount === selectedCredits);
-  const basePrice = option ? option.price : selectedCredits * 0.01;
+  const basePrice = selectedCredits < 5000
+    ? creditOptions[0].price
+    : (option ? option.price : selectedCredits * 0.01);
   const discounted = basePrice * 0.85;
-  const save = (basePrice - discounted).toFixed(2);
-
-  React.useEffect(() => {
+  const exceedsMax = selectedCredits > 1000000;
+ 
+  const handleContactClick = () => {
+    onClose();
+    navigate('/dashboard/contact', {
+      state: { from: 'buyCredits', requestedCredits: selectedCredits },
+    });
+  };
+ 
+  // prevent background scroll
+  useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = originalOverflow; };
   }, []);
-
+ 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-
+        <button className="modal-close" onClick={onClose}>×</button>
+ 
         <div className="modal-header">
           <h1>Buy Credits</h1>
         </div>
-
+ 
         <div className="pricing-container">
-          {/* LEFT SIDE – PACKAGE GRID */}
+          {/* LEFT SIDE */}
           <div className="credit-selector">
             <h2 className="section-title">CHOOSE A PACKAGE</h2>
-            
             <div className="credit-grid">
               {creditOptions.map((option) => (
                 <div
@@ -105,7 +141,7 @@ function BuyCreditsModal({ onClose }) {
                 </div>
               ))}
             </div>
-
+ 
             <div className="custom-amount-section">
               <p className="custom-label">OR ENTER AN AMOUNT OF CREDITS</p>
               <input
@@ -120,62 +156,70 @@ function BuyCreditsModal({ onClose }) {
               />
             </div>
           </div>
-
-          {/* RIGHT SIDE – PRICE CARD */}
-          <div className="pricing-card">
-            <div className="toggle-container">
-              <span className={`toggle-label ${!isMonthly ? 'active' : ''}`}>Pay-As-You-Go</span>
-              <div className={`toggle-switch ${isMonthly ? 'monthly' : ''}`} onClick={handleToggle}>
-                <div className="toggle-slider"></div>
+ 
+          {/* RIGHT SIDE */}
+          {!exceedsMax ? (
+            <div className="pricing-card">
+              <div className="toggle-container">
+                <span className={`toggle-label ${!isMonthly ? 'active' : ''}`}>Pay-As-You-Go</span>
+                <div className={`toggle-switch ${isMonthly ? 'monthly' : ''}`} onClick={handleToggle}>
+                  <div className="toggle-slider"></div>
+                </div>
+                <span className={`toggle-label ${isMonthly ? 'active' : ''}`}>Subscription</span>
               </div>
-              <span className={`toggle-label ${isMonthly ? 'active' : ''}`}>Subscription</span>
-            </div>
-
-            <div className="price-display">
-              {isMonthly && (
-                <>
-                  <div className="old-price">{formatPrice(basePrice)}</div>
-                  <div className="save-badge">SAVE ${save}</div>
-                </>
-              )}
-              
-              <div className="new-price">
-                {formatPrice(isMonthly ? discounted : basePrice)}
-                {isMonthly && <span className="per-month">/month</span>}
+ 
+              <div className="price-display">
+                {isMonthly && (
+                  <>
+                    <div className="old-price">{formatPrice(basePrice)}</div>
+                    <div className="save-badge">SAVE {formatPrice(basePrice - discounted)}</div>
+                  </>
+                )}
+ 
+                <div className="new-price">
+                  {formatPrice(isMonthly ? discounted : basePrice)}
+                  {isMonthly && <span className="per-month">/month</span>}
+                </div>
+ 
+                <div className="per-credit">
+                  COST PER CREDIT
+                  <div className="per-credit-value">{getPerCreditPrice()}</div>
+                </div>
               </div>
-
-              <div className="per-credit">
-                COST PER CREDIT
-                <div className="per-credit-value">{getPerCreditPrice()}</div>
+ 
+              <div className="price-breakdown">
+                <div className="breakdown-row">
+                  <span>{selectedCredits.toLocaleString()} credits</span>
+                  <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
+                </div>
+                <div className="breakdown-row total">
+                  <span>Total</span>
+                  <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
+                </div>
               </div>
-            </div>
-
-            <div className="price-breakdown">
-              <div className="breakdown-row">
-                <span>{selectedCredits.toLocaleString()} credits</span>
-                <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
-              </div>
-              <div className="breakdown-row total">
-                <span>Total</span>
-                <span>{formatPrice(isMonthly ? discounted : basePrice)}</span>
-              </div>
-            </div>
-
-            <Link to="/signup">
+ 
               <button className="cta-button">NEXT</button>
-            </Link>
-
-            <ul className="benefits">
-              <li>Real-time email validation</li>
-              <li>Bulk verification support</li>
-              <li>API access included</li>
-              <li>24/7 customer support</li>
-            </ul>
-          </div>
+ 
+              <ul className="benefits">
+                <li>Real-time email validation</li>
+                <li>Bulk verification support</li>
+                <li>API access included</li>
+                <li>24/7 customer support</li>
+              </ul>
+            </div>
+          ) : (
+            <div className="pricing-card contact-card">
+              <h2>Need more than<br />1,000,000 credits?</h2>
+              <p>Contact our sales team for enterprise pricing</p>
+              <button className="contact-button" onClick={handleContactClick}>Contact Us</button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-
+ 
 export default BuyCreditsModal;
+ 
+ 

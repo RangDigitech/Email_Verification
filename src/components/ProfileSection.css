@@ -178,12 +178,12 @@
 }
 
 .profile-input.error {
-  border-color: #ff6b6b;
+  border-color: #ffffff;
 }
 
 .error-text {
   font-size: 12px;
-  color: #ff6b6b;
+  color: #ffffff;
   margin-top: -4px;
 }
 
@@ -200,7 +200,7 @@
 
 .phone-input-wrapper:focus-within {
   border-color: var(--brand-orange);
-  box-shadow: 0 0 0 3px rgba(233, 87, 41, 0.1);
+  box-shadow: 0 0 0 3px rgb(255, 255, 255);
 }
 
 .country-selector {
@@ -536,7 +536,7 @@
 .credits-input:focus {
   outline: none;
   border-color: var(--brand-orange);
-  box-shadow: 0 0 0 3px rgba(233, 87, 41, 0.1);
+  box-shadow: 0 0 0 3px rgb(255, 255, 255);
 }
 
 .credits-label {
@@ -1235,7 +1235,7 @@
 .retention-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: white;
   display: flex;
   align-items: center;
   gap: 6px;
