@@ -128,13 +128,15 @@ import { register, checkEmailDisposable } from "./api";
     return (
       <div className="auth-container">
         <div className="auth-card">
-          <div className="signup-logo">
+        <div className="signup-logo">
+          <Link to="/">
             <img
-              src="/email_logo.png"
+              src="/logo_login1.png"
               alt="Email Verifier Logo"
               className="auth-logo"
             />
-          </div>
+          </Link>
+        </div>
 
           <h2>Create Your Account</h2>
           <p>Join Verifier and get 250 free credits instantly</p>

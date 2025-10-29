@@ -13,34 +13,26 @@ export default function AboutUs() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-container">
-          <h1 className="hero-title">The team behind the email verification tool you've been waiting for.</h1>
+          <h1 className="hero-title">Transforming email verification with smart AI solutions.</h1>
           <p className="hero-description">
-            We're a team of marketers and developers creating products that we actually want to use. 
-            AI Email Verifier was built because we understand that email verification is important, it shouldn't be 
-            expensive and hard to manage. It should be an essential step in any email marketing strategy. 
-            We wanted a more affordable, faster, and user-friendly email verification solution for ourselves, 
-            so we built it for you.
+          We’re a passionate team of developers and marketers driven by innovation and practicality. At AI Email Verifier, we believe that AI should simplify email verification, not make it harder or more expensive. Our platform uses intelligent automation to ensure accuracy, speed, and reliability without the usual complexity or high costs. We understand that verifying emails is a crucial step in every marketing and communication strategy. That’s why we built a smarter, AI-driven solution that’s efficient, affordable, and effortless to use. AI Email Verifier leverages smart automation to keep your email data clean, valid, and ready to perform.
           </p>
           <div className="hero-stats">
             <div className="stat-item">
-              <div className="stat-icon">🏁</div>
-              <div className="stat-number">2024</div>
-              <div className="stat-label">Year established</div>
+              <div className="stat-icon"><img src="/generative.png" alt="AI-Powered" /></div>
+              <div className="stat-number">AI-Powered Engine</div>
             </div>
             <div className="stat-item">
-              <div className="stat-icon">📧</div>
-              <div className="stat-number">0</div>
-              <div className="stat-label">Emails Verified</div>
+              <div className="stat-icon"><img src="/time-check-symbol.png" alt="Real-Time" /></div>
+              <div className="stat-number">Real-Time Verification</div>
             </div>
             <div className="stat-item">
-              <div className="stat-icon">👥</div>
-              <div className="stat-number">0</div>
-              <div className="stat-label">Happy Customers</div>
+              <div className="stat-icon"><img src="/secure-shield.png" alt="Bounce Protection" /></div>
+              <div className="stat-number">Bounce Protection</div>
             </div>
             <div className="stat-item">
-              <div className="stat-icon">⭐</div>
-              <div className="stat-number">0/5</div>
-              <div className="stat-label">Average rating</div>
+              <div className="stat-icon"><img src="/payment.png" alt="Payment" /></div>
+              <div className="stat-number">Smart Credit Management</div>
             </div>
           </div>
         </div>
@@ -51,12 +43,10 @@ export default function AboutUs() {
       {/* Global Team */}
       <section className="global-team-section">
         <div className="global-team-container">
-          <h2 className="global-team-title">A global team creating global solutions.</h2>
+          <h2 className="global-team-title">An AI-driven team building smarter global solutions.</h2>
           <p className="global-team-description">
-            We're building platforms and products we would love to use. We are a robust and diverse team 
-            formed of curious and creative professionals who work towards a common goal: make email validation 
-            affordable and straightforward. Headquartered in New York with offices in Miami, Los Angeles, and 
-            São Paulo, AI Email Verifier is a global team spread across Europe, South America, and Asia.
+          At AI Email Verifier, we create intelligent tools that simplify and enhance email verification for businesses worldwide. Our diverse team of thinkers, developers, and creators share one vision to make verification faster, more accurate, and effortless through the power of AI.
+          We’re committed to innovation, collaboration, and delivering reliable solutions that help users maintain clean and verified data with confidence.
           </p>
         </div>
       </section>
@@ -64,7 +54,7 @@ export default function AboutUs() {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="cta-container">
-          <h2 className="cta-title">Join the companies that will rely on AI Email Verifier to protect their sender reputation.</h2>
+          <h2 className="cta-title">Protect your sender reputation with the accuracy and reliability of AI Email Verifier.</h2>
           <a href="/signup">
             <button className="cta-button">Get Started Free</button>
           </a>

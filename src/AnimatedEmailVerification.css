@@ -1,0 +1,242 @@
+.animated-email-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 28px auto;
+  padding: 0 20px;
+}
+
+/* Row layout - input box and status badge side by side */
+.email-demo-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Translucent input wrapper */
+.email-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Display field that shows typing animation */
+.email-display-field {
+  width: 100%;
+  padding: 18px 24px;
+  padding-right: 100px; /* Space for score badge */
+  font-size: 17px;
+  font-family: 'Inter', sans-serif;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid #9a7bff;
+  border-radius: 16px;
+  color: #fff;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 4px rgba(154, 123, 255, 0.1);
+  min-height: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+/* Typing cursor animation */
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  color: #fff;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Score badge INSIDE the input */
+.score-badge-inside {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  height: 50px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.score-number {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #1f2937;
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Status badge on the RIGHT side of the input - colored icon, white text */
+.status-badge-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  animation: slideInRight 0.5s ease-out;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.status-icon {
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Color applied inline based on status */
+}
+
+.status-text {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 17px;
+  color: #ffffff; /* Always white */
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .animated-email-container {
+    max-width: 700px;
+  }
+
+  .email-input-wrapper {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .animated-email-container {
+    padding: 0 16px;
+  }
+
+  .email-demo-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .email-input-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .email-display-field {
+    padding: 16px 20px;
+    padding-right: 90px;
+    font-size: 16px;
+    min-height: 56px;
+    height: 56px;
+  }
+
+  .score-badge-inside {
+    min-width: 60px;
+    height: 45px;
+  }
+
+  .score-number {
+    font-size: 24px;
+  }
+
+  .status-badge-right {
+    font-size: 16px;
+  }
+
+  .status-text {
+    font-size: 15px;
+  }
+
+  .status-icon {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .animated-email-container {
+    padding: 0 12px;
+  }
+
+  .email-display-field {
+    padding: 14px 16px;
+    padding-right: 80px;
+    font-size: 15px;
+    min-height: 52px;
+    height: 52px;
+  }
+
+  .score-badge-inside {
+    min-width: 55px;
+    height: 40px;
+    right: 10px;
+  }
+
+  .score-number {
+    font-size: 20px;
+  }
+
+  .status-badge-right {
+    font-size: 15px;
+  }
+
+  .status-text {
+    font-size: 14px;
+  }
+
+  .status-icon {
+    font-size: 20px;
+  }
+}
+

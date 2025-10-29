@@ -1161,6 +1161,13 @@ body {
     font-size: 1.4rem;
     line-height: 1;
   }
+
+  .metric-icon img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+  }
   
   .metric-number {
     font-size: 1.8rem;

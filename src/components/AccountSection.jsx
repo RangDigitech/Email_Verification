@@ -97,7 +97,7 @@ export default function AccountSection() {
           <button 
             className="profile-nav-item"
             onClick={() => {
-              window.location.href = '/pricing';
+              window.dispatchEvent(new CustomEvent("openBillingTab"));
             }}
           >
             <span className="nav-icon">

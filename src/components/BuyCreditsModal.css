@@ -79,7 +79,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #ffffff;
+  color: #ffffff !important;
   margin-bottom: 1.5rem;
   text-transform: uppercase;
 }
@@ -161,7 +161,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #ffffff;
+  color: #ffffff !important;
   margin-bottom: 1rem;
   text-transform: uppercase;
 }

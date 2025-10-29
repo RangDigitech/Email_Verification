@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BuyCreditsModal.css';
+import { USD_TO_INR_RATE } from '../config';
  
 function BuyCreditsModal({ onClose }) {
   const navigate = useNavigate();
   const [selectedCredits, setSelectedCredits] = useState(5000);
   const [isMonthly, setIsMonthly] = useState(false);
   const [currency, setCurrency] = useState('USD');
-  const [conversionRate, setConversionRate] = useState(83); // Default fallback
-  const [isFetchingRate, setIsFetchingRate] = useState(true);
+  const [conversionRate] = useState(USD_TO_INR_RATE); // Hardcoded exchange rate from config
+  const [isFetchingRate] = useState(false); // No longer fetching from API
  
   // 🌍 Detect user's location
   useEffect(() => {
@@ -24,27 +25,9 @@ function BuyCreditsModal({ onClose }) {
       .catch(() => setCurrency('USD'));
   }, []);
  
-  // 💱 Fetch live USD→INR rate
-  useEffect(() => {
-    if (currency === 'INR') {
-      const fetchExchangeRate = async () => {
-        try {
-          const res = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=INR');
-          const data = await res.json();
-          if (data?.rates?.INR) {
-            setConversionRate(data.rates.INR);
-          }
-        } catch {
-          setConversionRate(83);
-        } finally {
-          setIsFetchingRate(false);
-        }
-      };
-      fetchExchangeRate();
-    } else {
-      setIsFetchingRate(false);
-    }
-  }, [currency]);
+  // 💱 Using hardcoded exchange rate (no API call needed)
+  // Rate is managed in src/config.js for easy updates
+  // Current rate: 1 USD = ${USD_TO_INR_RATE} INR (includes buffer)
  
   const creditOptions = [
     { amount: 5000, price: 11, perCreditPayg: 0.0021, perCreditMonthly: 0.001785 },
@@ -97,8 +80,8 @@ function BuyCreditsModal({ onClose }) {
  
   const handleContactClick = () => {
     onClose();
-    navigate('/dashboard/contact', {
-      state: { from: 'buyCredits', requestedCredits: selectedCredits },
+    navigate('/contact?from=dashboard', {
+      state: { from: 'buyCredits', requestedCredits: selectedCredits, isLoggedIn: true },
     });
   };
  

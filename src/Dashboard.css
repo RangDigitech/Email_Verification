@@ -117,20 +117,23 @@
 .dashboard-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0px;
   cursor: pointer;
 }
 
-.dashboard-logo svg {
-  width: 40px;
-  height: 40px;
-  color: #ffffff;
+.logo-icon {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle !important;
 }
-
 .logo-text {
   font-weight: 700;
   font-size: 1.2rem;
   color: #ffffff;
+  padding: auto;
+  vertical-align: middle !important;
+
 }
 
 /* Tabs */

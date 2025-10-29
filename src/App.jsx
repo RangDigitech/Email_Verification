@@ -21,6 +21,8 @@ import BulkPage from "./BulkPage";
 import SinglePage from "./SinglePage";
 import ContactPage from "./ContactPage";
 import Help from "./Help";
+// Icons are served from `public/` via absolute paths (e.g., "/wallet.png").
+
 export default function App() {
   return (
     <Router>  
@@ -85,7 +87,7 @@ export function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="nav-logo" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <img src="/email_logo.png" alt="Verifier Logo" className="logo" />
+        <img src="/app_logo1.png" alt="Verifier Logo" className="logo" />
         <span>AI Email Verifier</span>
       </Link>
       <ul className="nav-links">
@@ -360,8 +362,8 @@ function Home() {
                                   style={{
                                     width: '100%',
                                     height: '100%',
-                                    background: seg.color,
-                                    opacity: 0.9,
+                                    background: 'white',
+                                    opacity: 0,
                                     animation: 'glowPulse 0.6s ease-in-out',
                                     filter: `drop-shadow(0 0 20px ${seg.colorHex})`
                                   }}
@@ -401,7 +403,7 @@ function Home() {
                             style={{
                               transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                               transform: hoveredSegment ? 'scale(1.15)' : 'scale(1)',
-                              color: hoveredSegment ? currentSegment.colorHex : 'inherit',
+                              color: 'black',
                               fontSize: '32px',
                               fontWeight: 'bold',
                               lineHeight: '1.2'
@@ -416,7 +418,7 @@ function Home() {
                               opacity: hoveredSegment ? 1 : 0.7,
                               fontSize: '14px',
                               marginTop: '4px',
-                              color: '#696565ff'
+                              color: '#000000ff'
                             }}
                           >
                             {currentSegment.label}
@@ -524,38 +526,34 @@ function Home() {
 
           <div className="metrics-grid">
             <div className="metric-card">
-              <div className="metric-icon">🎯</div>
-              <div className="metric-number">99%</div>
-              <div className="metric-title">Deliverability Guarantee</div>
+              <div className="metric-icon"><img src="/wallet.png" alt="Smart Credit Saver" /></div>
+              <div className="metric-number">Smart Credit Saver</div>
               <div className="metric-desc">
-                We guarantee that no more than 1% of emails verified as Deliverable will bounce upon sending.
+              Duplicate emails? No worries. We never charge credits for rechecking the same address you only pay once.
               </div>
             </div>
 
             <div className="metric-card">
-              <div className="metric-icon">✉️</div>
-              <div className="metric-number">30k+</div>
-              <div className="metric-title">Emails Verified per Minute</div>
+              <div className="metric-icon"><img src="/secure-data.png" alt="Data Privacy" /></div>
+              <div className="metric-number">Data Privacy First</div>
               <div className="metric-desc">
-                We verify emails over 8x faster than the competition, verifying 100,000 emails in under 3 minutes.
+              Your data stays yours encrypted, protected, and never shared with third parties.
               </div>
             </div>
 
             <div className="metric-card">
-              <div className="metric-icon">⚡</div>
-              <div className="metric-number">99.99%</div>
-              <div className="metric-title">Platform Uptime</div>
+              <div className="metric-icon"><img src="/reliability.png" alt="Platform Reliability" /></div>
+              <div className="metric-number">Platform Reliability</div>
               <div className="metric-desc">
-                Our secure and robust global infrastructure provides exceptional performance to customers around the world.
+              Our infrastructure runs 24/7 on secure, globally distributed servers for uninterrupted service.
               </div>
             </div>
 
             <div className="metric-card">
-              <div className="metric-icon">💬</div>
-              <div className="metric-number">24/7</div>
-              <div className="metric-title">Customer Support</div>
+              <div className="metric-icon"><img src="/document.png" alt="Detailed Reporting" /></div>
+              <div className="metric-number">Detailed Reporting</div>
               <div className="metric-desc">
-                Our team of experts are located around the globe and are available 24 hours a day.
+              Understand every verification at a glance with transparent, easy-to-read reports.
               </div>
             </div>
           </div>
@@ -776,7 +774,7 @@ function Home() {
       {/* CTA Join */}
       <section className="section cta-section">
         <div className="section-inner cta-inner">
-          <h2>Join the world's largest companies that rely on AI Email Verifier to protect their sender reputation</h2>
+          <h2>Protect your sender reputation with the accuracy and reliability of AI Email Verifier.</h2>
           <Link to="/signup">
             <button className="primary-cta large">Get Started Free</button>
           </Link>

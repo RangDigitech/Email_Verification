@@ -21,6 +21,11 @@ export default function Dashboard() {
   const [bulkPanel, setBulkPanel] = useState("overview");
   const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
 
+  // Debug: Log when showBuyCreditsModal changes
+  React.useEffect(() => {
+    console.log("Dashboard - showBuyCreditsModal changed to:", showBuyCreditsModal);
+  }, [showBuyCreditsModal]);
+
   const navigate = useNavigate();
 
   const userEmail = localStorage.getItem("userEmail") || "user@example.com";
@@ -73,28 +78,36 @@ export default function Dashboard() {
     const handleIntegrationsEvent = () => setActiveTab("integrations");
     const handleBillingEvent = () => setActiveTab("billing");
     const handleReferralsEvent = () => setActiveTab("referrals");
+    const handleBuyCreditsEvent = () => setShowBuyCreditsModal(true);
     // expose helpers on window for direct calls
     window.openReferralsTab = () => { window.location.hash = "#referrals"; setActiveTab("referrals"); };
     window.openBillingTab = () => { window.location.hash = "#billing"; setActiveTab("billing"); };
     window.openAccountTab = () => { window.location.hash = "#account"; setActiveTab("account"); };
     window.openProfileTab = () => { window.location.hash = "#profile"; setActiveTab("profile"); };
     window.openIntegrationsTab = () => { window.location.hash = "#integrations"; setActiveTab("integrations"); };
+    window.openBuyCreditsModal = () => {
+      console.log("Opening Buy Credits Modal");
+      setShowBuyCreditsModal(true);
+    };
     window.addEventListener("openProfileTab", handleProfileEvent);
     window.addEventListener("openAccountTab", handleAccountEvent);
     window.addEventListener("openIntegrationsTab", handleIntegrationsEvent);
     window.addEventListener("openBillingTab", handleBillingEvent);
     window.addEventListener("openReferralsTab", handleReferralsEvent);
+    window.addEventListener("openBuyCreditsModal", handleBuyCreditsEvent);
     return () => {
       window.removeEventListener("openProfileTab", handleProfileEvent);
       window.removeEventListener("openAccountTab", handleAccountEvent);
       window.removeEventListener("openIntegrationsTab", handleIntegrationsEvent);
       window.removeEventListener("openBillingTab", handleBillingEvent);
       window.removeEventListener("openReferralsTab", handleReferralsEvent);
+      window.removeEventListener("openBuyCreditsModal", handleBuyCreditsEvent);
       delete window.openReferralsTab;
       delete window.openBillingTab;
       delete window.openAccountTab;
       delete window.openProfileTab;
       delete window.openIntegrationsTab;
+      delete window.openBuyCreditsModal;
     };
   }, []);
 
@@ -185,29 +198,14 @@ export default function Dashboard() {
       <div className={`dashboard-main ${showSidebar && activeTab === "bulk" ? "with-sidebar" : ""}`}>
         <header className="dashboard-header">
           <div className="header-left">
-            <div className="dashboard-logo" onClick={handleLogoClick}>
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <rect x="30" y="60" width="140" height="100" fill="#fffdfdff" rx="8" />
-                <path
-                  d="M 30 60 L 100 110 L 170 60"
-                  stroke="#000000ff"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <div className="dashboard-logo" onClick={handleLogoClick}>
+                <img 
+                  src="/app_logo1.png" 
+                  alt="AI Email Verifier Logo" 
+                  className="logo-icon"
                 />
-                <circle cx="150" cy="50" r="25" fill="#5d1590ff" />
-                <path
-                  d="M 140 50 L 147 57 L 160 44"
-                  stroke="#ffffff"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="logo-text">AI Email Verifier</span>
-            </div>
+                <span className="logo-text">AI Email Verifier</span>
+              </div>
 
             <nav className="dashboard-tabs">
               <button

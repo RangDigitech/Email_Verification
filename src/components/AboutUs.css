@@ -171,15 +171,24 @@
   margin-bottom: 8px;
 }
 
+.stat-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
 .stat-number {
-  font-size: 36px;
+  font-size: 25px;
   font-weight: bold;
   margin-bottom: 4px;
 }
 
 .stat-label {
-  font-size: 14px;
-  opacity: 0.8;
+  color: #ffffff;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Market Section */
@@ -401,6 +410,9 @@
   margin: 0 auto;
   padding: 0 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .cta-title {
@@ -409,21 +421,31 @@
   margin-bottom: 32px;
 }
 
+.cta-container a {
+  display: inline-block;
+  text-decoration: none;
+}
+
 .cta-button {
-  background: black;
+  background: #000000;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 12px 28px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  display: inline-block;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(247, 247, 247, 0.4);
 }
 
 .cta-button:hover {
-  background: #333;
+  background: #000000;
+  transform: translateY(-2px);
 }
 
 .cta-subtext {
