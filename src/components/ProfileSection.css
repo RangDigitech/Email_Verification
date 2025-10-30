@@ -33,6 +33,8 @@
   padding: 24px 12px;
   overflow-y: auto;
   border-right: 1px solid #333333;
+  border-radius: 20px 0 0 20px;
+  margin: 16px 0 16px 16px;
 }
 
 .profile-nav {
@@ -104,11 +106,15 @@
   overflow-x: hidden;
   position: relative;
   z-index: 1;
+  background: #2a2828;
+  border-radius: 20px;
+  margin: 16px;
+  padding: 8px;
 }
 
 .profile-content {
-  max-width: 900px;
-  margin: 0;
+  max-width: 1400px;
+  margin: 0 auto;
   padding: 24px 24px;
   display: flex;
   flex-direction: column;
@@ -121,7 +127,7 @@
   position: relative;
   background: #000000;
   border: 1px solid #333333;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 28px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 24px;
@@ -563,34 +569,36 @@
   position: relative;
   width: 50px;
   height: 28px;
-  background-color: #e5e7eb; /* neutral track */
+  background-color: #000000; /* black background when unchecked */
   border-radius: 14px;
   transition: background-color 0.25s ease;
   overflow: hidden; /* hide any inner overflow/ghosts */
   display: block;
-  border: 1px solid #d1d5db;
+  border: 1px solid #000000;
   background-image: none !important; /* neutralize any inherited bg */
 }
 
 .toggle-switch input:checked + .toggle-track {
-  background-color: #22c55e; /* green when active */
+  background-color: #ffffff; /* white background when checked */
+  border-color: #d1d5db;
 }
 
 .toggle-thumb {
   position: absolute;
   width: 24px;
   height: 24px;
-  background-color: #ffffff;
+  background-color: #ffffff; /* white thumb when unchecked */
   border-radius: 50%;
   left: 2px;
   top: 50%;
   transform: translateY(-50%) translateX(0);
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, background-color 0.25s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-switch input:checked + .toggle-track .toggle-thumb {
   transform: translateY(-50%) translateX(22px);
+  background-color: #000000; /* black thumb when checked */
 }
 
 /* Ensure no pseudo-elements from elsewhere leak in */

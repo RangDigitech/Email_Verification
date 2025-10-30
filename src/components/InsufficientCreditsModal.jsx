@@ -1,9 +1,5 @@
 import React from "react";
 import "./InsufficientCreditsModal.css";
-import expirationIcon from "./expiration.png";
-import discountIcon from "./discount.png";
-import noHiddenFeesIcon from "./icons8-no-hidden-fees-80.png";
-import paymentIcon from "./credit-cards-payment.png";
 
 export default function InsufficientCreditsModal({ onClose, onBuyCredits }) {
   const handleBuyClick = () => {
@@ -31,25 +27,25 @@ export default function InsufficientCreditsModal({ onClose, onBuyCredits }) {
         <div className="modal-features">
           <div className="feature-item">
             <div className="feature-icon">
-              <img src={expirationIcon} alt="Credits never expire" />
+              <img src="/expiration.png" alt="Credits never expire" />
             </div>
             <div className="feature-text">Your credits never expire</div>
           </div>
           <div className="feature-item">
             <div className="feature-icon">
-              <img src={discountIcon} alt="Volume discounts" />
+              <img src="/discount.png" alt="Volume discounts" />
             </div>
             <div className="feature-text">Enjoy discounts with larger credit packs</div>
           </div>
           <div className="feature-item">
             <div className="feature-icon">
-              <img src={noHiddenFeesIcon} alt="No hidden costs" />
+              <img src="/icons8-no-hidden-fees-80.png" alt="No hidden costs" />
             </div>
             <div className="feature-text">No surprises, transparent pricing</div>
           </div>
           <div className="feature-item">
             <div className="feature-icon">
-              <img src={paymentIcon} alt="Flexible billing options" />
+              <img src="/credit-cards-payment.png" alt="Flexible billing options" />
             </div>
             <div className="feature-text">Flexible billing that fits your needs</div>
           </div>

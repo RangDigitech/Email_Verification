@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./BulkVerifier.css";
 import { validateBulk, apiUrl } from "./api";
+import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
 
 export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "overview" }) {
   const [view, setView] = useState("list");
@@ -11,6 +12,7 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const [searchQuery, setSearchQuery] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [emailCount, setEmailCount] = useState(0);
+  const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("bulkValidations");
@@ -80,6 +82,16 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const handleValidate = async () => {
     if (!file) return alert("Please choose a CSV file first");
     
+    // Check if user has credits before starting verification
+    const currentCredits = Number(localStorage.getItem("credits") || 0);
+    console.log("Bulk verification - Current credits:", currentCredits);
+    
+    if (currentCredits <= 0) {
+      console.log("No credits available, showing insufficient credits modal");
+      setShowInsufficientCreditsModal(true);
+      return;
+    }
+
     setView("uploading");
     setUploadProgress(0);
 
@@ -111,7 +123,17 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     } catch (err) {
       clearInterval(progressInterval);
       console.error(err);
-      alert(err.message || "Bulk verification failed. Please try again.");
+      const errorMessage = err.message || "Bulk verification failed. Please try again.";
+      
+      // Check if error is about insufficient credits
+      if (errorMessage.toLowerCase().includes("insufficient credits") || 
+          errorMessage.toLowerCase().includes("not enough credits") ||
+          errorMessage.toLowerCase().includes("no credits")) {
+        setShowInsufficientCreditsModal(true);
+      } else {
+        alert(errorMessage);
+      }
+      
       setView("upload");
       setCurrentResult(null);
       setUploadProgress(0);
@@ -137,6 +159,25 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     setView("upload");
     setFile(null);
     setEmailCount(0);
+  };
+
+  const handleBuyCredits = () => {
+    console.log("handleBuyCredits called in BulkVerifier");
+    console.log("window.openBuyCreditsModal exists:", !!window.openBuyCreditsModal);
+    
+    // First open the buy credits modal, then close this one
+    if (window.openBuyCreditsModal) {
+      window.openBuyCreditsModal();
+    } else {
+      // Fallback: dispatch event that Dashboard can listen to
+      console.log("Using event fallback");
+      window.dispatchEvent(new CustomEvent("openBuyCreditsModal"));
+    }
+    
+    // Close the insufficient credits modal with a slight delay to ensure the other modal opens
+    setTimeout(() => {
+      setShowInsufficientCreditsModal(false);
+    }, 100);
   };
 
   const filteredValidations = validations.filter(
@@ -184,6 +225,14 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
 
       {view === "results" && currentResult && (
         <ResultsView results={currentResult} onBack={handleBackToList} panel={panel} setValidations={setValidations} validations={validations} setCurrentResult={setCurrentResult} />
+      )}
+
+      {/* Insufficient Credits Modal */}
+      {showInsufficientCreditsModal && (
+        <InsufficientCreditsModal
+          onClose={() => setShowInsufficientCreditsModal(false)}
+          onBuyCredits={handleBuyCredits}
+        />
       )}
     </div>
   );

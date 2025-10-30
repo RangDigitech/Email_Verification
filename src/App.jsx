@@ -21,6 +21,9 @@ import BulkPage from "./BulkPage";
 import SinglePage from "./SinglePage";
 import ContactPage from "./ContactPage";
 import Help from "./Help";
+import FAQs from "./FAQs";
+import Blogs from "./Blogs";
+import BlogPost1 from "./BlogPost1";
 // Icons are served from `public/` via absolute paths (e.g., "/wallet.png").
 
 export default function App() {
@@ -61,6 +64,9 @@ function MainApp() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/why-email-verification-matters" element={<BlogPost1 />} />
       </Routes>
 
       {!hideNavbarAndFooter && <Footer />}
@@ -177,6 +183,8 @@ export function Navbar() {
         <li><Link to="/pricing">Pricing</Link></li>
         <li><Link to="/about">About Us</Link></li>
         <li><Link to="/contact">Contact Us</Link></li>
+        <li><Link to="/blogs">Blogs</Link></li>
+
       </ul>
       <div className="nav-actions">
         {!user ? (
@@ -187,6 +195,7 @@ export function Navbar() {
             <Link to="/signup">
               <button className="signup-btn">Sign Up Free</button>
             </Link>
+
           </>
         ) : (
           <>
@@ -894,7 +903,9 @@ export function Footer() {
           <ul>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
-            <li><Link to="/help">Help / FAQs</Link></li>
+            <li><Link to="/help">Help</Link></li>
+            <li><Link to="/faqs">FAQs</Link></li>
+            <li><Link to="/blogs">Blogs</Link></li>
           </ul>
         </div>
 

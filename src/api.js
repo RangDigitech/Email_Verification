@@ -15,13 +15,18 @@ export async function checkEmailDisposable(email) {
   const data = await res.json();
   return data;
 }
+const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
 
 // ----------------------
 // Auth helpers
 // ----------------------
-function authHeaders() {
-  const t = localStorage.getItem("accessToken");
-  return t ? { Authorization: `Bearer ${t}` } : {};
+function authHeaders(tokenOverride) {
+  const token =
+    tokenOverride ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 // Call this after a successful login to fetch current balance and cache it
@@ -394,4 +399,30 @@ export async function updateUserProfile(profileData) {
     console.error("Failed to update user profile:", error);
     throw error;
   }
+}
+export async function getBillingSummary() {
+  const res = await fetch(apiUrl("/billing/summary"), {
+    method: "GET",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+    cache: "no-cache",
+  });
+  if (!res.ok) throw new Error("unauthorized");
+  return res.json();
+}
+
+export async function getBillingUsage({ startISO, endISO, interval }) {
+  const params = new URLSearchParams({
+    start: startISO,
+    end: endISO,
+    interval: (interval || "daily").toLowerCase(),
+  });
+  const res = await fetch(apiUrl(`/billing/usage?${params.toString()}`), {
+    method: "GET",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+    cache: "no-cache",
+  });
+  if (!res.ok) throw new Error("unauthorized");
+  return res.json();
 }

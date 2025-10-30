@@ -1,219 +1,172 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Help.css";
- 
-const faqs = [
+
+const helpSections = [
   {
-    category: "1. Getting Started",
-    questions: [
+    id: 1,
+    title: "1. Getting Started",
+    content: [
+      "Steps to log in or sign up using your credentials.",
+      "Overview of the main dashboard and navigation menu.",
+      "How to use different sections or tools available on the platform.",
+      "How to update or change preferences within the web interface."
+    ]
+  },
+  {
+    id: 2,
+    title: "2. Common Issues and Quick Fixes",
+    subsections: [
       {
-        q: "What is your email verification service and who is it for?",
-        a: "AI Email Verifier is designed for businesses, marketers, and developers who want to clean, verify, and maintain accurate email lists for better deliverability."
+        subtitle: "Login Problems",
+        points: [
+          "Double-check your username and password.",
+          "Ensure your internet connection is stable.",
+          "Try refreshing the page or clearing browser cache."
+        ]
       },
       {
-        q: "How does the verification process work?",
-        a: "Our system checks each email using multiple validation layers — syntax, domain, MX, and SMTP verification — to ensure it's valid and deliverable."
+        subtitle: "Page Not Loading Properly",
+        points: [
+          "Reload the page or log out and log in again.",
+          "Clear browser cookies and cache.",
+          "Try using a different browser if the issue continues."
+        ]
       },
       {
-        q: "Do I need to create an account to use the service?",
-        a: "You can test single emails without an account, but bulk verification and saved results require signing up for a free account."
-      },
-      {
-        q: "Can I try it for free?",
-        a: "Yes. New users receive 250 free credits to test the platform before purchasing."
+        subtitle: "Slow Performance",
+        points: [
+          "Close unnecessary browser tabs or background processes.",
+          "Clear temporary data and cache.",
+          "Refresh the page or restart the browser session."
+        ]
       }
     ]
   },
   {
-    category: "2. Uploading & Verifying Emails",
-    questions: [
-      {
-        q: "How do I upload an email list for verification?",
-        a: "You can upload your email list in the dashboard. Just drag and drop a CSV, TXT, or XLSX file to begin verification."
-      },
-      {
-        q: "Which file formats are supported?",
-        a: "We currently support CSV, TXT, and XLSX formats for bulk uploads."
-      },
-      {
-        q: "Can I verify a single email manually?",
-        a: "Yes. Use the verification box on our homepage for quick one-by-one checks."
-      },
-      {
-        q: "How long does the process take?",
-        a: "Processing speed depends on list size, but our servers verify up to 30,000+ emails per minute."
-      }
+    id: 3,
+    title: "3. Using the Application Features",
+    content: [
+      "Step-by-step guidance on performing common actions.",
+      "Explanation of major tools, buttons, or icons across the interface.",
+      "Tips for smoother workflow and avoiding common mistakes.",
+      "Keyboard shortcuts or quick actions (if supported)."
     ]
   },
   {
-    category: "3. Results Explained",
-    questions: [
-      {
-        q: "What do the verification results mean?",
-        a: "Each email is categorized as Valid, Invalid, Risky, Catch-all, or Unknown based on SMTP responses and domain behavior."
-      },
-      {
-        q: "What is a catch-all domain?",
-        a: "A catch-all domain accepts all incoming emails, making it difficult to confirm if specific addresses are valid. We mark these as Risky."
-      },
-      {
-        q: "What's the difference between disposable and role-based emails?",
-        a: "Disposable emails are temporary addresses (like from TempMail). Role-based emails (like info@ or sales@) belong to teams rather than individuals."
-      },
-      {
-        q: "Can I download my results?",
-        a: "Yes. You can download verified results in CSV or XLSX format once processing is complete."
-      }
+    id: 4,
+    title: "4. Troubleshooting Guide",
+    content: [
+      "If the web page freezes, refresh or re-login.",
+      "Clear browser cache and cookies to resolve most errors.",
+      "Use an updated browser version for best compatibility.",
+      "Try opening the site in incognito/private mode to rule out extension conflicts."
     ]
   },
   {
-    category: "4. Pricing, Credits & Billing",
-    questions: [
-      {
-        q: "How is pricing structured?",
-        a: "Our plans are based on credits. Each email verification uses one credit. You can choose between pay-as-you-go or monthly subscriptions."
-      },
-      {
-        q: "Do credits expire?",
-        a: "No. Your purchased credits never expire and can be used anytime."
-      },
-      {
-        q: "Is there a free plan?",
-        a: "Yes. All new users start with 250 free credits."
-      },
-      {
-        q: "What happens if a verification fails?",
-        a: "If the verification process fails due to a temporary server issue, credits are automatically refunded for that email."
-      }
+    id: 5,
+    title: "5. Security & Privacy Tips",
+    content: [
+      "Never share your login credentials with anyone.",
+      "Always log out after finishing your session, especially on shared devices.",
+      "Use a strong password that includes a mix of letters, numbers, and symbols.",
+      "Avoid saving passwords on public or shared computers."
     ]
   },
   {
-    category: "5. API & Integration",
-    questions: [
-      {
-        q: "Do you offer an API for real-time verification?",
-        a: "Yes. Our REST API allows developers to integrate real-time verification into their websites, signup forms, and CRMs."
-      },
-      {
-        q: "How do I integrate the API?",
-        a: "You can generate API keys from your dashboard and connect via simple HTTP requests. Full documentation is available on our Developer page."
-      },
-      {
-        q: "What programming languages are supported?",
-        a: "The API is language-agnostic and works with any platform that supports HTTPS requests (Node.js, Python, PHP, etc.)."
-      },
-      {
-        q: "Are there rate limits?",
-        a: "We have soft limits to ensure fair usage. Enterprise customers can request higher API throughput."
-      }
+    id: 6,
+    title: "6. Best Practices",
+    content: [
+      "Keep your browser updated to ensure smooth functionality.",
+      "Avoid using multiple tabs of the same session to prevent conflicts.",
+      "Refresh your page after long periods of inactivity.",
+      "Note down any visible error message before reporting a problem."
     ]
   },
   {
-    category: "6. Data Privacy, Security & Compliance",
-    questions: [
-      {
-        q: "How do you protect my data?",
-        a: "All data is encrypted in transit (SSL) and at rest. We never share or sell your data to any third party."
-      },
-      {
-        q: "Do you keep my uploaded lists?",
-        a: "No. Uploaded lists are automatically deleted from our servers after 24 hours."
-      },
-      {
-        q: "Are you GDPR/CCPA compliant?",
-        a: "Yes. We comply fully with GDPR and CCPA regulations to ensure your data privacy."
-      },
-      {
-        q: "What happens if someone uploads emails without consent?",
-        a: "We advise users to verify only contacts who have given consent. Violations may lead to account suspension."
-      }
-    ]
-  },
-  {
-    category: "7. Best Practices & Troubleshooting",
-    questions: [
-      {
-        q: "What should I do before uploading a list?",
-        a: "Remove duplicates and ensure your list is formatted correctly. Clean data leads to faster and more accurate results."
-      },
-      {
-        q: "Why are some emails marked as 'unknown'?",
-        a: "Some mail servers temporarily block verification (greylisting). Retrying later often resolves these cases."
-      },
-      {
-        q: "Why am I seeing many catch-all results?",
-        a: "Catch-all domains accept all emails; this is normal for corporate or secure domains. Treat them as Risky."
-      },
-      {
-        q: "How can I improve deliverability?",
-        a: "Use verified emails only, authenticate your domain with SPF/DKIM/DMARC, and avoid spammy content."
-      }
-    ]
-  },
-  {
-    category: "8. Account & Support",
-    questions: [
-      {
-        q: "How do I manage my account or subscription?",
-        a: "You can upgrade, downgrade, or cancel anytime from your dashboard settings."
-      },
-      {
-        q: "How do I reset my password?",
-        a: "Go to the Login page, click 'Forgot Password', and follow the reset instructions."
-      },
-      {
-        q: "What types of support do you offer?",
-        a: "We provide 24/7 support via email and live chat. Phone support is available for enterprise clients."
-      },
-      {
-        q: "Where can I find documentation?",
-        a: "Our API documentation and user tutorials are available on the Developer page."
-      }
+    id: 7,
+    title: "7. Feedback & Support Instructions",
+    content: [
+      "If your issue isn't listed here:",
+      "• Refresh the page and check your internet connection.",
+      "• Clear cache and cookies, then try again.",
+      "• If the problem continues, note the steps that caused the issue and any visible error messages before contacting support."
     ]
   }
 ];
- 
+
 export default function Help() {
-  const [open, setOpen] = useState(null);
-  const toggle = (index) => setOpen(open === index ? null : index);
- 
+  const [openSections, setOpenSections] = useState({});
+
+  const toggleSection = (id) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   return (
-    <div className="help-container">
-      <div className="help-header">
-        <h1>Frequently Asked Questions</h1>
-      </div>
- 
-      <div className="faq-list">
-        {faqs.map((section, i) => (
-          <div key={i} className="faq-section">
-            <h2 className="category-title">{section.category}</h2>
-            {section.questions.map((item, j) => {
-              const idx = `${i}-${j}`;
-              const isOpen = open === idx;
-              return (
-                <div key={idx} className={`faq-card ${isOpen ? "open" : ""}`}>
-                  <div className="faq-question" onClick={() => toggle(idx)}>
-                    <span className="faq-text">{item.q}</span>
-                    <button className="faq-toggle-btn">
-                      <span className={`arrow ${isOpen ? "up" : "down"}`}>▼</span>
-                    </button>
-                  </div>
-                  <div
-                    className="faq-answer"
-                    style={{
-                      maxHeight: isOpen ? "300px" : "0",
-                      opacity: isOpen ? 1 : 0,
-                      paddingTop: isOpen ? "16px" : "0"
-                    }}
+    <div className="help-page">
+      <div className="help-container">
+        <div className="help-header">
+          <h1>Help Center</h1>
+          <p className="help-subtitle">
+            Welcome to the Help Page
+          </p>
+          <p className="help-intro">
+            If you're facing an issue or need guidance using the web application, you're in the right place. 
+            This page will help you understand how to use key features, solve common issues, and navigate the platform with ease.
+          </p>
+        </div>
+
+        <div className="help-sections">
+          {helpSections.map((section) => (
+            <div key={section.id} className={`help-section ${openSections[section.id] ? 'open' : ''}`}>
+              <div className="section-header" onClick={() => toggleSection(section.id)}>
+                <h2>{section.title}</h2>
+                <button className="toggle-btn">
+                  <svg 
+                    className={`chevron ${openSections[section.id] ? 'rotated' : ''}`}
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2"
                   >
-                    {item.a}
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="section-content">
+                {section.content && (
+                  <ul className="help-list">
+                    {section.content.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+                
+                {section.subsections && section.subsections.map((sub, idx) => (
+                  <div key={idx} className="subsection">
+                    <h3>{sub.subtitle}</h3>
+                    <ul className="help-list">
+                      {sub.points.map((point, pidx) => (
+                        <li key={pidx}>{point}</li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="help-footer">
+          <p>Still need help? <Link to="/contact" className="contact-link">Contact our support team</Link></p>
+        </div>
       </div>
     </div>
   );
 }
- 

@@ -17,8 +17,25 @@ export default function AccountSection() {
       {/* Left Sidebar */}
       <aside className="profile-sidebar">
         <nav className="profile-nav">
+          <button 
+            className="profile-nav-item"
+            onClick={() => window.dispatchEvent(new CustomEvent("openProfileTab"))}
+          >
+            <span className="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+              </svg>
+            </span>
+            Profile
+          </button>
+
           <button
-            onClick={() => setAccountOpen((o) => !o)}
+            onClick={() => {
+              setAccountOpen((o) => !o);
+              setActiveMenu("account");
+              scrollToSection("account-section");
+            }}
             className={`profile-nav-item profile-nav-parent ${activeMenu === "account" || activeMenu === "team" || activeMenu === "security" || activeMenu === "data" || activeMenu === "authorized" ? "active" : ""}`}
             aria-expanded={accountOpen}
           >
@@ -84,7 +101,7 @@ export default function AccountSection() {
             </div>
           )}
 
-          <button className="profile-nav-item">
+          {/* <button className="profile-nav-item">
             <span className="nav-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="4" width="18" height="14" rx="2" />
@@ -92,7 +109,7 @@ export default function AccountSection() {
               </svg>
             </span>
             Integrations
-          </button>
+          </button> */}
 
           <button 
             className="profile-nav-item"
@@ -109,7 +126,7 @@ export default function AccountSection() {
             Billing
           </button>
 
-          <button className="profile-nav-item">
+          {/* <button className="profile-nav-item">
             <span className="nav-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 20V10" />
@@ -117,7 +134,7 @@ export default function AccountSection() {
               </svg>
             </span>
             Referrals
-          </button>
+          </button> */}
 
           {/* <button className="profile-nav-item">
             <span className="nav-icon">

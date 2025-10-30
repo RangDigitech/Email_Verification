@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import "./SingleVerifier.css";
 import { validateEmail } from "./api";
 import RecentEmails from "./components/RecentEmails";
+import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
 
 export default function SingleVerifier() {
   const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
 
   const normalizeBackendResult = (r) => {
     if (!r) return null;
@@ -68,6 +70,16 @@ export default function SingleVerifier() {
     e.preventDefault();
     if (!email) return;
 
+    // Check if user has credits before starting verification
+    const currentCredits = Number(localStorage.getItem("credits") || 0);
+    console.log("Single verification - Current credits:", currentCredits);
+    
+    if (currentCredits <= 0) {
+      console.log("No credits available, showing insufficient credits modal");
+      setShowInsufficientCreditsModal(true);
+      return;
+    }
+
     setIsVerifying(true);
     setErrorMsg("");
     setResult(null);
@@ -81,12 +93,40 @@ export default function SingleVerifier() {
       })
       .catch((err) => {
         console.error("Verification API call failed:", err);
-        setErrorMsg(err.message || "An unexpected error occurred. Please try again.");
+        const errorMessage = err.message || "An unexpected error occurred. Please try again.";
+        
+        // Check if error is about insufficient credits
+        if (errorMessage.toLowerCase().includes("insufficient credits") || 
+            errorMessage.toLowerCase().includes("not enough credits") ||
+            errorMessage.toLowerCase().includes("no credits")) {
+          setShowInsufficientCreditsModal(true);
+        } else {
+          setErrorMsg(errorMessage);
+        }
         setResult(null);
       })
       .finally(() => {
         setIsVerifying(false);
       });
+  };
+
+  const handleBuyCredits = () => {
+    console.log("handleBuyCredits called");
+    console.log("window.openBuyCreditsModal exists:", !!window.openBuyCreditsModal);
+    
+    // First open the buy credits modal, then close this one
+    if (window.openBuyCreditsModal) {
+      window.openBuyCreditsModal();
+    } else {
+      // Fallback: dispatch event that Dashboard can listen to
+      console.log("Using event fallback");
+      window.dispatchEvent(new CustomEvent("openBuyCreditsModal"));
+    }
+    
+    // Close the insufficient credits modal with a slight delay to ensure the other modal opens
+    setTimeout(() => {
+      setShowInsufficientCreditsModal(false);
+    }, 100);
   };
 
   return (
@@ -117,6 +157,14 @@ export default function SingleVerifier() {
         <div className="api-error">
           <strong>Error:</strong> {errorMsg}
         </div>
+      )}
+
+      {/* Insufficient Credits Modal */}
+      {showInsufficientCreditsModal && (
+        <InsufficientCreditsModal
+          onClose={() => setShowInsufficientCreditsModal(false)}
+          onBuyCredits={handleBuyCredits}
+        />
       )}
 
       {/* ✅ CENTERED LOADING SPINNER - Shows between input and recent verifications */}

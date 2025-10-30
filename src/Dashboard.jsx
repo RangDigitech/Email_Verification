@@ -12,6 +12,8 @@ import AccountSection from "./components/AccountSection";
 import BillingSection from "./components/BillingSection";
 import ReferralsSection from "./components/ReferralsSection";
 import BuyCreditsModal from "./components/BuyCreditsModal";
+import Help from "./Help";
+import FAQs from "./FAQs";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("single");
@@ -59,11 +61,13 @@ export default function Dashboard() {
 
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === "#referrals") setActiveTab("referrals");
-      else if (hash === "#billing") setActiveTab("billing");
+      // if (hash === "#referrals") setActiveTab("referrals");
+      if (hash === "#billing") setActiveTab("billing");
       else if (hash === "#account") setActiveTab("account");
       else if (hash === "#profile") setActiveTab("profile");
-      else if (hash === "#integrations") setActiveTab("integrations");
+      else if (hash === "#help") setActiveTab("help");
+      else if (hash === "#faqs") setActiveTab("faqs");
+      // else if (hash === "#integrations") setActiveTab("integrations");
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -75,38 +79,48 @@ export default function Dashboard() {
   useEffect(() => {
     const handleProfileEvent = () => setActiveTab("profile");
     const handleAccountEvent = () => setActiveTab("account");
-    const handleIntegrationsEvent = () => setActiveTab("integrations");
+    // const handleIntegrationsEvent = () => setActiveTab("integrations");
     const handleBillingEvent = () => setActiveTab("billing");
-    const handleReferralsEvent = () => setActiveTab("referrals");
+    // const handleReferralsEvent = () => setActiveTab("referrals");
+    const handleHelpEvent = () => setActiveTab("help");
+    const handleFAQsEvent = () => setActiveTab("faqs");
     const handleBuyCreditsEvent = () => setShowBuyCreditsModal(true);
     // expose helpers on window for direct calls
-    window.openReferralsTab = () => { window.location.hash = "#referrals"; setActiveTab("referrals"); };
+    // window.openReferralsTab = () => { window.location.hash = "#referrals"; setActiveTab("referrals"); };
     window.openBillingTab = () => { window.location.hash = "#billing"; setActiveTab("billing"); };
     window.openAccountTab = () => { window.location.hash = "#account"; setActiveTab("account"); };
     window.openProfileTab = () => { window.location.hash = "#profile"; setActiveTab("profile"); };
-    window.openIntegrationsTab = () => { window.location.hash = "#integrations"; setActiveTab("integrations"); };
+    window.openHelpTab = () => { window.location.hash = "#help"; setActiveTab("help"); };
+    window.openFAQsTab = () => { window.location.hash = "#faqs"; setActiveTab("faqs"); };
+    // window.openIntegrationsTab = () => { window.location.hash = "#integrations"; setActiveTab("integrations"); };
     window.openBuyCreditsModal = () => {
       console.log("Opening Buy Credits Modal");
       setShowBuyCreditsModal(true);
     };
     window.addEventListener("openProfileTab", handleProfileEvent);
     window.addEventListener("openAccountTab", handleAccountEvent);
-    window.addEventListener("openIntegrationsTab", handleIntegrationsEvent);
+    // window.addEventListener("openIntegrationsTab", handleIntegrationsEvent);
     window.addEventListener("openBillingTab", handleBillingEvent);
-    window.addEventListener("openReferralsTab", handleReferralsEvent);
+    // window.addEventListener("openReferralsTab", handleReferralsEvent);
+    window.addEventListener("openHelpTab", handleHelpEvent);
+    window.addEventListener("openFAQsTab", handleFAQsEvent);
     window.addEventListener("openBuyCreditsModal", handleBuyCreditsEvent);
     return () => {
       window.removeEventListener("openProfileTab", handleProfileEvent);
       window.removeEventListener("openAccountTab", handleAccountEvent);
-      window.removeEventListener("openIntegrationsTab", handleIntegrationsEvent);
+      // window.removeEventListener("openIntegrationsTab", handleIntegrationsEvent);
       window.removeEventListener("openBillingTab", handleBillingEvent);
-      window.removeEventListener("openReferralsTab", handleReferralsEvent);
+      // window.removeEventListener("openReferralsTab", handleReferralsEvent);
+      window.removeEventListener("openHelpTab", handleHelpEvent);
+      window.removeEventListener("openFAQsTab", handleFAQsEvent);
       window.removeEventListener("openBuyCreditsModal", handleBuyCreditsEvent);
-      delete window.openReferralsTab;
+      // delete window.openReferralsTab;
       delete window.openBillingTab;
       delete window.openAccountTab;
       delete window.openProfileTab;
-      delete window.openIntegrationsTab;
+      delete window.openHelpTab;
+      delete window.openFAQsTab;
+      // delete window.openIntegrationsTab;
       delete window.openBuyCreditsModal;
     };
   }, []);
@@ -198,14 +212,29 @@ export default function Dashboard() {
       <div className={`dashboard-main ${showSidebar && activeTab === "bulk" ? "with-sidebar" : ""}`}>
         <header className="dashboard-header">
           <div className="header-left">
-              <div className="dashboard-logo" onClick={handleLogoClick}>
-                <img 
-                  src="/app_logo1.png" 
-                  alt="AI Email Verifier Logo" 
-                  className="logo-icon"
+            <div className="dashboard-logo" onClick={handleLogoClick}>
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <rect x="30" y="60" width="140" height="100" fill="#fffdfdff" rx="8" />
+                <path
+                  d="M 30 60 L 100 110 L 170 60"
+                  stroke="#000000ff"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <span className="logo-text">AI Email Verifier</span>
-              </div>
+                <circle cx="150" cy="50" r="25" fill="#5d1590ff" />
+                <path
+                  d="M 140 50 L 147 57 L 160 44"
+                  stroke="#ffffff"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="logo-text">AI Email Verifier</span>
+            </div>
 
             <nav className="dashboard-tabs">
               <button
@@ -243,7 +272,6 @@ export default function Dashboard() {
               displayName={displayName}
               onOpenProfile={() => setActiveTab("profile")}
               onOpenAccount={() => setActiveTab("account")}
-              onOpenIntegrations={() => setActiveTab("integrations")}
               onOpenBilling={() => setActiveTab("billing")}
             />
           </div>
@@ -260,9 +288,11 @@ export default function Dashboard() {
           {activeTab === "single" && <SingleVerifier />}
           {activeTab === "profile" && <ProfileSection />}
           {activeTab === "account" && <AccountSection />}
-          {activeTab === "integrations" && <ProfileSection />}
+          {/* {activeTab === "integrations" && <ProfileSection />} */}
           {activeTab === "billing" && <BillingSection />}
-          {activeTab === "referrals" && <ReferralsSection />}
+          {activeTab === "help" && <Help />}
+          {activeTab === "faqs" && <FAQs />}
+          {/* {activeTab === "referrals" && <ReferralsSection />} */}
         </div>
       </div>
       
@@ -274,7 +304,7 @@ export default function Dashboard() {
   );
 }
 
-function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = null, onOpenProfile, onOpenAccount, onOpenIntegrations, onOpenBilling }) {
+function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = null, onOpenProfile, onOpenAccount, onOpenBilling }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
   const navigate = useNavigate();
@@ -309,16 +339,26 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
     onOpenAccount?.();
   };
 
-  const handleIntegrationsClick = () => {
+  const handleHelpClick = () => {
     setOpen(false);
-    onOpenIntegrations?.();
+    if (window.openHelpTab) window.openHelpTab();
   };
 
-  const handleReferralsClick = () => {
+  const handleFAQsClick = () => {
     setOpen(false);
-    if (window.openReferralsTab) window.openReferralsTab();
-    else window.dispatchEvent(new CustomEvent("openReferralsTab"));
+    if (window.openFAQsTab) window.openFAQsTab();
   };
+
+  // const handleIntegrationsClick = () => {
+  //   setOpen(false);
+  //   onOpenIntegrations?.();
+  // };
+
+  // const handleReferralsClick = () => {
+  //   setOpen(false);
+  //   if (window.openReferralsTab) window.openReferralsTab();
+  //   else window.dispatchEvent(new CustomEvent("openReferralsTab"));
+  // };
 
   return (
     <div className="user-toggle relative" ref={ref}>
@@ -360,7 +400,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Account</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleIntegrationsClick}>
+            {/* <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleIntegrationsClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="14" rx="2" />
@@ -368,7 +408,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
                 </svg>
               </span>
               <span>Integrations</span>
-            </li>
+            </li> */}
             <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleBillingClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -378,7 +418,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Billing</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleReferralsClick}>
+            {/* <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleReferralsClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 20V10" />
@@ -386,6 +426,25 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
                 </svg>
               </span>
               <span>Referrals</span>
+            </li> */}
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleHelpClick}>
+              <span className="menu-icon" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </span>
+              <span>Help</span>
+            </li>
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleFAQsClick}>
+              <span className="menu-icon" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 9h6v6H9z" />
+                  <path d="M3 12h4M17 12h4M12 3v4M12 17v4" />
+                </svg>
+              </span>
+              <span>FAQs</span>
             </li>
           </ul>
 
