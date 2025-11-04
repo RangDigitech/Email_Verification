@@ -24,13 +24,19 @@ import Help from "./Help";
 import FAQs from "./FAQs";
 import Blogs from "./Blogs";
 import BlogPost1 from "./BlogPost1";
+import AdminDashboard from "./admin/AdminDashboard";
+import OAuthCallback from "./OAuthCallback";
+import AdminProtectedRoute from "./AdminProtectedRoute";
 // Icons are served from `public/` via absolute paths (e.g., "/wallet.png").
+import { CreditsProvider } from "./CreditsContext";
 
 export default function App() {
   return (
-    <Router>  
-      <MainApp />
-    </Router>
+    <CreditsProvider>
+      <Router>  
+        <MainApp />
+      </Router>
+    </CreditsProvider>
   );
 }
 
@@ -40,7 +46,8 @@ function MainApp() {
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
     location.pathname === "/dashboard" ||
-    location.pathname === "/about";
+    location.pathname === "/admin" ||
+    location.pathname === "/oauth/callback";
 
   return (
     <div className="app">
@@ -50,6 +57,7 @@ function MainApp() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/bulk" element={<BulkPage />}/>
         <Route path="/Single" element={<SinglePage />}/>
         
@@ -59,6 +67,14 @@ function MainApp() {
           <Route path="/dashboard" element={<Dashboard />} />
           {/* You can add other protected routes here */}
         </Route>
+        <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
 
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
@@ -77,115 +93,158 @@ function MainApp() {
 export function Navbar() {
   const user = getUser();
   const [showSolutionsMenu, setShowSolutionsMenu] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const solutionsRef = React.useRef(null);
+  const navbarRef = React.useRef(null); // 🔹 ref for entire navbar
 
-  // Close menu when clicking outside
+  // === CLOSE SOLUTIONS MENU WHEN CLICKING OUTSIDE ===
   React.useEffect(() => {
     function handleClickOutside(event) {
       if (solutionsRef.current && !solutionsRef.current.contains(event.target)) {
         setShowSolutionsMenu(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // === CLOSE MOBILE MENU WHEN CLICKING OUTSIDE ===
+  React.useEffect(() => {
+    function handleOutsideClick(event) {
+      if (
+        navbarRef.current &&
+        !navbarRef.current.contains(event.target)
+      ) {
+        setMobileMenuOpen(false);
+        setShowSolutionsMenu(false);
+      }
+    }
+
+    // Only activate listener when menu is open
+    if (mobileMenuOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [mobileMenuOpen]);
+
   return (
-    <nav className="navbar">
-      <Link to="/" className="nav-logo" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <nav className="navbar" ref={navbarRef}>
+      {/* === LOGO === */}
+      <Link
+        to="/"
+        className="nav-logo"
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
         <img src="/app_logo1.png" alt="Verifier Logo" className="logo" />
         <span>AI Email Verifier</span>
       </Link>
-      <ul className="nav-links">
-        <li 
-          className="solutions-dropdown" 
+
+      {/* === HAMBURGER MENU BUTTON === */}
+      <button
+        className="menu-toggle"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      >
+        {mobileMenuOpen ? "✖" : "☰"}
+      </button>
+
+      {/* === NAV LINKS === */}
+      <ul className={`nav-links ${mobileMenuOpen ? "active" : ""}`}>
+        <li
+          className="solutions-dropdown"
           ref={solutionsRef}
-          onMouseEnter={() => setShowSolutionsMenu(true)}
-          onMouseLeave={() => setShowSolutionsMenu(false)}
+          onMouseEnter={() => window.innerWidth > 768 && setShowSolutionsMenu(true)}
+          onMouseLeave={() => window.innerWidth > 768 && setShowSolutionsMenu(false)}
         >
-          <button className="solutions-toggle">
+          <button
+            className="solutions-toggle"
+            onClick={() => {
+              if (window.innerWidth <= 768)
+                setShowSolutionsMenu(!showSolutionsMenu);
+            }}
+          >
             Solutions
-            <svg 
-              className={`dropdown-arrow ${showSolutionsMenu ? 'open' : ''}`} 
-              width="12" 
-              height="12" 
-              viewBox="0 0 12 12" 
+            <svg
+              className={`dropdown-arrow ${showSolutionsMenu ? "open" : ""}`}
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
               fill="none"
             >
-              <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path
+                d="M2 4L6 8L10 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
-          
+
           {showSolutionsMenu && (
-            <div className="solutions-menu">
-              <Link to="/bulk" className="solution-item">
-                <div className="solution-icon bulk-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 11H15M9 15H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="solution-content">
-                  <div className="solution-title">Bulk</div>
-                  <div className="solution-desc">Verify email address lists</div>
-                </div>
-              </Link>
+           <div className="solutions-menu">
+  <Link
+    to="/bulk"
+    className="solution-item"
+    onClick={() => setMobileMenuOpen(false)}
+  >
+    <div className="solution-icon bulk-icon">
+      <img src="email_logo.png" alt="Bulk Icon" />
+    </div>
+    <div className="solution-content">
+      <div className="solution-title">Bulk</div>
+      <div className="solution-desc">Verify email address lists</div>
+    </div>
+  </Link>
 
-              <Link to="/single" className="solution-item">
-                <div className="solution-icon verifier-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="solution-content">
-                  <div className="solution-title">Single Verifier</div>
-                  <div className="solution-desc">One Click One Email</div>
-                </div>
-              </Link>
+  <Link
+    to="/single"
+    className="solution-item"
+    onClick={() => setMobileMenuOpen(false)}
+  >
+    <div className="solution-icon verifier-icon">
+      <img src="email_logo.png" alt="Verifier Icon" />
+    </div>
+    <div className="solution-content">
+      <div className="solution-title">Single Verifier</div>
+      <div className="solution-desc">One Click One Email</div>
+    </div>
+  </Link>
+</div>
 
-              {/* <Link to="/api" className="solution-item">
-                <div className="solution-icon api-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M10 20L14 4M18 8L22 12L18 16M6 16L2 12L6 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="solution-content">
-                  <div className="solution-title">API</div>
-                  <div className="solution-desc">Email Verification for Developers</div>
-                </div>
-              </Link>
-
-              <Link to="/widget" className="solution-item">
-                <div className="solution-icon widget-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9.75 17L9 20L8 21H16L15 20L14.25 17M3 13H21M5 17H19C20.1046 17 21 16.1046 21 15V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V15C3 16.1046 3.89543 17 5 17Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="solution-content">
-                  <div className="solution-title">Widget</div>
-                  <div className="solution-desc">Real-Time Email Validation</div>
-                </div>
-              </Link>
-
-              <Link to="/deliverability" className="solution-item">
-                <div className="solution-icon deliverability-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 8L10.89 13.26C11.5417 13.6728 12.4583 13.6728 13.11 13.26L21 8M5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="solution-content">
-                  <div className="solution-title">Deliverability</div>
-                  <div className="solution-desc">Inbox Placement and Insights</div>
-                </div>
-              </Link> */}
-            </div>
           )}
         </li>
-        <li><Link to="/pricing">Pricing</Link></li>
-        <li><Link to="/about">About Us</Link></li>
-        <li><Link to="/contact">Contact Us</Link></li>
-        <li><Link to="/blogs">Blogs</Link></li>
 
+        <li><Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</Link></li>
+        <li><Link to="/about" onClick={() => setMobileMenuOpen(false)}>About Us</Link></li>
+        <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link></li>
+        <li><Link to="/blogs" onClick={() => setMobileMenuOpen(false)}>Blogs</Link></li>
+        <li><Link to="/help" onClick={() => setMobileMenuOpen(false)}>Help</Link></li>
+
+        {/* === MOBILE ACTION BUTTONS === */}
+        <div className="mobile-actions">
+          {!user ? (
+            <>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <button className="login-btn">Login</button>
+              </Link>
+              <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                <button className="signup-btn">Sign Up Free</button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <button className="signup-btn">BUY CREDITS</button>
+              <div className="user-avatar" title={user.email}>
+                {(user.name || user.email || "U").charAt(0).toUpperCase()}
+              </div>
+            </>
+          )}
+        </div>
       </ul>
+
+      {/* === DESKTOP ACTIONS === */}
       <div className="nav-actions">
         {!user ? (
           <>
@@ -195,12 +254,13 @@ export function Navbar() {
             <Link to="/signup">
               <button className="signup-btn">Sign Up Free</button>
             </Link>
-
           </>
         ) : (
           <>
             <button className="signup-btn">BUY CREDITS</button>
-            <div className="user-avatar" title={user.email}>{(user.name || user.email || 'U').charAt(0).toUpperCase()}</div>
+            <div className="user-avatar" title={user.email}>
+              {(user.name || user.email || "U").charAt(0).toUpperCase()}
+            </div>
           </>
         )}
       </div>
@@ -225,7 +285,7 @@ function Home() {
       <Hero />
 
       {/* Bulk Verification */}
-      <section className="section bulk-section">
+      <section className="bulk-section">
         <div className="section-inner">
           <div className="bulk-left">
             <h2>Validate Emails in Bulk</h2>
@@ -265,10 +325,10 @@ function Home() {
                 const duplicate = 3.0;
 
                 const segments = [
-                  { name: 'deliverable', value: deliverable, count: 3802, color: 'var(--brand-primary)', label: 'Deliverable', colorHex: '#000000' },
-                  { name: 'undeliverable', value: undeliverable, count: 728, color: '#999', label: 'Undeliverable', colorHex: '#999999' },
+                  { name: 'deliverable', value: deliverable, count: 3802, color: 'var(--brand-primary)', label: 'Deliverable', colorHex: 'var(--brand-primary)' },
+                  { name: 'undeliverable', value: undeliverable, count: 728, color: '#999', label: 'Undeliverable', colorHex: '#999' },
                   { name: 'risky', value: risky, count: 1372, color: '#f4a261', label: 'Risky', colorHex: '#f4a261' },
-                  { name: 'unknown', value: unknown, count: 403, color: '#ccc', label: 'Unknown', colorHex: '#cccccc' },
+                  { name: 'unknown', value: unknown, count: 403, color: '#ccc', label: 'Unknown', colorHex: '#ccc' },
                   { name: 'duplicate', value: duplicate, count: 195, color: '#c1b3ff', label: 'Duplicate', colorHex: '#c1b3ff' }
                 ];
 
@@ -329,14 +389,14 @@ function Home() {
                 return (
                   <div className="donut-card">
                     <div className="donut-wrap" aria-hidden>
-                      <div className="donut-container" style={{ position: 'relative', width: '200px', height: '200px' }}>
+                      <div className="donut-container" style={{ position: 'relative', width: '14vw', height: '14vw' }}>
                         {/* Base donut chart */}
                         <div 
                           className="donut multi" 
                           style={{ 
                             background: baseGradient,
-                            filter: hoveredSegment ? 'brightness(0.7)' : 'brightness(1)',
-                            transition: 'filter 0.3s ease, transform 0.3s ease',
+                            // Removed global brightness filter to avoid dimming center on hover
+                            transition: 'transform 0.3s ease',
                             transform: hoveredSegment ? 'scale(0.98)' : 'scale(1)',
                             position: 'relative',
                             width: '100%',
@@ -364,31 +424,18 @@ function Home() {
                             onMouseEnter={() => setHoveredSegment(seg.name)}
                             onMouseLeave={() => setHoveredSegment(null)}
                           >
-                            {/* Highlight overlay with glow */}
+                            {/* Exact-color highlight for hovered segment only */}
                             {hoveredSegment === seg.name && (
-                              <>
-                                <div
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    background: 'white',
-                                    opacity: 0,
-                                    animation: 'glowPulse 0.6s ease-in-out',
-                                    filter: `drop-shadow(0 0 20px ${seg.colorHex})`
-                                  }}
-                                />
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    background: `radial-gradient(circle at center, ${seg.colorHex}88 0%, transparent 70%)`,
-                                    animation: 'ripple 0.8s ease-out'
-                                  }}
-                                />
-                              </>
+                              <div
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  background: seg.colorHex,
+                                  opacity: 0.35,
+                                  filter: `drop-shadow(0 0 16px ${seg.colorHex})`,
+                                  transition: 'opacity 0.2s ease'
+                                }}
+                              />
                             )}
                           </div>
                         ))}
@@ -400,6 +447,7 @@ function Home() {
                             position: 'absolute',
                             top: '50%',
                             left: '50%',
+                          
                             transform: 'translate(-50%, -50%)',
                             zIndex: 10,
                             pointerEvents: 'none',
@@ -413,9 +461,11 @@ function Home() {
                               transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                               transform: hoveredSegment ? 'scale(1.15)' : 'scale(1)',
                               color: 'black',
-                              fontSize: '32px',
+                              fontSize: '2.5vw',
                               fontWeight: 'bold',
+          
                               lineHeight: '1.2'
+                            
                             }}
                           >
                             {currentSegment.value}%
@@ -425,7 +475,7 @@ function Home() {
                             style={{
                               transition: 'all 0.3s ease',
                               opacity: hoveredSegment ? 1 : 0.7,
-                              fontSize: '14px',
+                              fontSize: '1vw',
                               marginTop: '4px',
                               color: '#000000ff'
                             }}
@@ -857,12 +907,12 @@ export function Footer() {
           {/* <p>The best way to verify emails.</p> */}
           
           {/* NEW: Tagline with different sizes */}
-          <div style={{
+          <div  className="footer-tagline"style={{
             marginTop: '0px',
             lineHeight: '1.1',
           }}>
-            <span style={{
-              fontSize: '40px',
+            <span  className="footer-tagline-span"style={{
+              fontSize: '2vw',
               fontWeight: '500',
               color: '#ffffff',
               margin: '0',
@@ -871,8 +921,8 @@ export function Footer() {
             }}>
               Verify Smart,
             </span>
-            <p style={{
-              fontSize: '60px',
+            <p  className="footer-tagline-p"style={{
+              fontSize: '3vw',
               fontWeight: '700',
               color: '#ffffff',
               margin: '4px 0 0 0',
@@ -903,6 +953,13 @@ export function Footer() {
           <ul>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
+           
+          </ul>
+        </div>
+         <div className="footer-section">
+          <h4>Resources</h4>
+          <ul>
+           
             <li><Link to="/help">Help</Link></li>
             <li><Link to="/faqs">FAQs</Link></li>
             <li><Link to="/blogs">Blogs</Link></li>
@@ -912,18 +969,21 @@ export function Footer() {
         {/* Auth Buttons Section */}
         <div className="footer-section">
           {/* <h4>Get Started</h4> */}
-          <div style={{ 
+          <div className="footer-button-section" style={{ 
             display: 'flex', 
             flexDirection: 'column', 
             gap: '12px', 
             marginTop: '16px' 
           }}>
             <Link to="/login" style={{ textDecoration: 'none' }}>
-              <button
+              <button className="login-footer"
                 style={{
                   width: '100%',
-                  padding: '12px 24px',
-                  fontSize: '15px',
+                  display:'flex',
+                  justifyContent:'center',
+                  alignItems:'center',
+                  fontSize: '1.5vw',
+                  height:'3vw',
                   fontWeight: 600,
                   fontFamily: 'Inter, sans-serif',
                   background: '#ffffff',
@@ -954,11 +1014,14 @@ export function Footer() {
             </Link>
 
             <Link to="/signup" style={{ textDecoration: 'none' }}>
-              <button
+              <button className="sign-up-footer"
                 style={{
                   width: '100%',
-                  padding: '12px 24px',
-                  fontSize: '15px',
+                  display:'flex',
+                  justifyContent:'center',
+                  alignItems:'center',
+                  height:'3vw',
+                  fontSize: '1.5vw',
                   fontWeight: 600,
                   fontFamily: 'Inter, sans-serif',
                   background: '#ffffff',
@@ -984,7 +1047,7 @@ export function Footer() {
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                Sign Up Free
+                Sign Up 
               </button>
             </Link>
           </div>
@@ -992,15 +1055,15 @@ export function Footer() {
       </div>
 
       <p className="footer-copy">
-        © 2025 Developed and Designed by{' '}
-        <a 
+        © 2025 Developed and Designed by AI Email Verifier.
+        {/* <a 
           href="https://rangdigitech.com" 
           target="_blank" 
           rel="noopener noreferrer"
           style={{ color: '#ffffffff', textDecoration: 'underline' }}
         >
           Rang Digitech LLC
-        </a>.
+        </a>. */}
       </p>
     </footer>
   );

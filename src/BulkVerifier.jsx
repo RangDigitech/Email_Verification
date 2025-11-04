@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./BulkVerifier.css";
 import { validateBulk, apiUrl } from "./api";
 import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
-
+import { useCredits } from "./CreditsContext";
+ 
 export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "overview" }) {
   const [view, setView] = useState("list");
   const [file, setFile] = useState(null);
@@ -13,6 +14,7 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const [uploadProgress, setUploadProgress] = useState(0);
   const [emailCount, setEmailCount] = useState(0);
   const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
+  const { refreshCredits } = useCredits?.() ?? { refreshCredits: () => {} };
 
   useEffect(() => {
     const saved = localStorage.getItem("bulkValidations");
@@ -109,7 +111,9 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
       const data = await validateBulk({ file });
       clearInterval(progressInterval);
       setUploadProgress(100);
-      
+      if (refreshCredits && typeof refreshCredits === 'function') {
+       Promise.resolve(refreshCredits()).catch(() => {});
+      }
       setTimeout(() => {
         const updatedValidations = [data, ...validations];
         setValidations(updatedValidations);

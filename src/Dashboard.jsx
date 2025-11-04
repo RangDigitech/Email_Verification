@@ -14,6 +14,10 @@ import ReferralsSection from "./components/ReferralsSection";
 import BuyCreditsModal from "./components/BuyCreditsModal";
 import Help from "./Help";
 import FAQs from "./FAQs";
+import ContactPage from "./ContactPage";
+import AboutUs from "./components/AboutUs";
+import Blogs from "./Blogs";
+import { isAdminEmail } from "./config/admin";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("single");
@@ -33,10 +37,18 @@ export default function Dashboard() {
   const userEmail = localStorage.getItem("userEmail") || "user@example.com";
   const userInitial = userEmail.charAt(0).toUpperCase();
   const displayName = (localStorage.getItem("name_email") === userEmail && localStorage.getItem("name")) || null;
+  
+// Check if current user is admin
+  const isAdmin = React.useMemo(() => {
+    return isAdminEmail(userEmail);
+  }, [userEmail]);
 
   useEffect(() => {
-    if (window.location.pathname !== "/dashboard") {
-      navigate("/dashboard", { replace: true });
+    // Check for access denied message
+    const accessDenied = sessionStorage.getItem('accessDenied');
+    if (accessDenied === 'true') {
+      alert('Access Denied: You do not have permission to access the admin dashboard.');
+      sessionStorage.removeItem('accessDenied');
     }
 
     const pushOrReplaceState = (state, title, url) => {
@@ -67,6 +79,9 @@ export default function Dashboard() {
       else if (hash === "#profile") setActiveTab("profile");
       else if (hash === "#help") setActiveTab("help");
       else if (hash === "#faqs") setActiveTab("faqs");
+      else if (hash === "#contact") setActiveTab("contact");
+      else if (hash === "#about") setActiveTab("about");
+      else if (hash === "#blogs") setActiveTab("blogs");
       // else if (hash === "#integrations") setActiveTab("integrations");
     };
 
@@ -92,6 +107,9 @@ export default function Dashboard() {
     window.openProfileTab = () => { window.location.hash = "#profile"; setActiveTab("profile"); };
     window.openHelpTab = () => { window.location.hash = "#help"; setActiveTab("help"); };
     window.openFAQsTab = () => { window.location.hash = "#faqs"; setActiveTab("faqs"); };
+    window.openContactTab = () => { window.location.hash = "#contact"; setActiveTab("contact"); };
+    window.openAboutTab = () => { window.location.hash = "#about"; setActiveTab("about"); };
+    window.openBlogsTab = () => { window.location.hash = "#blogs"; setActiveTab("blogs"); };
     // window.openIntegrationsTab = () => { window.location.hash = "#integrations"; setActiveTab("integrations"); };
     window.openBuyCreditsModal = () => {
       console.log("Opening Buy Credits Modal");
@@ -213,26 +231,7 @@ export default function Dashboard() {
         <header className="dashboard-header">
           <div className="header-left">
             <div className="dashboard-logo" onClick={handleLogoClick}>
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <rect x="30" y="60" width="140" height="100" fill="#fffdfdff" rx="8" />
-                <path
-                  d="M 30 60 L 100 110 L 170 60"
-                  stroke="#000000ff"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="150" cy="50" r="25" fill="#5d1590ff" />
-                <path
-                  d="M 140 50 L 147 57 L 160 44"
-                  stroke="#ffffff"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <img src="/app_logo1.png" alt="Logo" className="logo-image" />
               <span className="logo-text">AI Email Verifier</span>
             </div>
 
@@ -265,6 +264,26 @@ export default function Dashboard() {
 
           <div className="dashboard-actions">
             <button className="buy-credits-btn" onClick={() => setShowBuyCreditsModal(true)}>BUY CREDITS</button>
+            {/* Only show Admin Dashboard button to admins */}
+            {isAdmin && (
+              <button 
+                className="admin-dashboard-btn" 
+                onClick={() => navigate('/admin')}
+                style={{
+                  padding: '8px 16px',
+                  background: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginRight: '12px'
+                }}
+              >
+                Admin Dashboard
+              </button>
+            )}
             <UserToggle
               userEmail={userEmail}
               userInitial={userInitial}
@@ -292,6 +311,9 @@ export default function Dashboard() {
           {activeTab === "billing" && <BillingSection />}
           {activeTab === "help" && <Help />}
           {activeTab === "faqs" && <FAQs />}
+          {activeTab === "contact" && <ContactPage />}
+          {activeTab === "about" && <AboutUs />}
+          {activeTab === "blogs" && <Blogs />}
           {/* {activeTab === "referrals" && <ReferralsSection />} */}
         </div>
       </div>
@@ -303,11 +325,13 @@ export default function Dashboard() {
     </div>
   );
 }
-
 function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = null, onOpenProfile, onOpenAccount, onOpenBilling }) {
   const [open, setOpen] = React.useState(false);
+  const [currentCreditCount, setCurrentCreditCount] = React.useState(creditCount);
   const ref = React.useRef(null);
   const navigate = useNavigate();
+  const { refreshCredits, credits } = useCredits?.() ?? { refreshCredits: () => {}, credits: null };
+ 
 
   React.useEffect(() => {
     function onDocClick(e) {
@@ -323,6 +347,24 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
       document.removeEventListener("keydown", onKey);
     };
   }, []);
+
+  React.useEffect(() => {
+    if (open && refreshCredits && typeof refreshCredits === 'function') {
+      // Silently refresh credits in the background when dropdown opens
+      Promise.resolve(refreshCredits()).catch(() => {});
+    }
+  }, [open, refreshCredits]);
+ 
+  // Update credit count when credits context changes
+  React.useEffect(() => {
+    const newCreditCount = credits?.remaining_credits ?? Number(localStorage.getItem("credits") || 0);
+    setCurrentCreditCount(newCreditCount);
+  }, [credits]);
+ 
+  // Also sync with parent's creditCount prop
+  React.useEffect(() => {
+    setCurrentCreditCount(creditCount);
+  }, [creditCount]);
 
   const handleProfileClick = () => {
     setOpen(false);
@@ -347,6 +389,20 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
   const handleFAQsClick = () => {
     setOpen(false);
     if (window.openFAQsTab) window.openFAQsTab();
+  };
+
+  // New: open marketing pages as internal tabs (keep dashboard navbar)
+  const handleContactClick = () => {
+    setOpen(false);
+    if (window.openContactTab) window.openContactTab();
+  };
+  const handleAboutClick = () => {
+    setOpen(false);
+    if (window.openAboutTab) window.openAboutTab();
+  };
+  const handleBlogsClick = () => {
+    setOpen(false);
+    if (window.openBlogsTab) window.openBlogsTab();
   };
 
   // const handleIntegrationsClick = () => {
@@ -376,7 +432,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
             <div>
               <div className="panel-name font-semibold" style={{ color: '#000000' }}>{displayName || userEmail}</div>
               <div className="panel-credits text-xs text-gray-500">
-                CREDIT BALANCE <strong>{creditCount}</strong>
+                CREDIT BALANCE <strong>{currentCreditCount}</strong>
               </div>
             </div>
           </div>
@@ -437,7 +493,7 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>Help</span>
             </li>
-            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleFAQsClick}>
+             <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleFAQsClick}>
               <span className="menu-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 9h6v6H9z" />
@@ -446,6 +502,34 @@ function UserToggle({ userEmail, userInitial, creditCount = 0, displayName = nul
               </span>
               <span>FAQs</span>
             </li>
+            {/*<li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleContactClick}>
+              <span className="menu-icon" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 1 1 18 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </span>
+              <span>Contact Us</span>
+            </li>
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleAboutClick}>
+              <span className="menu-icon" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 20l-7-4V8l7-4 7 4v8l-7 4Z" />
+                  <path d="M12 12v.01" />
+                  <path d="M12 16v-2" />
+                </svg>
+              </span>
+              <span>About Us</span>
+            </li>
+            <li className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleBlogsClick}>
+              <span className="menu-icon" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16v16H4z" />
+                  <path d="M8 8h8M8 12h8M8 16h5" />
+                </svg>
+              </span>
+              <span>Blogs</span>
+            </li> */}
           </ul>
 
           <div className="panel-footer border-t border-gray-100 p-3">

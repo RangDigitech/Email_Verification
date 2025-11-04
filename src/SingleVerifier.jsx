@@ -3,13 +3,16 @@ import "./SingleVerifier.css";
 import { validateEmail } from "./api";
 import RecentEmails from "./components/RecentEmails";
 import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
-
+import { useCredits } from "./CreditsContext";
+import Tooltip from "./components/Tooltip";
+ 
 export default function SingleVerifier() {
   const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
+  const { refreshCredits } = useCredits?.() ?? { refreshCredits: () => {} };
 
   const normalizeBackendResult = (r) => {
     if (!r) return null;
@@ -90,6 +93,11 @@ export default function SingleVerifier() {
         if (!payload) throw new Error("Received an invalid response from the server.");
         const normalized = normalizeBackendResult(payload);
         setResult(normalized);
+        // Refresh credits after successful verification (silently in background)
+        if (refreshCredits && typeof refreshCredits === 'function') {
+          Promise.resolve(refreshCredits()).catch(() => {});
+        }
+ 
       })
       .catch((err) => {
         console.error("Verification API call failed:", err);

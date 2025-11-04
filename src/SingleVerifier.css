@@ -117,6 +117,9 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* Progress log (streaming steps) */
+/* progress-log elements removed (reverted) */
+
 .api-error {
   background: #4c0000;
   color: #ffbaba;

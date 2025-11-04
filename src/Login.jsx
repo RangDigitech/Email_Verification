@@ -1,20 +1,19 @@
+// src/Login.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaGoogle, FaGithub, FaLinkedinIn, FaFacebookF, FaApple } from "react-icons/fa";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import "./Auth.css";
-import { login } from "./api"; // UPDATED: Import the real login function from your api.js
-import { oauthStartUrl } from "./api";
+import { login, oauthStartUrl, getMe, RECAPTCHA_SITE_KEY } from "./api";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // UPDATED: Renamed to handleSubmit and made async to call the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -23,31 +22,23 @@ export default function Login() {
     const email = String(form.get("email") || "").trim();
     const password = String(form.get("password") || "");
 
-    // --- Input Validation ---
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    if (!password) {
-      setError("Password is required.");
-      return;
-    }
+    if (!validateEmail(email)) { setError("Please enter a valid email address."); return; }
+    if (!password) { setError("Password is required."); return; }
+    if (!captchaToken) { setError("Please complete the captcha."); return; }
 
     setLoading(true);
     try {
-      // --- API Call ---
-      // This calls the '/login' endpoint on your backend.
-      // The login function in api.js saves the JWT token to localStorage.
-      await login(email, password);
-
-      // --- Success Handling ---
-      localStorage.setItem("userEmail", email); // Store email for display on dashboard
+      await login(email, password, captchaToken);
+      const me = await getMe();
+      if (me && typeof me.is_admin === "boolean") {
+        localStorage.setItem("is_admin", me.is_admin ? "true" : "false");
+      } else {
+        localStorage.removeItem("is_admin");
+      }
+      localStorage.setItem("userEmail", email);
       navigate("/dashboard");
-
     } catch (err) {
-      // --- Error Handling ---
-      // This will display errors from the backend, like "Incorrect email or password"
-      setError(err.message);
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -56,31 +47,13 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <Link to="/">
-          <img src="/logo_login1.png" alt="Verifier Logo" className="auth-logo" />
-        </Link>
+        <Link to="/"><img src="/logo_login1.png" alt="Verifier Logo" className="auth-logo" /></Link>
         <h2>Welcome Back</h2>
         <p>Sign in to continue your journey with Verifier</p>
 
         <div className="social-login">
-          <button
-            className="social-btn"
-            onClick={() => { window.location.href = oauthStartUrl("google"); }}
-            title="Continue with Google"
-          >
-            <FaGoogle />
-          </button>
-
-          <button
-            className="social-btn"
-            onClick={() => { window.location.href = oauthStartUrl("github"); }}
-            title="Continue with GitHub"
-          >
-            <FaGithub />
-          </button>
-          {/* <button className="social-btn" title="Sign in with LinkedIn" disabled><FaLinkedinIn /></button>
-          <button className="social-btn" title="Sign in with Facebook" disabled><FaFacebookF /></button>
-          <button className="social-btn" title="Sign in with Apple" disabled><FaApple /></button> */}
+          <button className="social-btn" onClick={() => { window.location.href = oauthStartUrl("google"); }} title="Continue with Google"><FaGoogle /></button>
+          <button className="social-btn" onClick={() => { window.location.href = oauthStartUrl("github"); }} title="Continue with GitHub"><FaGithub /></button>
         </div>
 
         <p className="divider">OR SIGN IN USING EMAIL</p>
@@ -88,8 +61,14 @@ export default function Login() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <input name="email" type="email" placeholder="Email Address" required />
           <input name="password" type="password" placeholder="Password" required />
+
+          {/* NEW: reCAPTCHA */}
+          <div style={{ margin: "10px 0" }}>
+            <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={setCaptchaToken} />
+          </div>
+
           {error && <div className="auth-error">{error}</div>}
-          <button type="submit" className="submit-btn" disabled={loading}>
+          <button type="submit" className="submit-btn" disabled={loading || !captchaToken}>
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
@@ -101,4 +80,3 @@ export default function Login() {
     </div>
   );
 }
-

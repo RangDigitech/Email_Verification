@@ -7,6 +7,11 @@ export function apiUrl(path) {
   return `${BASE_URL.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+// NEW: expose site key to components
+export const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+
+
+
 // Public utility: quick disposable/syntax check for signup
 export async function checkEmailDisposable(email) {
   const url = apiUrl(`/utils/check-email?email=${encodeURIComponent(email)}`);
@@ -87,12 +92,16 @@ export const register = async (userData) => {
     throw error;
   }
 };
+export const login = async (email, password, captchaToken) => {
+  if (!captchaToken) throw new Error("Please complete the captcha first.");
 
-export const login = async (email, password) => {
   const formData = new URLSearchParams();
+  // backend accepts username/password in your current code
   formData.append("username", email);
   formData.append("password", password);
   formData.append("grant_type", "password");
+  // NEW: send token
+  formData.append("recaptcha_token", captchaToken);
 
   const response = await fetch(apiUrl("/login"), {
     method: "POST",
@@ -105,25 +114,37 @@ export const login = async (email, password) => {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
+    const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || "Login failed");
   }
 
   const data = await response.json();
-
-  // Save token + current email
   localStorage.setItem("accessToken", data.access_token);
   localStorage.setItem("userEmail", email);
 
-  // Hydrate profile name for this account
-  await getMe();
-
-  // Hydrate credits (and cache them)
-  await refreshCredits();
+  // hydrate profile & credits like you already do
+  try { await getMe(); } catch {}
+  try { await refreshCredits(); } catch {}
 
   return data;
 };
 
+// --- CONTACT: if you already post contact to backend, include token ---
+// Example helper (adjust to your actual contact endpoint & payload):
+export async function submitContact(form) {
+  // form = { name, email, phone, subject, message, recaptcha_token }
+  const res = await fetch(apiUrl("/contact/submit"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(form),
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
 
 export const logout = () => {
   localStorage.removeItem("accessToken");
@@ -425,4 +446,127 @@ export async function getBillingUsage({ startISO, endISO, interval }) {
   });
   if (!res.ok) throw new Error("unauthorized");
   return res.json();
+}
+
+// Get all users (admin only)
+export async function getAllUsers() {
+  try {
+    const res = await fetch(apiUrl("/admin/users"), {
+      method: "GET",
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    throw error;
+  }
+}
+
+// Get user details by ID (admin only)
+export async function getUserDetails(userId) {
+  try {
+    const res = await fetch(apiUrl(`/admin/users/${userId}`), {
+      method: "GET",
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch user details:", error);
+    throw error;
+  }
+}
+
+// Get all users with credits (admin only)
+export async function getAllUsersWithCredits() {
+  try {
+    const res = await fetch(apiUrl("/admin/users/credits"), {
+      method: "GET",
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch users with credits:", error);
+    throw error;
+  }
+}
+
+// Get deactivated users (admin only)
+export async function getDeactivatedUsers() {
+  try {
+    const res = await fetch(apiUrl("/admin/users/deactivated"), {
+      method: "GET",
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch deactivated users:", error);
+    throw error;
+  }
+}
+
+// Deactivate/Activate user (admin only)
+export async function toggleUserStatus(userId, isActive) {
+  try {
+    const res = await fetch(apiUrl(`/admin/users/${userId}/status`), {
+      method: "PUT",
+      headers: { 
+        ...authHeaders(), 
+        "Content-Type": "application/json",
+        Accept: "application/json" 
+      },
+      body: JSON.stringify({ is_active: isActive }),
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to update user status:", error);
+    throw error;
+  }
+}
+
+// Get admin dashboard stats (admin only)
+export async function getAdminStats() {
+  try {
+    const res = await fetch(apiUrl("/admin/stats"), {
+      method: "GET",
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch admin stats:", error);
+    throw error;
+  }
+}
+
+// Check if current user is admin
+export async function checkAdminStatus() {
+  try {
+    const res = await fetch(apiUrl("/me"), {
+      headers: { ...authHeaders(), Accept: "application/json" },
+      credentials: "include",
+      cache: "no-cache",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const userData = await res.json();
+    return userData.is_admin === true || false;
+  } catch (error) {
+    console.error("Failed to check admin status:", error);
+    return false;
+  }
 }
