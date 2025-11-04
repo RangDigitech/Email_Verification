@@ -67,6 +67,10 @@ function MainApp() {
           <Route path="/dashboard" element={<Dashboard />} />
           {/* You can add other protected routes here */}
         </Route>
+        {/* <Route element={<AdminProtectedRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route> */}
+ 
         <Route
             path="/admin"
             element={

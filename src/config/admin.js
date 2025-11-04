@@ -11,7 +11,8 @@
 export const ADMIN_EMAILS = [
   'jeet8patel1970@gmail.com',  
   'sagarjobanputra1997@gmail.com',
-  'zeel10538@gmail.com' 
+  'zeel10538@gmail.com',
+   'Admin@gmail.com' 
     // Replace with your actual admin email
   // Add more admin emails here, for example:
   // 'another-admin@example.com',
