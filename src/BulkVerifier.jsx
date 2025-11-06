@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./BulkVerifier.css";
-import { validateBulk, apiUrl } from "./api";
+// ⛔ remove validateBulk (old blocking call)
+// import { validateBulk, apiUrl } from "./api";
+import { apiUrl, enqueueBulk, getBulkStatus } from "./api";
 import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
 import { useCredits } from "./CreditsContext";
-import { enqueueBulk, getBulkStatus } from "./api";
 
 export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "overview" }) {
   const [view, setView] = useState("list");
@@ -46,6 +47,11 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     setShowSidebar(view === "results");
   }, [view, setShowSidebar]);
 
+  useEffect(() => {
+  return () => {
+    if (pollRef.current) clearInterval(pollRef.current);
+  };
+}, []);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files && e.target.files[0];
     if (selectedFile && (selectedFile.type === "text/csv" || selectedFile.name.endsWith(".csv"))) {
@@ -85,41 +91,72 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     }
   };
 
-  const startPolling = (jobid) => {
-  clearInterval(pollRef.current);
+const startPolling = (jobid) => {
+  if (pollRef.current) clearInterval(pollRef.current);
   pollRef.current = setInterval(async () => {
     try {
       const data = await getBulkStatus(jobid);
-      setProgress(data.progress || null);
-      // When you later show links, read data.files here:
-      // setFiles(data.files || []);
-      const done = Number(data?.progress?.done || 0);
-      const total = Number(data?.progress?.total || 0);
-      if (total > 0 && done >= total) {
+      // Expect: { status, total, done, chunks, files? } or { progress:{total,done} }
+      const total = Number(data?.total ?? data?.progress?.total ?? 0);
+      const done  = Number(data?.done  ?? data?.progress?.done  ?? 0);
+      const status = data?.status || (total && done < total ? "running" : "queued");
+
+      // update the Uploading view progress (0–100)
+      if (total > 0) {
+        const pct = Math.floor((done / total) * 100);
+        setUploadProgress(Math.max(0, Math.min(100, pct)));
+      }
+
+      // you’re already keeping `job` and `progress` in state:
+      setProgress({
+        status,
+        total,
+        done,
+        chunk_count: Number(data?.chunks || data?.progress?.chunks || 0),
+        files: data?.files || null,
+      });
+
+      if (status === "finished" || (total > 0 && done >= total)) {
         clearInterval(pollRef.current);
-        // You can now hit your download UI, or re-fetch a combined results file you emit.
+        pollRef.current = null;
+        setUploadProgress(100);
+        // Keep your UI the same: stay on "uploading" card, or:
+        // optionally auto-show results list if you have one:
+        // setView("list");
       }
     } catch (e) {
+      console.error("polling failed", e);
       clearInterval(pollRef.current);
-      console.error(e);
+      pollRef.current = null;
     }
   }, 2000);
 };
 
-  const handleValidate = async () => {
+
+const handleValidate = async () => {
   if (!file) return alert("Please choose a CSV file first");
 
-  // credits check kept as-is...
+  // keep your credits check as-is if you had one
 
+  // show the Uploading card immediately
   setView("uploading");
-  setUploadProgress(10);
+  setUploadProgress(5); // small initial tick so users see motion
 
   try {
-    const info = await enqueueBulk(file, { smtp: true, workers: 12 });
-    setJob(info);               // {jobid, chunks, status}
-    setProgress({ status: "queued", done: 0, total: 0, chunk_count: info.chunks });
-    setUploadProgress(100);     // upload is done; now the background job runs
-    startPolling(info.jobid);   // keep UI updated
+    // enqueue → { jobid, chunks, status }
+    // IMPORTANT: your enqueue helper signature is (file, smtp, workers)
+    const info = await enqueueBulk(file, true, 12);
+
+    setJob(info); // {jobid, chunks, status}
+    setProgress({
+      status: info?.status || "queued",
+      done: 0,
+      total: 0,
+      chunk_count: Number(info?.chunks || 0),
+    });
+
+    // begin polling for progress & completion
+    startPolling(info.jobid);
   } catch (err) {
     console.error(err);
     alert(err.message || "Bulk enqueue failed");
@@ -193,6 +230,9 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
           fileName={file?.name || "File"} 
           progress={uploadProgress}
           emailCount={emailCount}
+          // new optional props:
+          done={progress?.done || 0}
+          total={progress?.total || 0}
         />
       )}
 
@@ -303,7 +343,7 @@ function UploadView({
 }
 
 // NEW: Uploading View Component - Small Card
-function UploadingView({ fileName, progress, emailCount }) {
+function UploadingView({ fileName, progress, emailCount, done, total }) {
   const safeProgress = Math.max(0, Math.min(100, Number.isFinite(progress) ? progress : 0));
   const circumference = 2 * Math.PI * 85;
   const offset = circumference - (safeProgress / 100) * circumference;
@@ -351,6 +391,11 @@ function UploadingView({ fileName, progress, emailCount }) {
             <div className="uploading-label">Uploading</div>
           </div>
         </div>
+          {typeof done === "number" && typeof total === "number" && total > 0 && (
+            <div className="uploading-submeta" style={{ marginTop: 8, textAlign: "center", opacity: 0.8 }}>
+              {done} / {total}
+            </div>
+          )}
 
         <div className="uploading-spinner-container">
           <div className="uploading-spinner"></div>
