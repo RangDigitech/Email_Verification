@@ -115,7 +115,19 @@ const startPolling = (jobid) => {
         chunk_count: Number(data?.chunks || data?.progress?.chunks || 0),
         files: data?.files || null,
       });
-
+       setValidations(prev => { 
+   return prev.map(v => 
+     v.id === jobid 
+       ? { 
+           ...v, 
+           status: data.status || v.status, 
+           // update total from backend if it knows better 
+           totalEmails: Number(data?.progress?.total ?? v.totalEmails ?? 0), 
+           done: Number(data?.progress?.done ?? 0), 
+         } 
+       : v 
+   ); 
+ });
       if (status === "finished" || (total > 0 && done >= total)) {
         clearInterval(pollRef.current);
         pollRef.current = null;
@@ -157,6 +169,25 @@ const handleValidate = async () => {
 
     // begin polling for progress & completion
     startPolling(info.jobid);
+     // Create a local stub so the list shows correct totals right away 
+ const stub = { 
+   id: info.jobid, 
+   name: (file?.name || "list").replace(/\.csv$/i, ""), 
+   source: "My Computer", 
+   totalEmails: emailCount,       // <-- THIS prevents the 0 Emails issue 
+   deliverable: 0, 
+   undeliverable: 0, 
+   risky: 0, 
+   unknown: 0, 
+   status: "queued", 
+   createdAt: new Date().toISOString(), 
+ }; 
+ setValidations(prev => { 
+   const next = [stub, ...prev]; 
+   localStorage.setItem("bulkValidations", JSON.stringify(next)); 
+   return next; 
+ }); 
+ setCurrentResult(stub);
   } catch (err) {
     console.error(err);
     alert(err.message || "Bulk enqueue failed");
@@ -567,7 +598,7 @@ function ValidationCard({ validation, onViewResult }) {
       <div className="validation-chart-wrapper">
         <div className="validation-donut" style={{ background: gradient }}>
           <div className="validation-donut-hole">
-            <div className="validation-count">{validation.totalEmails}</div>
+            <div className="validation-count">{validation.totalEmails ?? 0}</div>
             <div className="validation-label">Emails</div>
           </div>
         </div>
