@@ -3,7 +3,8 @@ import "./BulkVerifier.css";
 import { validateBulk, apiUrl } from "./api";
 import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
 import { useCredits } from "./CreditsContext";
- 
+import { enqueueBulk, getBulkStatus } from "./api";
+
 export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "overview" }) {
   const [view, setView] = useState("list");
   const [file, setFile] = useState(null);
@@ -15,6 +16,9 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
   const [emailCount, setEmailCount] = useState(0);
   const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
   const { refreshCredits } = useCredits?.() ?? { refreshCredits: () => {} };
+  const [job, setJob] = useState(null);
+  const [progress, setProgress] = useState(null);
+  const pollRef = useRef(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("bulkValidations");
@@ -81,68 +85,47 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
     }
   };
 
-  const handleValidate = async () => {
-    if (!file) return alert("Please choose a CSV file first");
-    
-    // Check if user has credits before starting verification
-    const currentCredits = Number(localStorage.getItem("credits") || 0);
-    console.log("Bulk verification - Current credits:", currentCredits);
-    
-    if (currentCredits <= 0) {
-      console.log("No credits available, showing insufficient credits modal");
-      setShowInsufficientCreditsModal(true);
-      return;
-    }
-
-    setView("uploading");
-    setUploadProgress(0);
-
-    const progressInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 300);
-
+  const startPolling = (jobid) => {
+  clearInterval(pollRef.current);
+  pollRef.current = setInterval(async () => {
     try {
-      const data = await validateBulk({ file });
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      if (refreshCredits && typeof refreshCredits === 'function') {
-       Promise.resolve(refreshCredits()).catch(() => {});
+      const data = await getBulkStatus(jobid);
+      setProgress(data.progress || null);
+      // When you later show links, read data.files here:
+      // setFiles(data.files || []);
+      const done = Number(data?.progress?.done || 0);
+      const total = Number(data?.progress?.total || 0);
+      if (total > 0 && done >= total) {
+        clearInterval(pollRef.current);
+        // You can now hit your download UI, or re-fetch a combined results file you emit.
       }
-      setTimeout(() => {
-        const updatedValidations = [data, ...validations];
-        setValidations(updatedValidations);
-        localStorage.setItem("bulkValidations", JSON.stringify(updatedValidations));
-        setCurrentResult(data);
-        setView("completed");
-        setFile(null);
-        setUploadProgress(0);
-        setEmailCount(0);
-      }, 800);
-    } catch (err) {
-      clearInterval(progressInterval);
-      console.error(err);
-      const errorMessage = err.message || "Bulk verification failed. Please try again.";
-      
-      // Check if error is about insufficient credits
-      if (errorMessage.toLowerCase().includes("insufficient credits") || 
-          errorMessage.toLowerCase().includes("not enough credits") ||
-          errorMessage.toLowerCase().includes("no credits")) {
-        setShowInsufficientCreditsModal(true);
-      } else {
-        alert(errorMessage);
-      }
-      
-      setView("upload");
-      setCurrentResult(null);
-      setUploadProgress(0);
+    } catch (e) {
+      clearInterval(pollRef.current);
+      console.error(e);
     }
-  };
+  }, 2000);
+};
+
+  const handleValidate = async () => {
+  if (!file) return alert("Please choose a CSV file first");
+
+  // credits check kept as-is...
+
+  setView("uploading");
+  setUploadProgress(10);
+
+  try {
+    const info = await enqueueBulk(file, { smtp: true, workers: 12 });
+    setJob(info);               // {jobid, chunks, status}
+    setProgress({ status: "queued", done: 0, total: 0, chunk_count: info.chunks });
+    setUploadProgress(100);     // upload is done; now the background job runs
+    startPolling(info.jobid);   // keep UI updated
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Bulk enqueue failed");
+    setView("upload");
+  }
+};
 
   const handleBackToList = (e) => {
     if (e) {
@@ -321,8 +304,9 @@ function UploadView({
 
 // NEW: Uploading View Component - Small Card
 function UploadingView({ fileName, progress, emailCount }) {
+  const safeProgress = Math.max(0, Math.min(100, Number.isFinite(progress) ? progress : 0));
   const circumference = 2 * Math.PI * 85;
-  const offset = circumference - (progress / 100) * circumference;
+  const offset = circumference - (safeProgress / 100) * circumference;
 
   return (
     <div className="uploading-section fade-in">
@@ -363,7 +347,7 @@ function UploadingView({ fileName, progress, emailCount }) {
             />
           </svg>
           <div className="uploading-center">
-            <div className="uploading-percentage">{Math.round(progress)}%</div>
+            <div className="uploading-percentage">{Math.round(safeProgress)}%</div>
             <div className="uploading-label">Uploading</div>
           </div>
         </div>

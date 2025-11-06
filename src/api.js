@@ -570,3 +570,106 @@ export async function checkAdminStatus() {
     return false;
   }
 }
+// ----------------------
+// BLOGS
+// ----------------------
+
+// Public: list published posts
+export async function getPublicBlogPosts(page = 1, limit = 12, q = "") {
+  const params = new URLSearchParams({ page, limit });
+  if (q) params.set("q", q);
+  const res = await fetch(apiUrl(`/blog-posts?${params.toString()}`), {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Public: fetch one post by slug
+export async function getPublicBlogPostBySlug(slug) {
+  const res = await fetch(apiUrl(`/blog-posts/${slug}`), {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Admin: list all posts (drafts + published)
+export async function getAdminBlogPosts() {
+  const res = await fetch(apiUrl("/admin/blog-posts"), {
+    method: "GET",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Admin: create a new post
+export async function createBlogPost(post) {
+  const res = await fetch(apiUrl("/admin/blog-posts"), {
+    method: "POST",
+    headers: { ...authHeaders(), "Content-Type": "application/json", Accept: "application/json" },
+    credentials: "include",
+    body: JSON.stringify(post),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// Admin: update existing post
+export async function updateBlogPost(id, post) {
+  const res = await fetch(apiUrl(`/admin/blog-posts/${id}`), {
+    method: "PATCH",
+    headers: { ...authHeaders(), "Content-Type": "application/json", Accept: "application/json" },
+    credentials: "include",
+    body: JSON.stringify(post),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// Admin: delete post
+export async function deleteBlogPost(id) {
+  const res = await fetch(apiUrl(`/admin/blog-posts/${id}`), {
+    method: "DELETE",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok && res.status !== 204) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return true;
+}
+
+// RQ-based bulk API
+export async function enqueueBulk(file, { smtp = true, workers = 12 } = {}) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("smtp", String(smtp));
+  fd.append("workers", String(workers));
+  const res = await fetch(apiUrl("/bulk/enqueue"), {
+    method: "POST",
+    body: fd,
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`enqueue failed: ${res.status}`);
+  return res.json(); // { jobid, chunks, status }
+}
+
+export async function getBulkStatus(jobid) {
+  const res = await fetch(apiUrl(`/bulk/jobs/${jobid}`), { credentials: "include" });
+  if (!res.ok) throw new Error(`status failed: ${res.status}`);
+  return res.json(); // { jobid, progress:{status,done,total,chunk_count}, files:[...] }
+}
