@@ -652,25 +652,36 @@ export async function deleteBlogPost(id) {
   }
   return true;
 }
-export async function enqueueBulk(file, smtp=true, workers=12, token) {
-  const form = new FormData();
-  form.append("file", file);
-  form.append("smtp", String(smtp));
-  form.append("workers", String(workers));
+// api.js (add these near your other helpers)
+export async function enqueueBulk(file, smtp = true, workers = 12) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("smtp", String(smtp));
+  fd.append("workers", String(workers));
 
-  const resp = await fetch(`${BASE_URL}/validate-file`, {
+  const res = await fetch(apiUrl("/validate-file?source=bulk"), {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form
+    body: fd,
+    credentials: "include",
+    headers: { ...authHeaders() }, // <-- IMPORTANT
   });
-  if (!resp.ok) throw new Error(`Bulk enqueue failed: ${resp.status}`);
-  return resp.json(); // { jobid, chunks, status }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  return res.json(); // { jobid, chunks, status }
 }
 
-export async function getBulkStatus(jobid, token) {
-  const resp = await fetch(`${BASE_URL}/bulk/jobs/${jobid}`, {
-    headers: { Authorization: `Bearer ${token}` }
+export async function getBulkStatus(jobid) {
+  const res = await fetch(apiUrl(`/bulk/status/${jobid}`), {
+    method: "GET",
+    credentials: "include",
+    headers: { ...authHeaders(), Accept: "application/json" }, // <-- IMPORTANT
+    cache: "no-cache",
   });
-  if (!resp.ok) throw new Error(`Status failed: ${resp.status}`);
-  return resp.json(); // { total, done, progress, status, files? }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  return res.json(); // { status, total, done, chunks, files? }
 }
