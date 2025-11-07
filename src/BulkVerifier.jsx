@@ -183,10 +183,10 @@ const handleValidate = async () => {
    createdAt: new Date().toISOString(), 
  }; 
  setValidations(prev => { 
-   const next = [stub, ...prev]; 
-   localStorage.setItem("bulkValidations", JSON.stringify(next)); 
-   return next; 
- }); 
+    const next = [stub, ...prev]; 
+    localStorage.setItem("bulkValidations", JSON.stringify(next)); 
+    return next; 
+  });
  setCurrentResult(stub);
   } catch (err) {
     console.error(err);
