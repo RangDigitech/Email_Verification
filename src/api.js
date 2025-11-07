@@ -685,3 +685,39 @@ export async function getBulkStatus(jobid) {
   }
   return res.json(); // { status, total, done, chunks, files? }
 }
+export async function enqueueBulk(file, smtp = true, workers = 12) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("smtp", String(!!smtp));
+  fd.append("workers", String(workers));
+
+  const res = await fetch(apiUrl("/validate-file?source=bulk"), {
+    method: "POST",
+    body: fd,
+    credentials: "include",
+    headers: { ...authHeaders() },
+    cache: "no-cache",
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  // expected shape: { jobid, chunks, status: "queued" }
+  return res.json();
+}
+
+// Poll progress from Redis-backed status route
+export async function getBulkStatus(jobid) {
+  const res = await fetch(apiUrl(`/bulk/status/${encodeURIComponent(jobid)}`), {
+    method: "GET",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+    cache: "no-cache",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
