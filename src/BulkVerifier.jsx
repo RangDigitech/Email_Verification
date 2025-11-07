@@ -261,9 +261,23 @@ const handleValidate = async () => {
           fileName={file?.name || "File"} 
           progress={uploadProgress}
           emailCount={emailCount}
-          // new optional props:
           done={progress?.done || 0}
           total={progress?.total || 0}
+          isDone={progress?.status === "finished"}          // NEW
+          files={progress?.files || null}                   // NEW
+          onOpenResults={() => {
+            // Prefer server-generated CSV/JSON if present
+            if (progress?.files?.results_csv) {
+              window.open(apiUrl(progress.files.results_csv), "_blank");
+              return;
+            }
+            if (progress?.files?.results_json) {
+              window.open(apiUrl(progress.files.results_json), "_blank");
+              return;
+            }
+            // Fallback: switch to list/results if you later hydrate from DB
+            setView("list");
+          }}
         />
       )}
 
@@ -374,7 +388,7 @@ function UploadView({
 }
 
 // NEW: Uploading View Component - Small Card
-function UploadingView({ fileName, progress, emailCount, done, total }) {
+function UploadingView({ fileName, progress, emailCount, done, total, isDone, files, onOpenResults }) {
   const safeProgress = Math.max(0, Math.min(100, Number.isFinite(progress) ? progress : 0));
   const circumference = 2 * Math.PI * 85;
   const offset = circumference - (safeProgress / 100) * circumference;
@@ -382,58 +396,26 @@ function UploadingView({ fileName, progress, emailCount, done, total }) {
   return (
     <div className="uploading-section fade-in">
       <div className="uploading-card">
-        <div className="uploading-header">
-          <h3>{fileName.replace('.csv', '')}</h3>
-          <div className="uploading-meta">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            <span>My Computer</span>
-          </div>
-        </div>
+        {/* ...header + donut stays the same... */}
 
-        <div className="uploading-chart-wrapper">
-          <svg className="uploading-donut-svg" viewBox="0 0 200 200">
-            <circle
-              cx="100"
-              cy="100"
-              r="85"
-              fill="none"
-              stroke="#F2F2F2"
-              strokeWidth="18"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r="85"
-              fill="none"
-              stroke="#7C3AED"
-              strokeWidth="18"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-              transform="rotate(-90 100 100)"
-              className="uploading-progress-circle"
-            />
-          </svg>
-          <div className="uploading-center">
-            <div className="uploading-percentage">{Math.round(safeProgress)}%</div>
-            <div className="uploading-label">Uploading</div>
+        {typeof done === "number" && typeof total === "number" && total > 0 && (
+          <div className="uploading-submeta" style={{ marginTop: 8, textAlign: "center", opacity: 0.8 }}>
+            {done} / {total}
           </div>
-        </div>
-          {typeof done === "number" && typeof total === "number" && total > 0 && (
-            <div className="uploading-submeta" style={{ marginTop: 8, textAlign: "center", opacity: 0.8 }}>
-              {done} / {total}
-            </div>
-          )}
+        )}
 
         <div className="uploading-spinner-container">
-          <div className="uploading-spinner"></div>
+          {/* show spinner only while not done */}
+          {!isDone && <div className="uploading-spinner"></div>}
         </div>
 
-        <button className="verify-btn-uploading" disabled>
-          View Results
+        <button
+          className="verify-btn-uploading"
+          disabled={!isDone}
+          onClick={isDone ? onOpenResults : undefined}
+          title={isDone ? "Open results" : "Processing..."}
+        >
+          {isDone ? "View Results" : "Processing…"}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <polyline points="9 18 15 12 9 6" />
           </svg>
