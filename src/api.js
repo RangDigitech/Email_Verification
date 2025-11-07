@@ -719,5 +719,36 @@ export async function getBulkStatus(jobid) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.detail || body.error || `HTTP ${res.status}`);
   }
-  return res.json();
+  const data = await res.json();
+
+  // --- normalize fields coming from Redis ---
+  const out = {
+    status: data?.status || "queued",
+    total: Number(data?.total ?? data?.progress?.total ?? 0),
+    done: Number(data?.done ?? data?.progress?.done ?? 0),
+    chunks: Number(data?.chunks ?? data?.progress?.chunks ?? 0),
+    files: null,
+  };
+
+  // files can arrive as a JSON STRING; parse if needed
+  let f = data?.files;
+  if (typeof f === "string") {
+    try { f = JSON.parse(f); } catch {}
+  }
+  if (f && typeof f === "object") out.files = f;
+
+  return out;
+}
+
+// Optional: quick helper to read the JSON results file
+export async function fetchBulkResultsJSON(files) {
+  if (!files?.results_json) return [];
+  const res = await fetch(apiUrl(files.results_json), {
+    method: "GET",
+    headers: { ...authHeaders(), Accept: "application/json" },
+    credentials: "include",
+    cache: "no-cache",
+  });
+  if (!res.ok) return [];
+  return res.json().catch(() => []);
 }

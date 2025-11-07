@@ -95,46 +95,32 @@ const startPolling = (jobid) => {
   if (pollRef.current) clearInterval(pollRef.current);
   pollRef.current = setInterval(async () => {
     try {
-      const data = await getBulkStatus(jobid);
-      // Expect: { status, total, done, chunks, files? } or { progress:{total,done} }
-      const total = Number(data?.total ?? data?.progress?.total ?? 0);
-      const done  = Number(data?.done  ?? data?.progress?.done  ?? 0);
-      const status = data?.status || (total && done < total ? "running" : "queued");
+      const data = await getBulkStatus(jobid); // now normalized
+      const { status, total, done, files, chunks } = data;
 
-      // update the Uploading view progress (0–100)
       if (total > 0) {
         const pct = Math.floor((done / total) * 100);
         setUploadProgress(Math.max(0, Math.min(100, pct)));
       }
 
-      // you’re already keeping `job` and `progress` in state:
-      setProgress({
-        status,
-        total,
-        done,
-        chunk_count: Number(data?.chunks || data?.progress?.chunks || 0),
-        files: data?.files || null,
+      setProgress({ status, total, done, chunk_count: chunks, files: files || null });
+
+      // keep the list stub in sync
+      setValidations(prev => {
+        const next = prev.map(v =>
+          v.id === jobid
+            ? { ...v, status, done, totalEmails: v.totalEmails || total, files: files || v.files }
+            : v
+        );
+        localStorage.setItem("bulkValidations", JSON.stringify(next));
+        return next;
       });
-       setValidations(prev => { 
-   return prev.map(v => 
-     v.id === jobid 
-       ? { 
-           ...v, 
-           status: data.status || v.status, 
-           // update total from backend if it knows better 
-           totalEmails: Number(data?.progress?.total ?? v.totalEmails ?? 0), 
-           done: Number(data?.progress?.done ?? 0), 
-         } 
-       : v 
-   ); 
- });
+
       if (status === "finished" || (total > 0 && done >= total)) {
         clearInterval(pollRef.current);
         pollRef.current = null;
         setUploadProgress(100);
-        // Keep your UI the same: stay on "uploading" card, or:
-        // optionally auto-show results list if you have one:
-        // setView("list");
+        // do not force view switch; the button will light up
       }
     } catch (e) {
       console.error("polling failed", e);
@@ -263,10 +249,12 @@ const handleValidate = async () => {
           emailCount={emailCount}
           done={progress?.done || 0}
           total={progress?.total || 0}
-          isDone={progress?.status === "finished"}          // NEW
+          isDone={
+            progress?.status === "finished" ||
+            ((progress?.total || 0) > 0 && (progress?.done || 0) >= (progress?.total || 0))
+          }          // NEW
           files={progress?.files || null}                   // NEW
-          onOpenResults={() => {
-            // Prefer server-generated CSV/JSON if present
+          onViewResults={() => {
             if (progress?.files?.results_csv) {
               window.open(apiUrl(progress.files.results_csv), "_blank");
               return;
@@ -275,7 +263,6 @@ const handleValidate = async () => {
               window.open(apiUrl(progress.files.results_json), "_blank");
               return;
             }
-            // Fallback: switch to list/results if you later hydrate from DB
             setView("list");
           }}
         />
@@ -388,7 +375,7 @@ function UploadView({
 }
 
 // NEW: Uploading View Component - Small Card
-function UploadingView({ fileName, progress, emailCount, done, total, isDone, files, onOpenResults }) {
+function UploadingView({ fileName, progress, emailCount, done, total, isDone, onViewResults }) {
   const safeProgress = Math.max(0, Math.min(100, Number.isFinite(progress) ? progress : 0));
   const circumference = 2 * Math.PI * 85;
   const offset = circumference - (safeProgress / 100) * circumference;
@@ -396,26 +383,23 @@ function UploadingView({ fileName, progress, emailCount, done, total, isDone, fi
   return (
     <div className="uploading-section fade-in">
       <div className="uploading-card">
-        {/* ...header + donut stays the same... */}
-
-        {typeof done === "number" && typeof total === "number" && total > 0 && (
-          <div className="uploading-submeta" style={{ marginTop: 8, textAlign: "center", opacity: 0.8 }}>
-            {done} / {total}
-          </div>
-        )}
+        {/* ... chart ... */}
+        <div className="uploading-center">
+          <div className="uploading-percentage">{Math.round(safeProgress)}%</div>
+          <div className="uploading-label">{isDone ? "Completed" : "Uploading"}</div>
+        </div>
+        {/* progress numbers ... */}
 
         <div className="uploading-spinner-container">
-          {/* show spinner only while not done */}
           {!isDone && <div className="uploading-spinner"></div>}
         </div>
 
         <button
           className="verify-btn-uploading"
           disabled={!isDone}
-          onClick={isDone ? onOpenResults : undefined}
-          title={isDone ? "Open results" : "Processing..."}
+          onClick={isDone ? onViewResults : undefined}
         >
-          {isDone ? "View Results" : "Processing…"}
+          {isDone ? "View Results" : "View Results"}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <polyline points="9 18 15 12 9 6" />
           </svg>
