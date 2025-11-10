@@ -1,7 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../auth';
 import { getToken } from '../auth';
+import {
+  getAdminBlogPosts,
+  createBlogPost,
+  updateBlogPost,
+  deleteBlogPost,
+} from '../api';
 
 import {
   getAllUsers,
@@ -41,61 +48,82 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [blogForm, setBlogForm] = useState({
+    title: '',
+    author_name: '',
+    cover_image_url: '',
+    excerpt: '',
+    content_md: '',
+    status: 'draft',
+    published_at: ''
+  });
+  const [editingPostId, setEditingPostId] = useState(null);
+
+  async function loadBlogPosts() {
+    try {
+      const res = await getAdminBlogPosts();
+      setBlogPosts(res?.items || []);
+    } catch (e) {
+      console.error('Failed to load blog posts', e);
+    }
+  }
 
   useEffect(() => {
     loadDashboardData();
+    loadBlogPosts();
   }, []);
 
-const loadDashboardData = async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    const token = getToken?.() || localStorage.getItem("token");
-    const [usersData, creditsData, deactivatedData, statsData] = await Promise.all([
-      getAllUsers(token),
-      getAllUsersWithCredits(token),
-      getDeactivatedUsers(token),
-      getAdminStats(token),
-    ]);
+  const loadDashboardData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = getToken?.() || localStorage.getItem("token");
+      const [usersData, creditsData, deactivatedData, statsData] = await Promise.all([
+        getAllUsers(token),
+        getAllUsersWithCredits(token),
+        getDeactivatedUsers(token),
+        getAdminStats(token),
+      ]);
 
-    setUsers(usersData);
-    setUsersWithCredits(creditsData);
-    setDeactivatedUsers(deactivatedData);
-    setStats(statsData);
-  } catch (err) {
-    console.error('Failed to load dashboard data:', err);
-    setError('Failed to load dashboard data. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
-const handleViewUser = async (userId) => {
-  try {
-    const token = getToken?.() || localStorage.getItem("token");
-    const userDetails = await getUserDetails(userId, token);
-    setSelectedUser(userDetails);
-    setActiveTab('user-details');
-  } catch (err) {
-    console.error('Failed to load user details:', err);
-    alert('Failed to load user details');
-  }
-};
-
-const handleToggleUserStatus = async (userId, currentStatus) => {
-  if (!window.confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) return;
-  try {
-    const token = getToken?.() || localStorage.getItem("token");
-    await toggleUserStatus(userId, !currentStatus, token);
-    await loadDashboardData();
-    if (selectedUser && selectedUser.id === userId) {
-      setSelectedUser({ ...selectedUser, is_active: !currentStatus });
+      setUsers(usersData);
+      setUsersWithCredits(creditsData);
+      setDeactivatedUsers(deactivatedData);
+      setStats(statsData);
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err);
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Failed to update user status:', err);
-    alert('Failed to update user status');
-  }
-};
+  };
 
+  const handleViewUser = async (userId) => {
+    try {
+      const token = getToken?.() || localStorage.getItem("token");
+      const userDetails = await getUserDetails(userId, token);
+      setSelectedUser(userDetails);
+      setActiveTab('user-details');
+    } catch (err) {
+      console.error('Failed to load user details:', err);
+      alert('Failed to load user details');
+    }
+  };
+
+  const handleToggleUserStatus = async (userId, currentStatus) => {
+    if (!window.confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) return;
+    try {
+      const token = getToken?.() || localStorage.getItem("token");
+      await toggleUserStatus(userId, !currentStatus, token);
+      await loadDashboardData();
+      if (selectedUser && selectedUser.id === userId) {
+        setSelectedUser({ ...selectedUser, is_active: !currentStatus });
+      }
+    } catch (err) {
+      console.error('Failed to update user status:', err);
+      alert('Failed to update user status');
+    }
+  };
 
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -184,6 +212,12 @@ const handleToggleUserStatus = async (userId, currentStatus) => {
           onClick={() => setActiveTab('deactivated')}
         >
           Deactivated Users
+        </button>
+        <button
+          className={activeTab === 'blogs' ? 'active' : ''}
+          onClick={() => setActiveTab('blogs')}
+        >
+          Blogs
         </button>
         {selectedUser && (
           <button
@@ -453,7 +487,7 @@ const handleToggleUserStatus = async (userId, currentStatus) => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                    <Bar dataKey="used" fill="#8884d8" name="Used Credits" />
+                  <Bar dataKey="used" fill="#8884d8" name="Used Credits" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -575,7 +609,6 @@ const handleToggleUserStatus = async (userId, currentStatus) => {
                   )}
                 </div>
                 
-                {/* Charts for user details */}
                 <div className="user-details-charts">
                   <div className="chart-card">
                     <h3>Credits Usage Over Time</h3>
@@ -661,7 +694,246 @@ const handleToggleUserStatus = async (userId, currentStatus) => {
             </div>
           </div>
         )}
+
+        {activeTab === 'blogs' && (
+          <div className="blogs-admin-tab">
+            <div className="blogs-container">
+              {/* LEFT SIDE - FORM */}
+              <div className="blog-editor-section">
+                <form
+                  className="blog-form"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const payload = {
+                      ...blogForm,
+                      published_at: blogForm.published_at
+                        ? new Date(blogForm.published_at).toISOString()
+                        : null,
+                    };
+                    try {
+                      if (editingPostId) {
+                        await updateBlogPost(editingPostId, payload);
+                      } else {
+                        await createBlogPost(payload);
+                      }
+                      setBlogForm({
+                        title: "",
+                        author_name: "",
+                        cover_image_url: "",
+                        excerpt: "",
+                        content_md: "",
+                        status: "draft",
+                        published_at: "",
+                      });
+                      setEditingPostId(null);
+                      await loadBlogPosts();
+                      alert("Saved successfully!");
+                    } catch (err) {
+                      alert(err.message || "Save failed");
+                    }
+                  }}
+                >
+                  <div className="blog-form-header">
+                    <h2>{editingPostId ? '✏️ Edit Post' : '✍️ Create New Post'}</h2>
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Post Title *</label>
+                    <input
+                      className="blog-input"
+                      type="text"
+                      required
+                      placeholder="Enter post title..."
+                      value={blogForm.title}
+                      onChange={e => setBlogForm({ ...blogForm, title: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Author Name *</label>
+                    <input
+                      className="blog-input"
+                      type="text"
+                      required
+                      placeholder="Enter author name..."
+                      value={blogForm.author_name}
+                      onChange={e => setBlogForm({ ...blogForm, author_name: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Cover Image URL</label>
+                    <input
+                      className="blog-input"
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      value={blogForm.cover_image_url}
+                      onChange={e => setBlogForm({ ...blogForm, cover_image_url: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Publish Date</label>
+                    <input
+                      className="blog-input"
+                      type="date"
+                      value={blogForm.published_at}
+                      onChange={e => setBlogForm({ ...blogForm, published_at: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Short Excerpt (for cards)</label>
+                    <textarea
+                      className="blog-textarea blog-textarea-excerpt"
+                      rows={3}
+                      placeholder="Write a brief summary of your post..."
+                      value={blogForm.excerpt}
+                      onChange={e => setBlogForm({ ...blogForm, excerpt: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="blog-form-group">
+                    <label className="blog-label">Content (Markdown)</label>
+                    <textarea
+                      className="blog-textarea blog-textarea-content"
+                      rows={15}
+                      placeholder="Write your content here... Use **bold**, *italic*, # Headings, - Lists, etc."
+                      value={blogForm.content_md}
+                      onChange={e => setBlogForm({ ...blogForm, content_md: e.target.value })}
+                    />
+                    <p className="blog-hint">💡 Tip: Use Markdown syntax for formatting</p>
+                  </div>
+
+                  <div className="blog-form-footer">
+                    <div className="blog-status-group">
+                      <label className="blog-label">Status</label>
+                      <select
+                        className="blog-select"
+                        value={blogForm.status}
+                        onChange={e => setBlogForm({ ...blogForm, status: e.target.value })}
+                      >
+                        <option value="draft">📝 Draft</option>
+                        <option value="published">🚀 Published</option>
+                      </select>
+                    </div>
+
+                    <div className="blog-actions">
+                      <button className="blog-btn blog-btn-primary" type="submit">
+                        {editingPostId ? '💾 Update Post' : '✨ Create Post'}
+                      </button>
+
+                      {editingPostId && (
+                        <button
+                          className="blog-btn blog-btn-secondary"
+                          type="button"
+                          onClick={() => {
+                            setEditingPostId(null);
+                            setBlogForm({
+                              title: '',
+                              author_name: '',
+                              cover_image_url: '',
+                              excerpt: '',
+                              content_md: '',
+                              status: 'draft',
+                              published_at: ''
+                            });
+                          }}
+                        >
+                          ✕ Cancel
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              {/* RIGHT SIDE - LIST */}
+              <div className="blog-list-section">
+                <div className="blog-list-header">
+                  <h2>📚 All Posts ({blogPosts.length})</h2>
+                </div>
+
+                {blogPosts && blogPosts.length > 0 ? (
+                  <div className="blog-posts-grid">
+                    {blogPosts.map(post => (
+                      <div key={post.id} className="blog-post-card">
+                        {post.cover_image_url && (
+                          <div className="blog-post-image">
+                            <img src={post.cover_image_url} alt={post.title} />
+                          </div>
+                        )}
+                        
+                        <div className="blog-post-content">
+                          <div className="blog-post-header">
+                            <h3 className="blog-post-title">{post.title}</h3>
+                            <span className={`blog-badge ${post.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
+                              {post.status === 'published' ? '🚀 Published' : '📝 Draft'}
+                            </span>
+                          </div>
+
+                          <p className="blog-post-author">By {post.author_name}</p>
+                          
+                          <p className="blog-post-excerpt">{post.excerpt}</p>
+
+                          <div className="blog-post-meta">
+                            <span className="blog-post-date">
+                              📅 {post.published_at ? new Date(post.published_at).toLocaleDateString() : 'Not published'}
+                            </span>
+                          </div>
+
+                          <div className="blog-post-actions">
+                            <button
+                              className="blog-btn blog-btn-edit"
+                              onClick={() => {
+                                setEditingPostId(post.id);
+                                setBlogForm({
+                                  title: post.title || '',
+                                  author_name: post.author_name || '',
+                                  cover_image_url: post.cover_image_url || '',
+                                  excerpt: post.excerpt || '',
+                                  content_md: post.content_md || '',
+                                  status: post.status || 'draft',
+                                  published_at: post.published_at ? post.published_at.slice(0, 10) : ''
+                                });
+                              }}
+                            >
+                              ✏️ Edit
+                            </button>
+
+                            <button
+                              className="blog-btn blog-btn-delete"
+                              onClick={async () => {
+                                if (!window.confirm('Are you sure you want to delete this post?')) return;
+                                try {
+                                  await deleteBlogPost(post.id);
+                                  await loadBlogPosts();
+                                  alert('Post deleted successfully!');
+                                } catch (e) {
+                                  alert(e.message || 'Delete failed');
+                                }
+                              }}
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="blog-empty-state">
+                    <div className="blog-empty-icon">📭</div>
+                    <p className="blog-empty-text">No posts yet</p>
+                    <p className="blog-empty-subtext">Create your first blog post to get started!</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+

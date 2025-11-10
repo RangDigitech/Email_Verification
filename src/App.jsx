@@ -29,6 +29,7 @@ import OAuthCallback from "./OAuthCallback";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 // Icons are served from `public/` via absolute paths (e.g., "/wallet.png").
 import { CreditsProvider } from "./CreditsContext";
+import BlogPost from "./BlogPost"; // new dynamic page
 
 export default function App() {
   return (
@@ -60,7 +61,9 @@ function MainApp() {
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/bulk" element={<BulkPage />}/>
         <Route path="/Single" element={<SinglePage />}/>
-        
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:slug" element={<BlogPost />} />
 
         {/* PROTECTED ROUTE FOR DASHBOARD */}
         <Route element={<ProtectedRoute />}>

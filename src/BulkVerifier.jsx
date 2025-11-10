@@ -99,11 +99,14 @@ export default function BulkVerifier({ setShowSidebar, resetTrigger, panel = "ov
 
     const progressInterval = setInterval(() => {
       setUploadProgress(prev => {
+        // Prevent overshoot by clamping each tick
         if (prev >= 95) {
           clearInterval(progressInterval);
           return 95;
         }
-        return prev + Math.random() * 15;
+        const increment = Math.random() * 12; // slightly smaller step
+        const next = Math.min(prev + increment, 95);
+        return next;
       });
     }, 300);
 
@@ -321,8 +324,9 @@ function UploadView({
 
 // NEW: Uploading View Component - Small Card
 function UploadingView({ fileName, progress, emailCount }) {
+  const safeProgress = Math.max(0, Math.min(100, Number.isFinite(progress) ? progress : 0));
   const circumference = 2 * Math.PI * 85;
-  const offset = circumference - (progress / 100) * circumference;
+  const offset = circumference - (safeProgress / 100) * circumference;
 
   return (
     <div className="uploading-section fade-in">
@@ -363,7 +367,7 @@ function UploadingView({ fileName, progress, emailCount }) {
             />
           </svg>
           <div className="uploading-center">
-            <div className="uploading-percentage">{Math.round(progress)}%</div>
+            <div className="uploading-percentage">{Math.round(safeProgress)}%</div>
             <div className="uploading-label">Uploading</div>
           </div>
         </div>
