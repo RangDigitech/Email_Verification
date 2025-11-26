@@ -314,7 +314,6 @@ const Hero = () => {
     renderer.setSize(windowWidth, windowHeight);
 
     // Hide the canvas
-    renderer.domElement.style.display = "none";
 
     if (backgroundRef.current) {
       backgroundRef.current.appendChild(renderer.domElement);
