@@ -2,6 +2,30 @@
 import { useEffect, useState } from "react";
 import { apiUrl } from "../api";
 import "./RecentEmails.css";
+import Tooltip from "./Tooltip";
+
+const TOOLTIP_TEXT = {
+  'Full Name': 'The full name associated with this email address',
+  'Gender': 'Detected gender based on the name',
+  'State': 'State or region where the email user is located',
+  'Reason': 'Reason why the email is invalid or risky',
+  'Domain': 'The domain part of the email address',
+  'Free': 'Whether this email uses a free email service (Gmail, Yahoo, etc.)',
+  'Role': 'Whether this is a role-based email (info@, support@, etc.)',
+  'Disposable': 'Whether this email uses a disposable/temporary email service',
+  'Accept All': 'Whether the mail server accepts all emails (risky)',
+  'Tag': 'Email tag or label associated with this address',
+  'Numerical Characters': 'Number of numerical digits in the email address',
+  'Alphabetical Characters': 'Number of letters in the email address',
+  'Unicode Symbols': 'Number of special Unicode characters in the email',
+  'Mailbox Full': 'Whether the mailbox is full and cannot receive emails',
+  'No Reply': 'Whether this is a no-reply email address',
+  'Secure Email Gateway': 'Whether the email uses a secure gateway',
+  'SMTP Provider': 'The SMTP mail server provider',
+  'MX Record': 'Mail exchange record for the domain',
+  'Implicit MX': 'Implicit MX record configuration',
+  'Verified On': 'Date and time when the email was verified'
+};
 
 export default function RecentEmails({ limit = 12 }) {
   const [rows, setRows] = useState([]);
@@ -42,99 +66,99 @@ export default function RecentEmails({ limit = 12 }) {
     if (score >= 5) return "#ff5f7d";
     return "#549ee7";
   };
-const formatTimestamp = (ts) => {
-  if (!ts) return "—";
-  // ts can be ISO from backend; handle variations safely
-  const d = new Date(ts);
-  if (isNaN(d.getTime())) return String(ts);
-  // Example: 10/28/2025, 4:09:27 PM (uses user’s locale)
-  return d.toLocaleString();
-};
+  const formatTimestamp = (ts) => {
+    if (!ts) return "—";
+    // ts can be ISO from backend; handle variations safely
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return String(ts);
+    // Example: 10/28/2025, 4:09:27 PM (uses user’s locale)
+    return d.toLocaleString();
+  };
 
-const countFromLocalPart = (email) => {
-  const lp = (email && email.includes("@")) ? email.split("@")[0] : (email || "");
-  let numerical = 0, alphabetical = 0, unicodeSyms = 0;
-  for (const ch of lp) {
-    if (/[0-9]/.test(ch)) numerical++;
-    else if (/[A-Za-z]/.test(ch)) alphabetical++;
-    else if (ch !== "." && ch !== "_" && ch !== "-" && ch !== "+") unicodeSyms++;
-  }
-  return { numerical, alphabetical, unicodeSyms };
-};
+  const countFromLocalPart = (email) => {
+    const lp = (email && email.includes("@")) ? email.split("@")[0] : (email || "");
+    let numerical = 0, alphabetical = 0, unicodeSyms = 0;
+    for (const ch of lp) {
+      if (/[0-9]/.test(ch)) numerical++;
+      else if (/[A-Za-z]/.test(ch)) alphabetical++;
+      else if (ch !== "." && ch !== "_" && ch !== "-" && ch !== "+") unicodeSyms++;
+    }
+    return { numerical, alphabetical, unicodeSyms };
+  };
 
-const normalizeDetails = (dbRowOrJson = {}, listRow = {}) => {
-  let j = {};
-  if (dbRowOrJson && typeof dbRowOrJson === "object" && dbRowOrJson.result_json) {
-    try { j = JSON.parse(dbRowOrJson.result_json || "{}"); } catch { j = {}; }
-  } else {
-    j = dbRowOrJson || {};
-  }
+  const normalizeDetails = (dbRowOrJson = {}, listRow = {}) => {
+    let j = {};
+    if (dbRowOrJson && typeof dbRowOrJson === "object" && dbRowOrJson.result_json) {
+      try { j = JSON.parse(dbRowOrJson.result_json || "{}"); } catch { j = {}; }
+    } else {
+      j = dbRowOrJson || {};
+    }
 
-  const fromDb = (k, fallback) =>
+    const fromDb = (k, fallback) =>
     (dbRowOrJson && typeof dbRowOrJson === "object" && dbRowOrJson[k] !== undefined
       ? dbRowOrJson[k]
       : fallback);
 
-  const email = fromDb("email", listRow.email || j.email || "");
-  const domain = fromDb("domain", j.domain || (email.includes("@") ? email.split("@")[1] : ""));
-  const state  = fromDb("state", listRow.state || j.state || "—");
-  const reason = fromDb("reason", j.reason || j.reason_label || "—");
-  const score  = fromDb("score", typeof listRow.score === "number" ? listRow.score : j.score);
-  const created_at = fromDb("created_at", j.timestamp || listRow.created_at || null);
+    const email = fromDb("email", listRow.email || j.email || "");
+    const domain = fromDb("domain", j.domain || (email.includes("@") ? email.split("@")[1] : ""));
+    const state = fromDb("state", listRow.state || j.state || "—");
+    const reason = fromDb("reason", j.reason || j.reason_label || "—");
+    const score = fromDb("score", typeof listRow.score === "number" ? listRow.score : j.score);
+    const created_at = fromDb("created_at", j.timestamp || listRow.created_at || null);
 
-  // Base attributes
-  const free       = fromDb("free", j.free ?? j.is_free ?? false);
-  const role       = fromDb("role", j.role ?? j.is_role ?? false);
-  const disposable = fromDb("disposable", j.disposable ?? j.is_disposable ?? false);
-  const accept_all = fromDb("accept_all", j.accept_all ?? false);
-  const tag        = j.tag || "—";
+    // Base attributes
+    const free = fromDb("free", j.free ?? j.is_free ?? false);
+    const role = fromDb("role", j.role ?? j.is_role ?? false);
+    const disposable = fromDb("disposable", j.disposable ?? j.is_disposable ?? false);
+    const accept_all = fromDb("accept_all", j.accept_all ?? false);
+    const tag = j.tag || "—";
 
-  // Prefer values from result_json; fallback compute from local-part
-  let numerical_chars      = j.numerical_chars ?? j.num_digits;
-  let alphabetical_chars   = j.alphabetical_chars ?? j.num_alpha;
-  let unicode_symbols      = j.unicode_symbols ?? j.num_unicode;
-  if (numerical_chars == null || alphabetical_chars == null || unicode_symbols == null) {
-    const c = countFromLocalPart(email);
-    numerical_chars    = numerical_chars    ?? c.numerical;
-    alphabetical_chars = alphabetical_chars ?? c.alphabetical;
-    unicode_symbols    = unicode_symbols    ?? c.unicodeSyms;
-  }
+    // Prefer values from result_json; fallback compute from local-part
+    let numerical_chars = j.numerical_chars ?? j.num_digits;
+    let alphabetical_chars = j.alphabetical_chars ?? j.num_alpha;
+    let unicode_symbols = j.unicode_symbols ?? j.num_unicode;
+    if (numerical_chars == null || alphabetical_chars == null || unicode_symbols == null) {
+      const c = countFromLocalPart(email);
+      numerical_chars = numerical_chars ?? c.numerical;
+      alphabetical_chars = alphabetical_chars ?? c.alphabetical;
+      unicode_symbols = unicode_symbols ?? c.unicodeSyms;
+    }
 
-  const mailbox_full  = j.mailbox_full ?? false;
-  const no_reply      = j.no_reply ?? false;
-  const secure_gateway= j.secure_email_gateway ?? j.secure_gateway ?? false;
+    const mailbox_full = j.mailbox_full ?? false;
+    const no_reply = j.no_reply ?? false;
+    const secure_gateway = j.secure_email_gateway ?? j.secure_gateway ?? false;
 
-  // Mail server
-  const smtp_provider      = fromDb("smtp_provider", j.smtp_provider || "---");
-  const mx_record          = fromDb("mx_record", j.mx_record || "---");
-  const implicit_mx_record = j.implicit_mx ?? j.implicit_mx_record ?? false;
+    // Mail server
+    const smtp_provider = fromDb("smtp_provider", j.smtp_provider || "---");
+    const mx_record = fromDb("mx_record", j.mx_record || "---");
+    const implicit_mx_record = j.implicit_mx ?? j.implicit_mx_record ?? false;
 
-  return {
-    id: fromDb("id", listRow.id),
-    email,
-    state,
-    reason,
-    score,
-    full_name: j.full_name || "—",
-    gender: j.gender || "—",
-    domain: domain || "—",
-    is_free: !!free,
-    is_role: !!role,
-    is_disposable: !!disposable,
-    accept_all: !!accept_all,
-    tag,
-    numerical_chars: Number(numerical_chars) || 0,
-    alphabetical_chars: Number(alphabetical_chars) || 0,
-    unicode_symbols: Number(unicode_symbols) || 0,
-    mailbox_full: !!mailbox_full,
-    no_reply: !!no_reply,
-    secure_gateway: !!secure_gateway,
-    smtp_provider,
-    mx_record,
-    implicit_mx_record: !!implicit_mx_record,
-    timestamp: created_at ? formatTimestamp(created_at) : "—",
+    return {
+      id: fromDb("id", listRow.id),
+      email,
+      state,
+      reason,
+      score,
+      full_name: j.full_name || "—",
+      gender: j.gender || "—",
+      domain: domain || "—",
+      is_free: !!free,
+      is_role: !!role,
+      is_disposable: !!disposable,
+      accept_all: !!accept_all,
+      tag,
+      numerical_chars: Number(numerical_chars) || 0,
+      alphabetical_chars: Number(alphabetical_chars) || 0,
+      unicode_symbols: Number(unicode_symbols) || 0,
+      mailbox_full: !!mailbox_full,
+      no_reply: !!no_reply,
+      secure_gateway: !!secure_gateway,
+      smtp_provider,
+      mx_record,
+      implicit_mx_record: !!implicit_mx_record,
+      timestamp: created_at ? formatTimestamp(created_at) : "—",
+    };
   };
-};
 
 
   const fetchDetails = async (row) => {
@@ -364,11 +388,11 @@ const normalizeDetails = (dbRowOrJson = {}, listRow = {}) => {
 
                   {/* General */}
                   <Section title="General">
-                    <DetailRow label="Full Name" value={r.full_name || "—"} />
-                    <DetailRow label="Gender" value={r.gender || "—"} />
-                    <DetailRow label="State" value={r.state} badge={true} badgeStyle={getStateBadgeStyle(r.state)} />
-                    <DetailRow label="Reason" value={r.reason || "—"} pill={true} />
-                    <DetailRow label="Domain" value={r.email?.split("@")[1] || "—"} link={true} />
+                    <DetailRow label="Full Name" value={r.full_name || "—"} tooltipOnValue={true} />
+                    <DetailRow label="Gender" value={r.gender || "—"} tooltipOnValue={true} />
+                    <DetailRow label="State" value={r.state} badge={true} badgeStyle={getStateBadgeStyle(r.state)} tooltipOnValue={true} />
+                    <DetailRow label="Reason" value={r.reason || "—"} pill={true} tooltipOnValue={true} />
+                    <DetailRow label="Domain" value={r.email?.split("@")[1] || "—"} link={true} tooltipOnValue={true} />
                   </Section>
 
                   {/* Attributes */}
@@ -460,27 +484,63 @@ function ScoreGauge({ score, getScoreColor }) {
   );
 }
 
-function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
+function DetailRow({ label, value, icon, badge, badgeStyle, pill, link, tooltipOnValue = false }) {
+  const tooltipText = TOOLTIP_TEXT[label];
+
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14 }}>
       <div style={{ color: "#bbb", display: "flex", alignItems: "center", gap: 6 }}>
         {icon && <span style={{ filter: "brightness(1.7)" }}>{icon}</span>}
-        {label}
+        {!tooltipOnValue && tooltipText ? (
+          <Tooltip text={tooltipText} align="left">
+            <span style={{ cursor: 'help' }}>{label}</span>
+          </Tooltip>
+        ) : (
+          label
+        )}
       </div>
 
       <div style={{ color: "#fff", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
         {badge && badgeStyle ? (
-          <span style={{ padding: "4px 10px", borderRadius: 12, background: badgeStyle.bg, color: badgeStyle.color, fontSize: 12, fontWeight: 500 }}>
-            {value}
-          </span>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{ padding: "4px 10px", borderRadius: 12, background: badgeStyle.bg, color: badgeStyle.color, fontSize: 12, fontWeight: 500, cursor: 'help' }}>
+                {value}
+              </span>
+            </Tooltip>
+          ) : (
+            <span style={{ padding: "4px 10px", borderRadius: 12, background: badgeStyle.bg, color: badgeStyle.color, fontSize: 12, fontWeight: 500 }}>
+              {value}
+            </span>
+          )
         ) : pill ? (
-          <span style={{ padding: "4px 10px", borderRadius: 12, background: "#3b3c8f", color: "#fff", fontSize: 12 }}>{value}</span>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{ padding: "4px 10px", borderRadius: 12, background: "#3b3c8f", color: "#fff", fontSize: 12, cursor: 'help' }}>{value}</span>
+            </Tooltip>
+          ) : (
+            <span style={{ padding: "4px 10px", borderRadius: 12, background: "#3b3c8f", color: "#fff", fontSize: 12 }}>{value}</span>
+          )
         ) : link ? (
-          <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{ color: "#fb923c", textDecoration: "none" }}>
-            {value}
-          </a>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{ color: "#fb923c", textDecoration: "none", cursor: 'help' }}>
+                {value}
+              </a>
+            </Tooltip>
+          ) : (
+            <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{ color: "#fb923c", textDecoration: "none" }}>
+              {value}
+            </a>
+          )
         ) : (
-          value
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{ cursor: 'help' }}>{value}</span>
+            </Tooltip>
+          ) : (
+            value
+          )
         )}
       </div>
     </div>

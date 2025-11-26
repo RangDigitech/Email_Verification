@@ -1,12 +1,17 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+// src/ProtectedRoute.jsx
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-    const token = localStorage.getItem('accessToken');
+  // Check all possible token keys that your app may set
+  const token =
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("auth_token") ||
+    localStorage.getItem("token");
 
-    // If token exists, render the child component (e.g., Dashboard)
-    // Otherwise, redirect to the login page
-    return token ? <Outlet /> : <Navigate to="/login" />;
+  // If any token exists, allow access; otherwise redirect to login
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

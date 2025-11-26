@@ -105,12 +105,7 @@ import { register, checkEmailDisposable } from "./api";
         // --- API Call ---
         // This calls the '/register' endpoint on your Python backend
         // In the handleSubmit function, update the register call:
-        await register({
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            password: password
-        });
+        await register(firstName, lastName, email, password);
 
         // --- Success Handling ---
         alert("Registration successful! Please log in to continue.");

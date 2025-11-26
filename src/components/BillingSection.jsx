@@ -5,6 +5,8 @@ import { getToken } from "../auth";
 import "./ProfileSection.css";
 import "./BillingSection.css";
 
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 export default function BillingSection() {
   // Sidebar state
   const [activeSub, setActiveSub] = useState("usage");
@@ -31,6 +33,7 @@ export default function BillingSection() {
   const [totals, setTotals] = useState({ bulk: 0, single: 0, api: 0, other: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState('graph'); // 'graph' or 'table'
 
   const rangeLabel = useMemo(() => {
     const fmt = (d) => d.toLocaleDateString("en-US");
@@ -89,25 +92,35 @@ export default function BillingSection() {
 
   const totalForRow = (r) => (r.bulk || 0) + (r.single || 0) + (r.api || 0) + (r.other || 0);
 
+  // Prepare data for graph
+  const graphData = useMemo(() => {
+    return series.map(item => ({
+      name: item.date ? new Date(item.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric' }) : item.label,
+      Bulk: item.bulk || 0,
+      Single: item.single || 0,
+      // API: item.api || 0,
+    }));
+  }, [series]);
+
   return (
     <div className="profile-layout">
       <aside className="profile-sidebar">
         <nav className="profile-nav">
           <button className="profile-nav-item" onClick={() => window.dispatchEvent(new CustomEvent("openProfileTab"))}>
             <span className="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M6 20c0-3.31 2.69-6 6-6s6 2.69 6 6" /></svg>
             </span>
             Profile
           </button>
           <button className="profile-nav-item" onClick={() => window.dispatchEvent(new CustomEvent("openAccountTab"))}>
             <span className="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 8v8M8 12h8" /></svg>
             </span>
             Account
           </button>
           <button className="profile-nav-item active">
             <span className="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 10h18" /></svg>
             </span>
             Billing
           </button>
@@ -136,12 +149,29 @@ export default function BillingSection() {
 
           {/* Usage */}
           <div className="billing-card" id="billing-usage">
-            <div className="billing-card-title">Credit Usage</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div className="billing-card-title" style={{ marginBottom: 0 }}>Credit Usage</div>
+              <div className="view-toggle">
+                <button
+                  className={`toggle-btn-credit ${viewMode === 'graph' ? 'active' : ''}`}
+                  onClick={() => setViewMode('graph')}
+                >
+                  Graph
+                </button>
+                <button
+                  className={`toggle-btn-credit ${viewMode === 'table' ? 'active' : ''}`}
+                  onClick={() => setViewMode('table')}
+                >
+                  Table
+                </button>
+              </div>
+            </div>
+
             <div className="usage-controls">
               <div className="control"><label>Start</label><input type="date" className="profile-input" value={fmtDateInput(range.start)} onChange={onStartChange} /></div>
               <div className="control"><label>End</label><input type="date" className="profile-input" value={fmtDateInput(range.end)} onChange={onEndChange} /></div>
               <div className="control"><label>Interval</label>
-                <select className="profile-input" value={interval} onChange={(e)=>setInterval(e.target.value)}>
+                <select className="profile-input" value={interval} onChange={(e) => setInterval(e.target.value)}>
                   <option>Hourly</option>
                   <option>Daily</option>
                   <option>Weekly</option>
@@ -160,38 +190,57 @@ export default function BillingSection() {
               {/* <div className="total-item"><span className="label">Other</span><span className="value">{totals.other}</span></div> */}
             </div>
 
-            <div className="usage-table-wrap">
-              <table className="usage-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Bulk</th>
-                    <th>Single</th>
-                    {/* <th>API</th> */}
-                    {/* <th>Other</th> */}
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr><td colSpan={6} className="loading-row">Loading…</td></tr>
-                  ) : series.length === 0 ? (
-                    <tr><td colSpan={6} className="empty-row">No usage in this range</td></tr>
-                  ) : (
-                    series.map((r, idx) => (
-                      <tr key={idx}>
-                        <td>{r.date ? new Date(r.date).toLocaleDateString("en-US") : r.label || "-"}</td>
-                        <td>{r.bulk || 0}</td>
-                        <td>{r.single || 0}</td>
-                        {/* <td>{r.api || 0}</td> */}
-                        {/* <td>{r.other || 0}</td> */}
-                        <td className="bold">{totalForRow(r)}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            {viewMode === 'graph' ? (
+              <div className="usage-graph-container">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={graphData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2f2f2f" vertical={false} />
+                    <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#111', border: '1px solid #2f2f2f', borderRadius: '8px' }}
+                      itemStyle={{ color: '#fff' }}
+                      cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                    />
+                    <Bar dataKey="Bulk" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Single" fill="#82ca9d" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="usage-table-wrap">
+                <table className="usage-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Bulk</th>
+                      <th>Single</th>
+                      {/* <th>API</th> */}
+                      {/* <th>Other</th> */}
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr><td colSpan={6} className="loading-row">Loading…</td></tr>
+                    ) : series.length === 0 ? (
+                      <tr><td colSpan={6} className="empty-row">No usage in this range</td></tr>
+                    ) : (
+                      series.map((r, idx) => (
+                        <tr key={idx}>
+                          <td>{r.date ? new Date(r.date).toLocaleDateString("en-US") : r.label || "-"}</td>
+                          <td>{r.bulk || 0}</td>
+                          <td>{r.single || 0}</td>
+                          {/* <td>{r.api || 0}</td> */}
+                          {/* <td>{r.other || 0}</td> */}
+                          <td className="bold">{totalForRow(r)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* Subscriptions */}
@@ -223,4 +272,3 @@ export default function BillingSection() {
     </div>
   );
 }
-

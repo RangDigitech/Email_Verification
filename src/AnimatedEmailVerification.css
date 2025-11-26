@@ -1,6 +1,6 @@
 .animated-email-container {
   width: 100%;
-  max-width: 800px;
+
   margin: 28px auto;
   padding: 0 20px;
 }
@@ -26,11 +26,12 @@
 .email-display-field {
   width: 100%;
   padding: 18px 24px;
-  padding-right: 100px; /* Space for score badge */
+  padding-right: 100px;
+  /* Space for score badge */
   font-size: 17px;
   font-family: 'Inter', sans-serif;
   background: rgba(255, 255, 255, 0.06);
-  border: 2px solid #9a7bff;
+  border: 2px solid #359df9;
   border-radius: 16px;
   color: #fff;
   transition: all 0.25s ease;
@@ -51,10 +52,14 @@
 }
 
 @keyframes blink {
-  0%, 50% {
+
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+
+  51%,
+  100% {
     opacity: 0;
   }
 }
@@ -84,6 +89,7 @@
     opacity: 0;
     transform: translateY(-50%) scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: translateY(-50%) scale(1);
@@ -99,9 +105,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
@@ -125,6 +134,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -145,7 +155,8 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 17px;
-  color: #ffffff; /* Always white */
+  color: #ffffff;
+  /* Always white */
 }
 
 /* Responsive design */
@@ -239,4 +250,3 @@
     font-size: 20px;
   }
 }
-

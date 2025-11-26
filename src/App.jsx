@@ -1,10 +1,12 @@
-import React from "react";
+// import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Link,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import "./App.css";
 import AnimatedEmailDemo from "./AnimatedEmailDemo";
@@ -30,15 +32,80 @@ import AdminProtectedRoute from "./AdminProtectedRoute";
 // Icons are served from `public/` via absolute paths (e.g., "/wallet.png").
 import { CreditsProvider } from "./CreditsContext";
 import BlogPost from "./BlogPost"; // new dynamic page
+import axios from "axios";
+import { getMe, refreshCredits } from "./api";
 
 export default function App() {
   return (
     <CreditsProvider>
-      <Router>  
+      <Router>
         <MainApp />
       </Router>
     </CreditsProvider>
   );
+}
+
+function AppBootstrap() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [booted, setBooted] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function attachAndBoot(token) {
+      try {
+        if (token) {
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Validate token by fetching current user
+        const me = await getMe();
+        if (me && me.email) {
+          try { await refreshCredits(); } catch (e) { /* ignore */ }
+
+          // Only redirect to dashboard if we are on a public/auth page
+          // If user is already on /admin, /bulk, /single etc, let them stay there
+          const currentPath = location.pathname;
+          if (currentPath === "/" || currentPath === "/login" || currentPath === "/signup") {
+            navigate("/dashboard", { replace: true });
+          }
+        }
+      } catch (e) {
+        console.warn("[AppBootstrap] validation failed", e);
+      } finally {
+        if (mounted) setBooted(true);
+      }
+    }
+
+    const token =
+      localStorage.getItem("access_token") ||
+      localStorage.getItem("auth_token") ||
+      localStorage.getItem("token") ||
+      localStorage.getItem("accessToken") ||
+      null;
+
+    if (token) {
+      attachAndBoot(token);
+    } else {
+      setBooted(true);
+    }
+
+    function onLogin(e) {
+      const t = e?.detail?.token || localStorage.getItem("token");
+      if (t) attachAndBoot(t);
+    }
+    window.addEventListener("auth:login", onLogin);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener("auth:login", onLogin);
+    };
+  }, [navigate, location.pathname]); // Added location.pathname dependency
+
+  // while booting, return null so route-guards don't run prematurely
+  if (!booted) return null;
+  return null;
 }
 
 function MainApp() {
@@ -52,6 +119,7 @@ function MainApp() {
 
   return (
     <div className="app">
+      <AppBootstrap />
       {!hideNavbarAndFooter && <Navbar />}
 
       <Routes>
@@ -59,8 +127,8 @@ function MainApp() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
-        <Route path="/bulk" element={<BulkPage />}/>
-        <Route path="/Single" element={<SinglePage />}/>
+        <Route path="/bulk" element={<BulkPage />} />
+        <Route path="/Single" element={<SinglePage />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:slug" element={<BlogPost />} />
@@ -73,15 +141,15 @@ function MainApp() {
         {/* <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />
         </Route> */}
- 
+
         <Route
-            path="/admin"
-            element={
-              <AdminProtectedRoute>
-                <AdminDashboard />
-              </AdminProtectedRoute>
-            }
-          />
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />
 
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
@@ -190,35 +258,35 @@ export function Navbar() {
           </button>
 
           {showSolutionsMenu && (
-           <div className="solutions-menu">
-  <Link
-    to="/bulk"
-    className="solution-item"
-    onClick={() => setMobileMenuOpen(false)}
-  >
-    <div className="solution-icon bulk-icon">
-      <img src="email_logo.png" alt="Bulk Icon" />
-    </div>
-    <div className="solution-content">
-      <div className="solution-title">Bulk</div>
-      <div className="solution-desc">Verify email address lists</div>
-    </div>
-  </Link>
+            <div className="solutions-menu">
+              <Link
+                to="/bulk"
+                className="solution-item"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <div className="solution-icon bulk-icon">
+                  <img src="email_logo.png" alt="Bulk Icon" />
+                </div>
+                <div className="solution-content">
+                  <div className="solution-title">Bulk</div>
+                  <div className="solution-desc">Verify email address lists</div>
+                </div>
+              </Link>
 
-  <Link
-    to="/single"
-    className="solution-item"
-    onClick={() => setMobileMenuOpen(false)}
-  >
-    <div className="solution-icon verifier-icon">
-      <img src="email_logo.png" alt="Verifier Icon" />
-    </div>
-    <div className="solution-content">
-      <div className="solution-title">Single Verifier</div>
-      <div className="solution-desc">One Click One Email</div>
-    </div>
-  </Link>
-</div>
+              <Link
+                to="/single"
+                className="solution-item"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <div className="solution-icon verifier-icon">
+                  <img src="email_logo.png" alt="Verifier Icon" />
+                </div>
+                <div className="solution-content">
+                  <div className="solution-title">Single Verifier</div>
+                  <div className="solution-desc">One Click One Email</div>
+                </div>
+              </Link>
+            </div>
 
           )}
         </li>
@@ -320,38 +388,38 @@ function Home() {
                 <button className="primary-cta">Get Started Free</button>
               </Link>
             </div>
-            </div>
-            <div className="bulk-right">
-              {(() => {
-                const [hoveredSegment, setHoveredSegment] = React.useState(null);
+          </div>
+          <div className="bulk-right">
+            {(() => {
+              const [hoveredSegment, setHoveredSegment] = React.useState(null);
 
-                const deliverable = 58.5;
-                const undeliverable = 11.2;
-                const risky = 21.1;
-                const unknown = 6.2;
-                const duplicate = 3.0;
+              const deliverable = 58.5;
+              const undeliverable = 11.2;
+              const risky = 21.1;
+              const unknown = 6.2;
+              const duplicate = 3.0;
 
-                const segments = [
-                  { name: 'deliverable', value: deliverable, count: 3802, color: 'var(--brand-primary)', label: 'Deliverable', colorHex: 'var(--brand-primary)' },
-                  { name: 'undeliverable', value: undeliverable, count: 728, color: '#999', label: 'Undeliverable', colorHex: '#999' },
-                  { name: 'risky', value: risky, count: 1372, color: '#f4a261', label: 'Risky', colorHex: '#f4a261' },
-                  { name: 'unknown', value: unknown, count: 403, color: '#ccc', label: 'Unknown', colorHex: '#ccc' },
-                  { name: 'duplicate', value: duplicate, count: 195, color: '#c1b3ff', label: 'Duplicate', colorHex: '#c1b3ff' }
-                ];
+              const segments = [
+                { name: 'deliverable', value: deliverable, count: 3802, color: 'var(--brand-primary)', label: 'Deliverable', colorHex: 'var(--brand-primary)' },
+                { name: 'undeliverable', value: undeliverable, count: 728, color: '#999', label: 'Undeliverable', colorHex: '#999' },
+                { name: 'risky', value: risky, count: 1372, color: '#f4a261', label: 'Risky', colorHex: '#f4a261' },
+                { name: 'unknown', value: unknown, count: 403, color: '#ccc', label: 'Unknown', colorHex: '#ccc' },
+                { name: 'duplicate', value: duplicate, count: 195, color: '#c1b3ff', label: 'Duplicate', colorHex: '#c1b3ff' }
+              ];
 
-                const total = segments.reduce((sum, seg) => sum + seg.value, 0);
-                
-                // Calculate angles for each segment
-                let currentAngle = 0;
-                const segmentsWithAngles = segments.map(seg => {
-                  const angle = (seg.value / total) * 360;
-                  const result = { ...seg, startAngle: currentAngle, endAngle: currentAngle + angle };
-                  currentAngle += angle;
-                  return result;
-                });
+              const total = segments.reduce((sum, seg) => sum + seg.value, 0);
 
-                // Build base gradient
-                const baseGradient = `conic-gradient(
+              // Calculate angles for each segment
+              let currentAngle = 0;
+              const segmentsWithAngles = segments.map(seg => {
+                const angle = (seg.value / total) * 360;
+                const result = { ...seg, startAngle: currentAngle, endAngle: currentAngle + angle };
+                currentAngle += angle;
+                return result;
+              });
+
+              // Build base gradient
+              const baseGradient = `conic-gradient(
                   var(--brand-primary) 0deg ${segmentsWithAngles[0].endAngle}deg,
                   #999 ${segmentsWithAngles[0].endAngle}deg ${segmentsWithAngles[1].endAngle}deg,
                   #f4a261 ${segmentsWithAngles[1].endAngle}deg ${segmentsWithAngles[2].endAngle}deg,
@@ -359,194 +427,194 @@ function Home() {
                   #c1b3ff ${segmentsWithAngles[3].endAngle}deg ${segmentsWithAngles[4].endAngle}deg
                 )`;
 
-                // Helper function to calculate donut segment path (ring only, not pizza slice)
-                function getDonutSegmentPath(startAngle, endAngle) {
-                  const outerRadius = 50; // 50% from center
-                  const innerRadius = 30; // 30% from center (creates the hole)
-                  const steps = 30;
-                  
-                  const points = [];
-                  
-                  // Outer arc (clockwise)
-                  for (let i = 0; i <= steps; i++) {
-                    const angle = startAngle + (endAngle - startAngle) * (i / steps);
-                    const rad = (angle - 90) * Math.PI / 180;
-                    const x = 50 + outerRadius * Math.cos(rad);
-                    const y = 50 + outerRadius * Math.sin(rad);
-                    points.push(`${x}% ${y}%`);
-                  }
-                  
-                  // Inner arc (counter-clockwise)
-                  for (let i = steps; i >= 0; i--) {
-                    const angle = startAngle + (endAngle - startAngle) * (i / steps);
-                    const rad = (angle - 90) * Math.PI / 180;
-                    const x = 50 + innerRadius * Math.cos(rad);
-                    const y = 50 + innerRadius * Math.sin(rad);
-                    points.push(`${x}% ${y}%`);
-                  }
-                  
-                  return points.join(', ');
+              // Helper function to calculate donut segment path (ring only, not pizza slice)
+              function getDonutSegmentPath(startAngle, endAngle) {
+                const outerRadius = 50; // 50% from center
+                const innerRadius = 30; // 30% from center (creates the hole)
+                const steps = 30;
+
+                const points = [];
+
+                // Outer arc (clockwise)
+                for (let i = 0; i <= steps; i++) {
+                  const angle = startAngle + (endAngle - startAngle) * (i / steps);
+                  const rad = (angle - 90) * Math.PI / 180;
+                  const x = 50 + outerRadius * Math.cos(rad);
+                  const y = 50 + outerRadius * Math.sin(rad);
+                  points.push(`${x}% ${y}%`);
                 }
 
-                // Get current display data
-                const currentSegment = hoveredSegment 
-                  ? segments.find(s => s.name === hoveredSegment)
-                  : segments[0];
+                // Inner arc (counter-clockwise)
+                for (let i = steps; i >= 0; i--) {
+                  const angle = startAngle + (endAngle - startAngle) * (i / steps);
+                  const rad = (angle - 90) * Math.PI / 180;
+                  const x = 50 + innerRadius * Math.cos(rad);
+                  const y = 50 + innerRadius * Math.sin(rad);
+                  points.push(`${x}% ${y}%`);
+                }
 
-                return (
-                  <div className="donut-card">
-                    <div className="donut-wrap" aria-hidden>
-                      <div className="donut-container" style={{ position: 'relative', width: '14vw', height: '14vw' }}>
-                        {/* Base donut chart */}
-                        <div 
-                          className="donut multi" 
-                          style={{ 
-                            background: baseGradient,
-                            // Removed global brightness filter to avoid dimming center on hover
-                            transition: 'transform 0.3s ease',
-                            transform: hoveredSegment ? 'scale(0.98)' : 'scale(1)',
-                            position: 'relative',
-                            width: '100%',
-                            height: '100%'
-                          }}
-                        >
-                        </div>
+                return points.join(', ');
+              }
 
-                        {/* Hover overlay segments with glow effect - DONUT RING ONLY */}
-                        {segmentsWithAngles.map((seg) => (
-                          <div
-                            key={seg.name}
-                            className="donut-segment-hover"
-                            style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              clipPath: `polygon(${getDonutSegmentPath(seg.startAngle, seg.endAngle)})`,
-                              cursor: 'pointer',
-                              pointerEvents: 'all',
-                              zIndex: 2
-                            }}
-                            onMouseEnter={() => setHoveredSegment(seg.name)}
-                            onMouseLeave={() => setHoveredSegment(null)}
-                          >
-                            {/* Exact-color highlight for hovered segment only */}
-                            {hoveredSegment === seg.name && (
-                              <div
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  background: seg.colorHex,
-                                  opacity: 0.35,
-                                  filter: `drop-shadow(0 0 16px ${seg.colorHex})`,
-                                  transition: 'opacity 0.2s ease'
-                                }}
-                              />
-                            )}
-                          </div>
-                        ))}
+              // Get current display data
+              const currentSegment = hoveredSegment
+                ? segments.find(s => s.name === hoveredSegment)
+                : segments[0];
 
-                        {/* Center content - MUST be after hover segments to be on top */}
-                        <div 
-                          className="donut-center"
+              return (
+                <div className="donut-card">
+                  <div className="donut-wrap" aria-hidden>
+                    <div className="donut-container" style={{ position: 'relative', width: '14vw', height: '14vw' }}>
+                      {/* Base donut chart */}
+                      <div
+                        className="donut multi"
+                        style={{
+                          background: baseGradient,
+                          // Removed global brightness filter to avoid dimming center on hover
+                          transition: 'transform 0.3s ease',
+                          transform: hoveredSegment ? 'scale(0.98)' : 'scale(1)',
+                          position: 'relative',
+                          width: '100%',
+                          height: '100%'
+                        }}
+                      >
+                      </div>
+
+                      {/* Hover overlay segments with glow effect - DONUT RING ONLY */}
+                      {segmentsWithAngles.map((seg) => (
+                        <div
+                          key={seg.name}
+                          className="donut-segment-hover"
                           style={{
                             position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                          
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: 10,
-                            pointerEvents: 'none',
-                            textAlign: 'center',
-                            width: '60%'
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            clipPath: `polygon(${getDonutSegmentPath(seg.startAngle, seg.endAngle)})`,
+                            cursor: 'pointer',
+                            pointerEvents: 'all',
+                            zIndex: 2
                           }}
+                          onMouseEnter={() => setHoveredSegment(seg.name)}
+                          onMouseLeave={() => setHoveredSegment(null)}
                         >
-                          <div 
-                            className="donut-percent"
-                            style={{
-                              transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                              transform: hoveredSegment ? 'scale(1.15)' : 'scale(1)',
-                              color: 'black',
-                              fontSize: '2.5vw',
-                              fontWeight: 'bold',
-          
-                              lineHeight: '1.2'
-                            
-                            }}
-                          >
-                            {currentSegment.value}%
-                          </div>
-                          <div 
-                            className="donut-label"
-                            style={{
-                              transition: 'all 0.3s ease',
-                              opacity: hoveredSegment ? 1 : 0.7,
-                              fontSize: '1vw',
-                              marginTop: '4px',
-                              color: '#000000ff'
-                            }}
-                          >
-                            {currentSegment.label}
-                          </div>
-                          {hoveredSegment && (
-                            <div 
-                              className="donut-count"
+                          {/* Exact-color highlight for hovered segment only */}
+                          {hoveredSegment === seg.name && (
+                            <div
                               style={{
-                                fontSize: '12px',
-                                color: '#050505ff',
-                                marginTop: '4px',
-                                animation: 'fadeInUp 0.3s ease'
+                                width: '100%',
+                                height: '100%',
+                                background: seg.colorHex,
+                                opacity: 0.35,
+                                filter: `drop-shadow(0 0 16px ${seg.colorHex})`,
+                                transition: 'opacity 0.2s ease'
                               }}
-                            >
-                              {currentSegment.count.toLocaleString()} emails
-                            </div>
+                            />
                           )}
                         </div>
-                      </div>
+                      ))}
 
-                      <div className="donut-legend modern">
-                        {segments.map((seg, idx) => (
+                      {/* Center content - MUST be after hover segments to be on top */}
+                      <div
+                        className="donut-center"
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+
+                          transform: 'translate(-50%, -50%)',
+                          zIndex: 10,
+                          pointerEvents: 'none',
+                          textAlign: 'center',
+                          width: '60%'
+                        }}
+                      >
+                        <div
+                          className="donut-percent"
+                          style={{
+                            transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                            transform: hoveredSegment ? 'scale(1.15)' : 'scale(1)',
+                            color: 'black',
+                            fontSize: '2.5vw',
+                            fontWeight: 'bold',
+
+                            lineHeight: '1.2'
+
+                          }}
+                        >
+                          {currentSegment.value}%
+                        </div>
+                        <div
+                          className="donut-label"
+                          style={{
+                            transition: 'all 0.3s ease',
+                            opacity: hoveredSegment ? 1 : 0.7,
+                            fontSize: '1vw',
+                            marginTop: '4px',
+                            color: '#000000ff'
+                          }}
+                        >
+                          {currentSegment.label}
+                        </div>
+                        {hoveredSegment && (
                           <div
-                            key={seg.name}
-                            className={`legend-row anim-slide-in ${hoveredSegment === seg.name ? 'highlighted' : ''}`}
-                            style={{ 
-                              animationDelay: `${40 + idx * 50}ms`,
-                              transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                              opacity: hoveredSegment && hoveredSegment !== seg.name ? 0.4 : 1,
-                              transform: hoveredSegment === seg.name ? 'translateX(12px) scale(1.05)' : 'translateX(0) scale(1)'
+                            className="donut-count"
+                            style={{
+                              fontSize: '12px',
+                              color: '#050505ff',
+                              marginTop: '4px',
+                              animation: 'fadeInUp 0.3s ease'
                             }}
-                            onMouseEnter={() => setHoveredSegment(seg.name)}
-                            onMouseLeave={() => setHoveredSegment(null)}
                           >
-                            <span 
-                              className={`legend-badge badge-${seg.name} anim-pulse-once`}
-                              style={{
-                                transition: 'all 0.3s ease',
-                                transform: hoveredSegment === seg.name ? 'scale(1.2) rotate(5deg)' : 'scale(1)',
-                                boxShadow: hoveredSegment === seg.name ? `0 4px 12px ${seg.colorHex}66` : 'none'
-                              }}
-                            >
-                              {seg.value}%
-                            </span>
-                            <span className="legend-text">{seg.label}</span>
-                            <span 
-                              className="legend-count"
-                              style={{
-                                transition: 'all 0.3s ease',
-                                fontWeight: hoveredSegment === seg.name ? '700' : '400'
-                              }}
-                            >
-                              {seg.count.toLocaleString()}
-                            </span>
+                            {currentSegment.count.toLocaleString()} emails
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
+
+                    <div className="donut-legend modern">
+                      {segments.map((seg, idx) => (
+                        <div
+                          key={seg.name}
+                          className={`legend-row anim-slide-in ${hoveredSegment === seg.name ? 'highlighted' : ''}`}
+                          style={{
+                            animationDelay: `${40 + idx * 50}ms`,
+                            transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                            opacity: hoveredSegment && hoveredSegment !== seg.name ? 0.4 : 1,
+                            transform: hoveredSegment === seg.name ? 'translateX(12px) scale(1.05)' : 'translateX(0) scale(1)'
+                          }}
+                          onMouseEnter={() => setHoveredSegment(seg.name)}
+                          onMouseLeave={() => setHoveredSegment(null)}
+                        >
+                          <span
+                            className={`legend-badge badge-${seg.name} anim-pulse-once`}
+                            style={{
+                              transition: 'all 0.3s ease',
+                              transform: hoveredSegment === seg.name ? 'scale(1.2) rotate(5deg)' : 'scale(1)',
+                              boxShadow: hoveredSegment === seg.name ? `0 4px 12px ${seg.colorHex}66` : 'none'
+                            }}
+                          >
+                            {seg.value}%
+                          </span>
+                          <span className="legend-text">{seg.label}</span>
+                          <span
+                            className="legend-count"
+                            style={{
+                              transition: 'all 0.3s ease',
+                              fontWeight: hoveredSegment === seg.name ? '700' : '400'
+                            }}
+                          >
+                            {seg.count.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                );
-              })()}
-            </div>
+                </div>
+              );
+            })()}
+          </div>
         </div>
       </section>
 
@@ -595,7 +663,7 @@ function Home() {
               <div className="metric-icon"><img src="/wallet.png" alt="Smart Credit Saver" /></div>
               <div className="metric-number">Smart Credit Saver</div>
               <div className="metric-desc">
-              Duplicate emails? No worries. We never charge credits for rechecking the same address you only pay once.
+                Duplicate emails? No worries. We never charge credits for rechecking the same address you only pay once.
               </div>
             </div>
 
@@ -603,7 +671,7 @@ function Home() {
               <div className="metric-icon"><img src="/secure-data.png" alt="Data Privacy" /></div>
               <div className="metric-number">Data Privacy First</div>
               <div className="metric-desc">
-              Your data stays yours encrypted, protected, and never shared with third parties.
+                Your data stays yours encrypted, protected, and never shared with third parties.
               </div>
             </div>
 
@@ -611,7 +679,7 @@ function Home() {
               <div className="metric-icon"><img src="/reliability.png" alt="Platform Reliability" /></div>
               <div className="metric-number">Platform Reliability</div>
               <div className="metric-desc">
-              Our infrastructure runs 24/7 on secure, globally distributed servers for uninterrupted service.
+                Our infrastructure runs 24/7 on secure, globally distributed servers for uninterrupted service.
               </div>
             </div>
 
@@ -619,7 +687,7 @@ function Home() {
               <div className="metric-icon"><img src="/document.png" alt="Detailed Reporting" /></div>
               <div className="metric-number">Detailed Reporting</div>
               <div className="metric-desc">
-              Understand every verification at a glance with transparent, easy-to-read reports.
+                Understand every verification at a glance with transparent, easy-to-read reports.
               </div>
             </div>
           </div>
@@ -870,9 +938,9 @@ function DemoVerify({ variant }) {
   React.useEffect(() => {
     // Prefill with a random realistic-looking email on first load
     if (!email) {
-      const names = ["victorkent", "jane.doe", "alex", "support", "maria", "sam" ];
-      const domains = ["gmail.com", "yahoo.com", "outlook.com", "emailable.co", "example.org"]; 
-      const seed = `${names[Math.floor(Math.random()*names.length)]}@${domains[Math.floor(Math.random()*domains.length)]}`;
+      const names = ["victorkent", "jane.doe", "alex", "support", "maria", "sam"];
+      const domains = ["gmail.com", "yahoo.com", "outlook.com", "emailable.co", "example.org"];
+      const seed = `${names[Math.floor(Math.random() * names.length)]}@${domains[Math.floor(Math.random() * domains.length)]}`;
       setEmail(seed);
     }
     // Trigger a quick entry animation on mount by re-setting score shortly after
@@ -912,13 +980,13 @@ export function Footer() {
         <div className="footer-section">
           {/* <h3>AI Email Verifier</h3> */}
           {/* <p>The best way to verify emails.</p> */}
-          
+
           {/* NEW: Tagline with different sizes */}
-          <div  className="footer-tagline"style={{
+          <div className="footer-tagline" style={{
             marginTop: '0px',
             lineHeight: '1.1',
           }}>
-            <span  className="footer-tagline-span"style={{
+            <span className="footer-tagline-span" style={{
               fontSize: '2vw',
               fontWeight: '500',
               color: '#ffffff',
@@ -928,7 +996,7 @@ export function Footer() {
             }}>
               Verify Smart,
             </span>
-            <p  className="footer-tagline-p"style={{
+            <p className="footer-tagline-p" style={{
               fontSize: '3vw',
               fontWeight: '700',
               color: '#ffffff',
@@ -960,13 +1028,13 @@ export function Footer() {
           <ul>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
-           
+
           </ul>
         </div>
-         <div className="footer-section">
+        <div className="footer-section">
           <h4>Resources</h4>
           <ul>
-           
+
             <li><Link to="/help">Help</Link></li>
             <li><Link to="/faqs">FAQs</Link></li>
             <li><Link to="/blogs">Blogs</Link></li>
@@ -976,21 +1044,21 @@ export function Footer() {
         {/* Auth Buttons Section */}
         <div className="footer-section">
           {/* <h4>Get Started</h4> */}
-          <div className="footer-button-section" style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '12px', 
-            marginTop: '16px' 
+          <div className="footer-button-section" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            marginTop: '16px'
           }}>
             <Link to="/login" style={{ textDecoration: 'none' }}>
               <button className="login-footer"
                 style={{
                   width: '100%',
-                  display:'flex',
-                  justifyContent:'center',
-                  alignItems:'center',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   fontSize: '1.5vw',
-                  height:'3vw',
+                  height: '3vw',
                   fontWeight: 600,
                   fontFamily: 'Inter, sans-serif',
                   background: '#ffffff',
@@ -1024,10 +1092,10 @@ export function Footer() {
               <button className="sign-up-footer"
                 style={{
                   width: '100%',
-                  display:'flex',
-                  justifyContent:'center',
-                  alignItems:'center',
-                  height:'3vw',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '3vw',
                   fontSize: '1.5vw',
                   fontWeight: 600,
                   fontFamily: 'Inter, sans-serif',
@@ -1054,7 +1122,7 @@ export function Footer() {
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                Sign Up 
+                Sign Up
               </button>
             </Link>
           </div>

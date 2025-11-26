@@ -18,12 +18,26 @@ export function loginUser({ email, name }) {
 }
 
 export function logout() {
-  localStorage.removeItem(TOKEN_KEY);
+  // Clear all token variants used across the app so route guards & bootstrap
+  // logic no longer think the user is logged in.
+  localStorage.removeItem(TOKEN_KEY);          // 'auth_token'
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('token');
+
+  // Also clear cached user profile
   localStorage.removeItem(USER_KEY);
 }
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || null;
+  // Normalize: read any of the token keys that might have been set
+  return (
+    localStorage.getItem(TOKEN_KEY) ||
+    localStorage.getItem('access_token') ||
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('token') ||
+    null
+  );
 }
 
 export function getUser() {

@@ -1,18 +1,41 @@
 import React, { useState } from "react";
 import "./SingleVerifier.css";
-import { validateEmail } from "./api";
+import { verifySingleEmail as validateEmail } from "./api";
 import RecentEmails from "./components/RecentEmails";
 import InsufficientCreditsModal from "./components/InsufficientCreditsModal";
 import { useCredits } from "./CreditsContext";
 import Tooltip from "./components/Tooltip";
- 
+
+const TOOLTIP_TEXT = {
+  'Full Name': 'The full name associated with this email address',
+  'Gender': 'Detected gender based on the name',
+  'State': 'State or region where the email user is located',
+  'Reason': 'Reason why the email is invalid or risky',
+  'Domain': 'The domain part of the email address',
+  'Free': 'Whether this email uses a free email service (Gmail, Yahoo, etc.)',
+  'Role': 'Whether this is a role-based email (info@, support@, etc.)',
+  'Disposable': 'Whether this email uses a disposable/temporary email service',
+  'Accept All': 'Whether the mail server accepts all emails (risky)',
+  'Tag': 'Email tag or label associated with this address',
+  'Numerical Characters': 'Number of numerical digits in the email address',
+  'Alphabetical Characters': 'Number of letters in the email address',
+  'Unicode Symbols': 'Number of special Unicode characters in the email',
+  'Mailbox Full': 'Whether the mailbox is full and cannot receive emails',
+  'No Reply': 'Whether this is a no-reply email address',
+  'Secure Email Gateway': 'Whether the email uses a secure gateway',
+  'SMTP Provider': 'The SMTP mail server provider',
+  'MX Record': 'Mail exchange record for the domain',
+  'Implicit MX Record': 'Implicit MX record configuration',
+  'Verified On': 'Date and time when the email was verified'
+};
+
 export default function SingleVerifier() {
   const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
-  const { refreshCredits } = useCredits?.() ?? { refreshCredits: () => {} };
+  const { refreshCredits } = useCredits?.() ?? { refreshCredits: () => { } };
 
   const normalizeBackendResult = (r) => {
     if (!r) return null;
@@ -76,7 +99,7 @@ export default function SingleVerifier() {
     // Check if user has credits before starting verification
     const currentCredits = Number(localStorage.getItem("credits") || 0);
     console.log("Single verification - Current credits:", currentCredits);
-    
+
     if (currentCredits <= 0) {
       console.log("No credits available, showing insufficient credits modal");
       setShowInsufficientCreditsModal(true);
@@ -87,7 +110,14 @@ export default function SingleVerifier() {
     setErrorMsg("");
     setResult(null);
 
-    validateEmail({ email, smtp: true, smtp_from: "noreply@example.com" })
+    // NOTE:
+    // `validateEmail` (`verifySingleEmail` in api.js) expects the first argument
+    // to be a plain email string and the second to be the SMTP boolean.
+    // Passing an object here was causing `[object Object]` to be sent to the
+    // backend, which then flagged the email as invalid and produced the UI
+    // issue you saw. Keep the call signature aligned to avoid breaking
+    // other usages of `verifySingleEmail`.
+    validateEmail(email, true)
       .then((data) => {
         const payload = data && data.result ? data.result : data;
         if (!payload) throw new Error("Received an invalid response from the server.");
@@ -95,18 +125,18 @@ export default function SingleVerifier() {
         setResult(normalized);
         // Refresh credits after successful verification (silently in background)
         if (refreshCredits && typeof refreshCredits === 'function') {
-          Promise.resolve(refreshCredits()).catch(() => {});
+          Promise.resolve(refreshCredits()).catch(() => { });
         }
- 
+
       })
       .catch((err) => {
         console.error("Verification API call failed:", err);
         const errorMessage = err.message || "An unexpected error occurred. Please try again.";
-        
+
         // Check if error is about insufficient credits
-        if (errorMessage.toLowerCase().includes("insufficient credits") || 
-            errorMessage.toLowerCase().includes("not enough credits") ||
-            errorMessage.toLowerCase().includes("no credits")) {
+        if (errorMessage.toLowerCase().includes("insufficient credits") ||
+          errorMessage.toLowerCase().includes("not enough credits") ||
+          errorMessage.toLowerCase().includes("no credits")) {
           setShowInsufficientCreditsModal(true);
         } else {
           setErrorMsg(errorMessage);
@@ -121,7 +151,7 @@ export default function SingleVerifier() {
   const handleBuyCredits = () => {
     console.log("handleBuyCredits called");
     console.log("window.openBuyCreditsModal exists:", !!window.openBuyCreditsModal);
-    
+
     // First open the buy credits modal, then close this one
     if (window.openBuyCreditsModal) {
       window.openBuyCreditsModal();
@@ -130,7 +160,7 @@ export default function SingleVerifier() {
       console.log("Using event fallback");
       window.dispatchEvent(new CustomEvent("openBuyCreditsModal"));
     }
-    
+
     // Close the insufficient credits modal with a slight delay to ensure the other modal opens
     setTimeout(() => {
       setShowInsufficientCreditsModal(false);
@@ -287,10 +317,10 @@ export default function SingleVerifier() {
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <DetailRow label="Full Name" value={result.full_name || '—'} />
-                <DetailRow label="State" value={result.state} badge={true} badgeStyle={getStateBadgeStyle(result.state)} />
-                <DetailRow label="Reason" value={result.reason} pill={true} />
-                <DetailRow label="Domain" value={result.domain || '—'} link={true} />
+                <DetailRow label="Full Name" value={result.full_name || '—'} tooltipOnValue={true} />
+                <DetailRow label="State" value={result.state} badge={true} badgeStyle={getStateBadgeStyle(result.state)} tooltipOnValue={true} />
+                <DetailRow label="Reason" value={result.reason} pill={true} tooltipOnValue={true} />
+                <DetailRow label="Domain" value={result.domain || '—'} link={true} tooltipOnValue={true} />
               </div>
             </div>
 
@@ -402,7 +432,9 @@ function ScoreGauge({ score, getScoreColor }) {
   );
 }
 
-function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
+function DetailRow({ label, value, icon, badge, badgeStyle, pill, link, tooltipOnValue = false }) {
+  const tooltipText = TOOLTIP_TEXT[label];
+
   return (
     <div style={{
       display: 'flex',
@@ -417,7 +449,13 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
         gap: 6
       }}>
         {icon && <span style={{ color: '#fff' }}>{icon}</span>}
-        {label}
+        {!tooltipOnValue && tooltipText ? (
+          <Tooltip text={tooltipText} align="left">
+            <span style={{ cursor: 'help' }}>{label}</span>
+          </Tooltip>
+        ) : (
+          label
+        )}
       </div>
 
       <div style={{
@@ -429,27 +467,59 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
       }}>
 
         {badge && badgeStyle ? (
-          <span style={{
-            padding: '4px 10px',
-            borderRadius: 12,
-            background: badgeStyle.bg,
-            color: badgeStyle.color,
-            fontSize: 12,
-            fontWeight: 500
-          }}>
-            {value}
-          </span>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{
+                padding: '4px 10px',
+                borderRadius: 12,
+                background: badgeStyle.bg,
+                color: badgeStyle.color,
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: 'help'
+              }}>
+                {value}
+              </span>
+            </Tooltip>
+          ) : (
+            <span style={{
+              padding: '4px 10px',
+              borderRadius: 12,
+              background: badgeStyle.bg,
+              color: badgeStyle.color,
+              fontSize: 12,
+              fontWeight: 500
+            }}>
+              {value}
+            </span>
+          )
         ) : pill ? (
-          <span style={{
-            padding: '4px 10px',
-            borderRadius: 12,
-            background: '#292d3e',
-            color: '#9aa5ce',
-            fontSize: 12,
-            fontWeight: 500
-          }}>
-            {value}
-          </span>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{
+                padding: '4px 10px',
+                borderRadius: 12,
+                background: '#292d3e',
+                color: '#9aa5ce',
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: 'help'
+              }}>
+                {value}
+              </span>
+            </Tooltip>
+          ) : (
+            <span style={{
+              padding: '4px 10px',
+              borderRadius: 12,
+              background: '#292d3e',
+              color: '#9aa5ce',
+              fontSize: 12,
+              fontWeight: 500
+            }}>
+              {value}
+            </span>
+          )
         ) : badge && typeof badge === 'boolean' ? (
           <>
             {value}
@@ -465,14 +535,32 @@ function DetailRow({ label, value, icon, badge, badgeStyle, pill, link }) {
             </span>
           </>
         ) : link ? (
-          <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{
-            color: '#fb923c',
-            textDecoration: 'none'
-          }}>
-            {value}
-          </a>
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{
+                color: '#fb923c',
+                textDecoration: 'none',
+                cursor: 'help'
+              }}>
+                {value}
+              </a>
+            </Tooltip>
+          ) : (
+            <a href={`https://${value}`} target="_blank" rel="noopener noreferrer" style={{
+              color: '#fb923c',
+              textDecoration: 'none'
+            }}>
+              {value}
+            </a>
+          )
         ) : (
-          value
+          tooltipOnValue && tooltipText ? (
+            <Tooltip text={tooltipText} align="right">
+              <span style={{ cursor: 'help' }}>{value}</span>
+            </Tooltip>
+          ) : (
+            value
+          )
         )}
       </div>
     </div>

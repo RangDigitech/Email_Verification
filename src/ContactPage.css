@@ -1,4 +1,3 @@
-
 .contact-page {
   background: #fff;
   color: #000;
@@ -6,7 +5,7 @@
 }
 
 .contact-section {
-  padding: 80px 20px;
+  padding: 0px 20px;
 }
 
 .contact-container {
@@ -96,6 +95,7 @@
   padding: 10px 12px;
   font-size: 0.95rem;
   transition: 0.3s;
+  font-family: "Inter", sans-serif;
 }
 
 .form-group input:focus,
@@ -122,10 +122,136 @@
   transform: translateY(-2px);
 }
 
+/* ===== MESSAGE WRAPPER WITH + BUTTON INSIDE ===== */
+
+.message-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Auto-expanding textarea - like chat input */
+.auto-expand-textarea {
+  width: 100%;
+  min-height: 60px;
+  max-height: 300px;
+  resize: none;
+  overflow-y: auto;
+  padding: 12px 45px 12px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: "Inter", sans-serif;
+  line-height: 1.5;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.auto-expand-textarea:focus {
+  border-color: #000;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.auto-expand-textarea::placeholder {
+  color: #999;
+}
+
+/* Plus button - INSIDE the box (bottom right) */
+.attachment-btn-inside {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+}
+
+.attachment-btn-inside:hover svg {
+  color: #000;
+  transform: scale(1.15);
+}
+
+.attachment-btn-inside svg {
+  color: #888;
+  transition: color 0.2s ease, transform 0.2s ease;
+  width: 24px;
+  height: 24px;
+}
+
+/* ATTACHMENT LIST */
+.attachment-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  gap: 10px;
+}
+
+.attachment-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #333;
+}
+
+.remove-attachment {
+  background: #ff4444;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.remove-attachment:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .contact-container {
     flex-direction: column;
     gap: 40px;
+  }
+
+  .auto-expand-textarea {
+    padding: 12px 45px 12px 12px;
+  }
+
+  .attachment-btn-inside {
+    bottom: 12px;
+    right: 12px;
   }
 }

@@ -10,6 +10,8 @@
   justify-content: center;
   z-index: 9999;
   animation: fadeIn 0.2s ease;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -25,11 +27,14 @@
   background: white;
   border-radius: 16px;
   padding: 40px;
-  max-width: 500px;
-  width: 90%;
+  max-width: 550px;
+  width: 100%;
+  max-height: 90vh;
   position: relative;
   animation: slideUp 0.3s ease;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  margin: auto;
 }
 
 @keyframes slideUp {
@@ -139,10 +144,70 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Credits Info Section */
+.credits-info-section {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid #e5e7eb;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.credits-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.credits-info-row:last-child {
+  border-bottom: none;
+}
+
+.credits-short-row {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 2px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.credits-label {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.credits-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.credits-needed {
+  color: #1f2937;
+}
+
+.credits-available {
+  color: #059669;
+}
+
+.credits-short {
+  color: #dc2626;
+  font-size: 20px;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
+  .insufficient-credits-overlay {
+    padding: 10px;
+  }
+
   .insufficient-credits-modal {
     padding: 30px 20px;
+    max-width: 100%;
+    max-height: 95vh;
   }
 
   .modal-title {
@@ -156,6 +221,22 @@
 
   .feature-icon {
     font-size: 32px;
+  }
+
+  .credits-info-section {
+    padding: 20px;
+  }
+
+  .credits-label {
+    font-size: 14px;
+  }
+
+  .credits-value {
+    font-size: 16px;
+  }
+
+  .credits-short {
+    font-size: 18px;
   }
 }
 
