@@ -314,7 +314,9 @@ const Hero = () => {
     renderer.setSize(windowWidth, windowHeight);
 
     // Hide the canvas
-
+    renderer.domElement.style.display = "block";
+    renderer.domElement.setAttribute('data-engine', 'three.js');
+    
     if (backgroundRef.current) {
       backgroundRef.current.appendChild(renderer.domElement);
     }
